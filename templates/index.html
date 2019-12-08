@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta content="initial-scale=1, shrink-to-fit=no, width=device-width" name="viewport">
+
+        <!-- CSS -->
+        <!-- Add Material font (Roboto) and Material icon as needed -->
+        <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i|Roboto+Mono:300,400,700|Roboto+Slab:300,400,700" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link href="../static/css/font_awesome_all.css" rel="stylesheet">
+
+        <!-- Add Material CSS, replace Bootstrap CSS -->
+        <link rel="stylesheet" type="text/css" href="../static/css/material.css">
+        <link rel="stylesheet" type="text/css" href="../static/css/project.css">
+
+        <!-- favicon -->
+        <!-- ... -->
+
+        <!-- title -->
+        <title>FlightRadar</title>
+    </head>
+    <script type="text/javascript">
+        var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    </script>
+  <body>
+    <header class="navbar navbar-expand-lg navbar-light sticky-top toolbar-waterfall">
+        <a class="navbar-brand mr-auto" href="index.html">FlightRadar</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ml-auto">
+                {% if(g.authedUser) %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-user mr-1"></i> Welcome, {{ g.authedUser.first_name }}
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="profile.html"><i class="fas fa-user-circle fa-lg mr-3"></i> My account </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="sign-out.html"><i class="fas fa-sign-out-alt fa-lg mr-3"></i> Sign out </a>
+                        </div>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="sign-up.html"><i class="fas fa-user-plus mr-1"></i> Sign up </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="sign-in.html"><i class="fas fa-sign-in-alt mr-1"></i> Sign in </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </header>
+    <div class="jumbotron jumbotron-fluid jumbotron-bg mb-3 shadow-none"></div>
+    <main role="main" class="container">
+        <div class="row justify-content-center text-center text-md-left">
+            <div class="col-lg-10 col-xl-8">
+                <div class="mt-md-3">
+                    <div class="card rounded-3x w-100 mx-auto mb-3">
+                        <div class="card-body pb-0">
+                            <nav class="nav nav-tabs nav-justified" id="nav-tab" role="tablist">
+                                <a class="nav-item nav-link active" id="nav-roundtrip-tab" data-toggle="tab" href="#nav-roundtrip-info" role="tab" aria-controls="nav-roundtrip-info" aria-selected="true">Roundtrip</a>
+                                <a class="nav-item nav-link" id="nav-oneway-tab" data-toggle="tab" href="#nav-roundtrip-info" role="tab" aria-controls="nav-roundtrip-info" aria-selected="false">One Way</a>
+                            </nav>
+                            <div class="my-3">
+                                <div class="tab-content" id="nav-flight-info-content">
+                                    <div class="tab-pane show active" id="nav-roundtrip-info" role="tabpanel" aria-labelledby="roundtrip-tab">
+                                        <form id="flightForm" class="needs-validation" novalidate>
+                                            <div class="form-row">
+                                                <div class="form-group col-md-3">
+                                                    <div class="floating-label">
+                                                        <label for="fromAirport"><i class="fas fa-plane-departure"></i> From </label>
+                                                        <select class="form-control custom-select" id="fromAirport" name="fromAirport" required data-ripple-line>
+                                                            <option></option>
+                                                            {% for airport in airports %}
+                                                                <option value="{{ airport.city }} ({{ airport.code }})">{{ airport.city }} ({{ airport.code }})</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                        <div class="invalid-feedback">
+                                                            Please choose a source airport.
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-md-3">
+                                                    <div class="floating-label">
+                                                        <label for="toAirport"><i class="fas fa-plane-arrival"></i> To </label>
+                                                        <select class="form-control custom-select" id="toAirport" name="toAirport" disabled required data-ripple-line>
+                                                            <option></option>
+                                                        </select>
+                                                        <div class="invalid-feedback">
+                                                            Please choose a destination airport.
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-md-3">
+                                                    <div class="floating-label">
+                                                        <label for="departDatePicker"><i class="far fa-calendar"></i> Depart Date </label>
+                                                        <input class="form-control" id="departDatePicker" type="text" name="departDate" required data-ripple-line>
+                                                    </div>
+                                                    <div class="invalid-feedback">
+                                                        Please choose a depart date.
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-md-3">
+                                                    <div class="floating-label">
+                                                        <label for="returnDatePicker"><i class="far fa-calendar"></i> Return Date </label>
+                                                        <input class="form-control" id="returnDatePicker" type="text" name="returnDate" required data-ripple-line>
+                                                    </div>
+                                                    <div class="invalid-feedback">
+                                                        Please choose a return date.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-row align-items-center">
+                                                <div class="form-group col-md-4">
+                                                    <div class="floating-label">
+                                                        <label for="numPassengers"><i class="fas fa-users"></i> Passengers </label>
+                                                        <select class="form-control" id="numPassengers" name="numPassengers" required data-ripple-line>
+                                                            <option></option>
+                                                            <option value="1">1</option>
+                                                            <option value="2">2</option>
+                                                            <option value="3">3</option>
+                                                            <option value="4">4</option>
+                                                            <option value="5">5</option>
+                                                            <option value="6">6</option>
+                                                            <option value="7">7</option>
+                                                            <option value="8">8</option>
+                                                            <option value="9">9</option>
+                                                        </select>
+                                                        <div class="invalid-feedback">
+                                                            Please choose at least one passenger.
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-md-4">
+                                                    <div class="floating-label">
+                                                        <label for="flightClass"><i class="fas fa-hand-holding-usd"></i> Flight Class </label>
+                                                        <select class="form-control" id="flightClass" name="flightClass" required data-ripple-line>
+                                                            <option></option>
+                                                            <option value="Economy">Economy</option>
+                                                            <option value="Business">Business</option>
+                                                            <option value="First Class">First Class</option>
+                                                        </select>
+                                                        <div class="invalid-feedback">
+                                                            Please choose a flight class.
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <button class="btn btn-primary btn-block" type="button" id="flightSearch" name="flightSearch"><i class="fas fa-search"></i> Search flights </button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="flightSearchResult"></div>
+    </main>
+    <!-- <footer class="footer">
+        <div id="footer" class="container">
+            <span class="text-center">© 2019 Copyright: FlightRadar</span>
+        </div>
+    </footer> -->
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    <!-- Then Material JavaScript on top of Bootstrap JavaScript -->
+    <script src="../static/js/material.js"></script>
+    <script src="../static/js/snackbar.js"></script>
+    <script src="../static/js/project.js"></script>
+    <script src="../static/js/simpleLoadMore.js"></script>
+    <script>
+        var resizeId;
+        $(window).resize(function() {
+            clearTimeout(resizeId);
+            resizeId = setTimeout(setSameHeight(".price", ".flight"), 500);
+        });
+    </script>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <script>
+                    $(function() {
+                        $.snackbar({content: '{{ message }}', style: 'snackbar-left mb-2'});
+                    });
+                </script>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+  </body>
+</html>
