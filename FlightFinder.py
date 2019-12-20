@@ -686,16 +686,16 @@ def new_booking():
     Connection.commit()
     cursor.close()
 
-    upd = """
+    query = """
     UPDATE flight 
     SET occupied_capacity=occupied_capacity+%s 
     WHERE flight_id=%s
     """
     
     cursor = Connection.cursor()
-    cursor.execute(upd, (flight_info['total_passengers'], flight_info['depart_flight_id']))
+    cursor.execute(query, (flight_info['total_passengers'], flight_info['depart_flight_id']))
     if is_roundtrip:
-        cursor.execute(upd, (flight_info['total_passengers'], flight_info['return_flight_id']))
+        cursor.execute(query, (flight_info['total_passengers'], flight_info['return_flight_id']))
     Connection.commit()
     cursor.close()
     
