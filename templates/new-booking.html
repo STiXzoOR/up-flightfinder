@@ -19,32 +19,35 @@
         <!-- ... -->
 
         <!-- title -->
-        <title>New Booking - FlightRadar</title>
+        <title>New Booking - Flight Finder</title>
     </head>
     <script type="text/javascript">
         var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
     </script>
-  <body>
-    <header class="navbar navbar-expand-lg navbar-light">
-        <a class="navbar-brand mr-auto" href="index.html">FlightRadar</a>
+  <body class="body-content">
+    <header class="navbar navbar-dark fixed-top bg-alt-primary toolbar-waterfall">
+        <a class="navbar-brand mr-auto" href="{{ url_for("index") }}">
+            <img src="../static/images/svg/logo_light.svg" width="35" height="35" class="d-inline-block align-top mr-2" alt="">
+            Flight Finder
+        </a>
     </header>
-    <div class="jumbotron jumbotron-fluid jumbotron-bg jumbotron-bg-booking px-lg-3 shadow-none"></div>
+    <div class="jumbotron jumbotron-fluid jumbotron-bg mb-3 shadow-none"></div>
     <main role="main">
         <section class="d-flex align-items-center my-4">
             <div class="container">
                 <div class="row justify-content-center">
-                    <div class="col-12 col-lg-7 col-xl-8 order-2 order-lg-1 mt-3 mt-lg-0 pr-lg-2">
-                        <form id="bookingForm" class="needs-validation" method="POST" action="new-booking" novalidate>
-                            <input id="pickedFlight" name="pickedFlight" type="hidden" value={id}>
-                            <div class="card rounded-3x">
-                                <div class="card-body">
+                    <div class="col-12 col-lg-7 col-xl-8 order-2 order-lg-1 mt-0 mt-sm-3 mt-lg-0 pr-lg-2">
+                        <form id="bookingForm" class="needs-validation" method="POST" action="{{ url_for("new_booking") }}" novalidate>
+                            <input type="hidden" name="isRoundtrip" value="{{ is_roundtrip }}">
+                            <div class="card rounded-3x shadow-sm-none shadow-1">
+                                <div class="card-body p-0 px-sm-3 pt-sm-3 pb-sm-1">
                                     <div class="card rounded-3x shadow-none">
-                                        <div class="card-title text-left font-weight-bold font-size-lg">Passenger Info</div>
-                                        <div class="card-body py-0">
+                                        <div class="card-title text-center text-sm-left font-weight-bold font-size-lg">Passenger Info</div>
+                                        <div class="card-body p-0 px-sm-3">
                                             <div class="list-group list-group-flush" id="passengersInfo">
                                                 {% for id in range(1,num_passenger+1) %}
                                                     <div class="expansion-panel list-group-item">
-                                                        <a id="passengerName-{{ id }}" aria-controls="passenger-{{ id }}" aria-expanded="false" class="small expansion-panel-toggler px-0 collapsed" data-toggle="collapse" href="#passenger-{{ id }}">
+                                                        <a id="passengerName-{{ id }}" aria-controls="passenger-{{ id }}" aria-expanded="false" class="font-size-90 expansion-panel-toggler px-0 collapsed" href="#passenger-{{ id }}" data-toggle="collapse">
                                                         Passenger Details #{{ id }}
                                                             <div class="expansion-panel-icon ml-3 text-black-secondary">
                                                                 <i class="collapsed-show material-icons">keyboard_arrow_down</i>
@@ -54,8 +57,8 @@
                                                         <div aria-labelledby="passenger-{{ id }}" class="card-footer pt-2 pb-0 collapse" data-parent="#passengerName-{{ id }}" id="passenger-{{ id }}">
                                                             <div class="py-0">
                                                                 <div class="form-row align-items-center">
-                                                                    <div class="form-group col-12 col-md-4 col-xl-3">
-                                                                        <div class="floating-label floating-label-sm">
+                                                                    <div class="form-group col-12 col-md-3">
+                                                                        <div class="floating-label">
                                                                             <label for="firstNamePassenger-{{ id }}">First name</label>
                                                                             <input class="form-control" id="firstNamePassenger-{{ id }}" type="text" name="firstNamePassenger-{{ id }}" required data-ripple-line>
                                                                             <div class="invalid-feedback">
@@ -63,8 +66,8 @@
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                    <div class="form-group col-12 col-md-4 col-xl-3">
-                                                                        <div class="floating-label floating-label-sm">
+                                                                    <div class="form-group col-12 col-md-3">
+                                                                        <div class="floating-label">
                                                                             <label for="lastNamePassenger-{{ id }}">Last name</label>
                                                                             <input class="form-control" id="lastNamePassenger-{{ id }}" type="text" name="lastNamePassenger-{{ id }}" required data-ripple-line>
                                                                             <div class="invalid-feedback">
@@ -72,16 +75,16 @@
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                    <div class="form-group col-12 col-md-4 col-xl-3">
-                                                                        <div class="floating-label floating-label-sm">
-                                                                            <label for="idPassenger-{{ id }}"> ID </label>
-                                                                            <input class="form-control" id="idPassenger-{{ id }}" type="text" name="idPassenger-{{ id }}" required data-ripple-line>
+                                                                    <div class="form-group col-12 col-md-3">
+                                                                        <div class="floating-label">
+                                                                            <label for="idPassenger-{{ id }}">ID</label>
+                                                                            <input class="form-control" id="idPassenger-{{ id }}" type="text" pattern="[0-9]{6,10}" maxlength="10" name="idPassenger-{{ id }}" required data-ripple-line>
                                                                             <div class="invalid-feedback">
-                                                                                Invalid ID.
+                                                                                Invalid ID, must be at least 6 characters long.
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                    <div class="col-12 col-xl-3">
+                                                                    <div class="form-group col-12 col-md-3">
                                                                         <button class="btn btn-primary btn-block" data-toggle="modal" href="#selectSeat">Select seat</button>
                                                                         <input class="form-control d-none" id="seatPassenger-{{ id }}" type="text" name="seatPassenger-{{ id }}" value="">
                                                                         <div class="invalid-feedback">
@@ -98,11 +101,11 @@
                                     </div>
                                     <hr class="mt-1">
                                     <div class="card rounded-3x shadow-none mt-3">
-                                        <div class="card-title text-left font-weight-bold font-size-lg">Contact Info</div>
-                                        <div class="card-body py-0">
+                                        <div class="card-title text-center text-sm-left font-weight-bold font-size-lg">Contact Info</div>
+                                        <div class="card-body p-0 px-sm-3">
                                             <div class="form-row">
-                                                <div class="form-group col-12 col-md-3">
-                                                    <div class="floating-label floating-label-sm">
+                                                <div class="form-group col-12 col-sm-6">
+                                                    <div class="floating-label">
                                                         <label for="contactFirstName">First name</label>
                                                         <input id="contactFirstName" class="form-control" type="text" name="contactFirstName" required data-ripple-line>
                                                         <div class="invalid-feedback">
@@ -110,8 +113,8 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="form-group col-12 col-md-3">
-                                                    <div class="floating-label floating-label-sm">
+                                                <div class="form-group col-12 col-sm-6">
+                                                    <div class="floating-label">
                                                         <label for="contactLastName">Last name</label>
                                                         <input id="contactLastName" class="form-control" type="text" name="contactLastName" required data-ripple-line>
                                                         <div class="invalid-feedback">
@@ -119,19 +122,19 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="form-group col-12 col-md-3">
-                                                    <div class="floating-label floating-label-sm">
+                                                <div class="form-group col-12 col-sm-6">
+                                                    <div class="floating-label">
                                                         <label for="contactEmail">Email address</label>
-                                                        <input id="contactEmail" class="form-control" type="text" name="contactEmail" required data-ripple-line>
+                                                        <input id="contactEmail" class="form-control" type="email" name="contactEmail" required data-ripple-line>
                                                         <div class="invalid-feedback">
                                                             Invalid email address.
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="form-group col-12 col-md-3">
-                                                    <div class="floating-label floating-label-sm">
+                                                <div class="form-group col-12 col-sm-6">
+                                                    <div class="floating-label">
                                                         <label for="contactMobile">Mobile number</label>
-                                                        <input id="contactMobile" class="form-control" type="text" name="contactMobile" required data-ripple-line>
+                                                        <input id="contactMobile" class="form-control" type="text" pattern="[0-9]{6,10}" maxlength="10" name="contactMobile" required data-ripple-line>
                                                         <div class="invalid-feedback">
                                                             Invalid mobile number.
                                                         </div>
@@ -140,19 +143,19 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <hr>
+                                    <hr class="mt-1">
                                     <div class="card rounded-3x shadow-none mt-3"> 
-                                        <div class="card-title text-left font-weight-bold font-size-lg clearfix">
+                                        <div class="card-title text-center text-sm-left font-weight-bold font-size-lg clearfix">
                                             Payment Info
-                                            <div class="d-inline-block d-sm-none text-right float-right">
+                                            <div class="d-inline-block d-sm-none text-center text-sm-right float-sm-right">
                                                 <i class="fab fa-cc-visa"></i>
                                                 <i class="fab fa-cc-amex"></i>
                                                 <i class="fab fa-cc-mastercard"></i>
                                             </div>
                                         </div>
-                                        <div class="card-body py-0">
+                                        <div class="card-body p-0 px-sm-3">
                                             <div class="form-group">
-                                                <div class="floating-label floating-label-sm">
+                                                <div class="floating-label">
                                                     <label for="cardOwner">Owner name</label>
                                                     <input id="cardOwner" class="form-control" type="text" name="cardOwner" required data-ripple-line>
                                                     <div class="invalid-feedback">
@@ -162,7 +165,7 @@
                                             </div>
                                             <div class="form-row">
                                                 <div class="form-group col-8">
-                                                    <div class="floating-label floating-label-sm">
+                                                    <div class="floating-label">
                                                         <label for="cardNumber">Card number</label>
                                                         <input id="cardNumber" class="form-control" pattern="[0-9]{16,19}" maxlength="19" placeholder="8888-8888-8888-8888" type="text" name="cardNumber" required data-ripple-line>
                                                         <div class="invalid-feedback">
@@ -171,7 +174,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="form-group col-4">
-                                                    <div class="floating-label floating-label-sm">
+                                                    <div class="floating-label">
                                                         <label for="cardCCV">CCV</label>
                                                         <input id="cardCCV" class="form-control" pattern="[0-9]{3}" maxlength="3" placeholder="888" type="text" name="cardCCV" required data-ripple-line>
                                                         <div class="invalid-feedback">
@@ -212,11 +215,12 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="card-footer d-block d-lg-none">
-                                    <div class="card-title font-weight-bold font-size-lg">Price Summary</div>
-                                    <div class="card-body pb-1 pt-0">
+                                <div class="card-footer px-0 px-sm-3 d-block d-lg-none">
+                                    <div class="card-title font-weight-bold font-size-lg text-center text-sm-left">Price Summary</div>
+                                    <div class="card-body p-0 px-sm-3">
                                         <div class="form-row">
                                             <div class="col-6">
+                                                <input type="hidden" name="numPassenger" value="{{ num_passenger }}">
                                                 <div>Adult x{{ num_passenger }}</div>
                                             </div>
                                             <div class="col-6 text-right">
@@ -236,13 +240,17 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="card-footer text-right text-sm-left">
-                                    <button class="btn btn-primary" type="submit">Book Now</button>
+                                <div class="card-footer text-right text-sm-left px-0 px-sm-3">
+                                    <div class="form-row justify-content-start align-items-center">
+                                        <div class="col-12 col-sm-3 col-xl-2">
+                                            <button class="btn btn-block btn-primary" type="submit">Book Now</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-12 col-lg-5 col-xl-4 order-1 order-lg-2 pl-lg-2">
-                            <div class="card rounded-3x">
+                            <div class="card rounded-3x shadow-sm-none shadow-1">
                                 <div class="card-body p-2">
                                     <div class="accordion" id="flightsInfo">
                                         {{ picked_flight|safe }}
@@ -257,7 +265,6 @@
                                                     <div>Adult x{{ num_passenger }}</div>
                                                 </div>
                                                 <div class="col-6 text-right">
-                                                    <input type="hidden" name="pricePerPassenger" value="{{ price }}">
                                                     <div id="pricePerPassenger">€{{ price }}</div>
                                                 </div>
                                             </div>
@@ -268,13 +275,13 @@
                                                 <div>Total Price:</div>
                                             </div>
                                             <div class="col-6 text-right">
-                                                <input type="hidden" name="totalPrice" value="{{ total_price }}">
                                                 <div id="totalPrice">€{{ total_price }}</div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            <hr class="d-block d-sm-none mt-1 mb-3">
                         </div>
                     </form>
                 </div>

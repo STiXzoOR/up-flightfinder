@@ -12,7 +12,7 @@ def _tosql(value=None, quote=False):
     if not is_text:
         return float(value)
     elif quote:
-        return "'{value}'".format(value=value)
+        return '"{value}"'.format(value=value)
 
     return value
 
@@ -129,7 +129,7 @@ class DBHelper():
 
     def fetchrow(self, tables=None, fields='*', condition='', con_data={}, start=0, limit=0, order_by='', group_by='', direction='', is_distinct=False):
         return self._select(tables, fields, condition, con_data, start,
-                            limit, order_by, group_by, direction, is_distinct, FETCHONE=True)[0]
+                            limit, order_by, group_by, direction, is_distinct, FETCHONE=True)
 
     def fetchall(self, tables=None, fields='*', condition='', con_data={}, start=0, limit=0, order_by='', group_by='', direction='', is_distinct=False):
         return self._select(tables, fields, condition, con_data, start,

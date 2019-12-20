@@ -19,342 +19,173 @@
         <!-- ... -->
 
         <!-- title -->
-        <title>Profile - FlightRadar</title>
+        <title>Profile - Flight Finder</title>
     </head>
     <script type="text/javascript">
         var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
     </script>
-  	<body>
-		<header class="navbar navbar-dark navbar-expand-lg sticky-top bg-alt-primary toolbar-waterfall">
-			<button aria-controls="doc-navdrawer" aria-expanded="false" aria-label="Toggle Navdrawer" class="navbar-toggler mr-3" data-breakpoint="lg" data-target="#navdrawerUser" data-toggle="navdrawer" data-type="permanent"><span class="navbar-toggler-icon"></span></button>
-			<a aria-label="FlightRadar" class="navbar-brand mr-auto" href="/index.html">FlightRadar</a>
-		</header>
-		<div aria-hidden="true" class="navdrawer navdrawer-permanent-lg navdrawer-permanent-clipped" id="navdrawerUser" tabindex="-1">
-			<div class="navdrawer-content d-flex flex-column">
-				<div class="navdrawer-bg"></div>
-				<ul class="navdrawer-nav nav nav-pills" role="tablist" aria-orientation="vertical">
-					<li class="nav-item mb-2">
-						<a class="nav-link active" id="overiew-tab" data-toggle="pill" href="#overview" role="tab" aria-controls="overview" aria-selected="true"><i class="material-icons mr-3">person</i> Overview</a>
-					</li>
-					<li class="nav-item mb-2">
-						<a class="nav-link" id="trips-tab" data-toggle="pill" href="#trips" role="tab" aria-controls="trips" aria-selected="false"><i class="material-icons mr-3">flight</i> My Trips</a>
-					</li>
-					<li class="nav-item mb-2">
-						<a class="nav-link" id="edit-tab" data-toggle="pill" href="#edit" role="tab" aria-controls="edit" aria-selected="false"><i class="material-icons mr-3">edit</i> Edit Profile</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" id="cards-tab" data-toggle="pill" href="#cards" role="tab" aria-controls="cards" aria-selected="false"><i class="material-icons mr-3">credit_card</i> My Cards</a>
-					</li>
-				</ul>
-				<div class="mt-auto">
-					<div class="navdrawer-divider"></div>
-					<div class="navdrawer-nav">
-						<a class="nav-item nav-link text-danger" href="close-account.html"><i class="material-icons mr-3">delete</i> Close Account</a>
-						<div class="navdrawer-divider"></div>
-						<a class="nav-item nav-link text-black-primary" href="sign-out.html"><i class="material-icons mr-3">exit_to_app</i> Sign Out</a>
-					</div>
-				</div>
-			</div>
-		</div>
-		<!-- <div class="hero-section"></div> -->
-		<!-- <div class="jumbotron jumbotron-fluid jumbotron-bg jumbotron-bg-profile px-lg-3 shadow-none"></div> -->
-		<main role="main" class="main-content px-lg-3">
+  	<body class="body-content">
+		<header class="navbar navbar-dark navbar-expand-md fixed-top bg-alt-primary toolbar-waterfall">
+            <a class="navbar-brand mr-auto" href="{{ url_for("index") }}">
+                <img src="../static/images/svg/logo_light.svg" width="35" height="35" class="d-inline-block align-top mr-2" alt="">
+                Flight Finder
+            </a>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link p-0" style="opacity: 1;" href="#" id="navbarDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-user-circle fa-2x fa-fw"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="{{ url_for("my_bookings") }}"><i class="fas fa-plane fa-fw mr-2"></i>My bookings</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{{ url_for("sign_out") }}"><i class="fas fa-sign-out-alt fa-fw mr-2"></i>Sign out</a>
+                    </div>
+                </li>
+            </ul>
+        </header>
+		<main role="main" class="px-lg-3">
 			<section class="d-flex align-items-center my-4">
 				<div class="container">
 					<div class="row justify-content-center">
-						<div class="col-xl-8">
-							<div class="tab-content">
-								<div id="overview" class="tab-pane fade show active" role="tabpanel">
-									<div class="card rounded-3x shadow-1">
-										<div class="card-body py-0 py-lg-3">
-											<div class="row align-items-center">
-												<div class="col-sm-4 text-center">
-													<img class="img-fluid w-75" src="../static/images/svg/profile_pic.svg" alt="Profile Picture">
-												</div>
-												<div class="col-sm-8">
-													<h2 class="text-center text-md-left mt-3 mb-sm-0">{{ user_info.name }}</h2>
-													<hr class="mt-0 mt-sm-1 mb-2 mb-sm-0">
-													<h5 class="pt-2"><i class="fas fa-envelope fa-fw mr-3"></i>{{ user_info.email }}</h5>
-													<h5><i class="fas fa-phone fa-fw mr-3"></i>{{ user_info.mobile }}</h5>
-													<h5><i class="fas fa-map-marker fa-fw mr-3"></i>{{ user_info.country }}</h5>
-													<h5><i class="fas fa-calendar-alt fa-fw mr-3"></i>{{ user_info.joined }}</h5>
-												</div>
-											</div>
-										</div>
-										<div class="list-group list-group-flush" id="quickEditInfo">
-											<div class="expansion-panel list-group-item">
-												<a id="quickEditInfoBtn" aria-controls="quickInfo" aria-expanded="false" class="expansion-panel-toggler justify-content-center collapsed" data-toggle="collapse" href="#quickInfo">
-													<div class="expansion-panel-icon mr-3 text-black-secondary small">
-														<i class="collapsed-show material-icons">keyboard_arrow_down</i>
-														<i class="collapsed-hide material-icons">keyboard_arrow_up</i>
-													</div>
-													Quick edit info
-													<div class="expansion-panel-icon ml-3 text-black-secondary small">
-														<i class="collapsed-show material-icons">keyboard_arrow_down</i>
-														<i class="collapsed-hide material-icons">keyboard_arrow_up</i>
-													</div>
-												</a>
-												<div aria-labelledby="Quick edit info" class="collapse" data-parent="#quickEditInfoBtn" id="quickInfo">
-													<div class="expansion-panel-body pt-0">
-														<form id="quickEditForm" class="needs-validation" method="POST" action="quick-edit-info" novalidate>
-															<div class="form-row">
-																<div class="form-group col-12 col-md-4">
-																	<div class="floating-label floating-label-sm has-value">
-																		<label for="quickFirstName">First name</label>
-																		<input id="quickFirstName" class="form-control" type="text" name="quickFirstName" value="{{ user_info.fname }}" required data-ripple-line>
-																		<div class="invalid-feedback">
-																			Invalid first name.
-																		</div>
-																	</div>
-																</div>
-																<div class="form-group col-12 col-md-4">
-																	<div class="floating-label floating-label-sm has-value">
-																		<label for="quickLastName">Last name</label>
-																		<input id="quickLastName" class="form-control" type="text" name="quickLastName" value="{{ user_info.lname }}" required data-ripple-line>
-																		<div class="invalid-feedback">
-																			Invalid last name.
-																		</div>
-																	</div>
-																</div>
-																<div class="form-group col-12 col-md-4">
-																	<div class="floating-label floating-label-sm has-value">
-																		<label for="quickMobile">Mobile number</label>
-																		<input id="quickMobile" class="form-control" type="text" name="quickMobile" value="{{ user_info.mobile }}" required data-ripple-line>
-																		<div class="invalid-feedback">
-																			Invalid mobile number.
-																		</div>
-																	</div>
-																</div>
-																<div class="col-12">
-																	<button class="btn btn-sm btn-block btn-primary" type="submit">Save Changes</button>
-																</div>
-															</div>
-														</form>
-													</div>
-												</div>
-											</div>
+						<div class="col-xl-10">
+                            <div class="row">
+                                <div class="col-md-3 text-center text-md-left">
+                                    <div class="card-title font-size-lg">Profile</div>
+                                    <div class="card-subtitle text-muted">Overview of your profile</div>
+                                    <hr class="d-block d-md-none">
+                                </div>
+                                <div class="col-md-6 offset-md-3">
+                                    <div class="row align-items-center justify-content-center">
+                                        <div class="col-5 col-sm-4 col-xl-3 text-center">
+                                            <img class="img-fluid" src="../static/images/svg/profile_pic_{{ user_info.gender }}.svg" alt="Profile Picture">
                                         </div>
-									</div>
-									<div class="card rounded-3x shadow-1 mt-3">
-										<div class="card-header mb-0">
-											<div class="card-title">Recent Bookings</div>
-										</div>
-										{% if bookings|length %}
-											<div class="table-responsive table-responsive-md">
-												<table class="bookings-table table mb-0">
-													<thead>
-														<tr>
-															<th scope="col">ID</th>
-															<th scope="col">Route</th>
-															<th scope="col">Date</th>
-															<th scope="col">Status</th>
-														</tr>
-													</thead>
-													<tbody>
-														{% for booking in bookings %}
-															<tr>
-																<th scope="row">{{ booking.id }}</th>
-																{% if booking.flightType = "Oneway" %}
-																	<td>{{ booking.from }}<i class="fas fa-long-arrow-alt-right fa-fw mx-2"></i>{{ booking.to }}</td>
-																{% else %}
-																	<td>{{ booking.from }}<i class="fas fa-exchange-alt fa-fw mx-2"></i>{{ booking.to }}</td>
-																{% endif %}
-																<td>{{ booking.date }}</td>
-																{% if booking.status = "Active" %}
-																	<td class="text-success">{{ booking.status }}</td>
-																{% else %}
-																	<td class="text-danger">{{ booking.status }}</td>
-																{% endif %}
-															</tr>
-														{% endfor %}
-													</tbody>
-												</table>
-											</div>
-										{% else %}
-											<div class="card-body text-center">
-												<p>There no recent bookings available yet.</p>
-											</div>
-										{% endif %}
-									</div>
-								</div>
-								<div id="trips" class="tab-pane fade" role="tabpanel">
-									<div class="col-md-12">
-									</div>
-								</div>
-								<div id="edit" class="tab-pane fade" role="tabpanel">
-									<div class="card rounded-3x shadow-1">
-										<form id="editForm" class="needs-validation" method="POST" action="edit-info" novalidate>
-											<div class="card-header mb-0">
-												<div class="card-title">Personal Information</div>
-											</div>
-											<div class="card-body">
-												<div class="form-row">
-													<div class="form-group col-12 col-md-4">
-														<div class="floating-label floating-label-sm has-value">
-															<label for="firstName">First name</label>
-															<input id="firstName" class="form-control" type="text" name="firstName" value="{{ user_info.fname }}" required data-ripple-line>
-															<div class="invalid-feedback">
-																Invalid first name.
-															</div>
-														</div>
-													</div>
-													<div class="form-group col-12 col-md-4">
-														<div class="floating-label floating-label-sm has-value">
-															<label for="lastName">Last name</label>
-															<input id="lastName" class="form-control" type="text" name="lastName" value="{{ user_info.lname }}" required data-ripple-line>
-															<div class="invalid-feedback">
-																Invalid last name.
-															</div>
-														</div>
-													</div>
-													<div class="form-group col-12 col-md-4">
-														<div class="floating-label floating-label-sm has-value">
-															<label for="mobile">Mobile number</label>
-															<input id="mobile" class="form-control" type="text" name="mobile" value="{{ user_info.mobile }}" required data-ripple-line>
-															<div class="invalid-feedback">
-																Invalid mobile number.
-															</div>
-														</div>
-													</div>
-												</div>
-												<div class="form-group">
-													<div class="floating-label floating-label-sm">
-														<label for="address">Address</label>
-														<input id="address" class="form-control" type="text" name="address" placeholder="123 Main Str." value="{{ user_info.address }}" required data-ripple-line>
-														<div class="invalid-feedback">
-															Invalid address.
-														</div>
-													</div>
-												</div>
-												<div class="form-group">
-													<div class="floating-label floating-label-sm">
-														<label for="address2">Address 2</label>
-														<input id="address2" class="form-control" type="text" name="address2" placeholder="Apartment, studio or floor" value="{{ user_info.address2 }}" required data-ripple-line>
-														<div class="invalid-feedback">
-															Invalid address.
-														</div>
-													</div>
-												</div>
-												<div class="form-row">
-													<div class="form-group col-md-6 mb-md-0">
-														<div class="floating-label floating-label-sm">
-															<label for="city">City</label>
-															<input id="city" class="form-control" type="text" name="city" value="{{ user_info.city }}" required data-ripple-line>
-															<div class="invalid-feedback">
-																Invalid city.
-															</div>
-														</div>
-													</div>
-													<div class="form-group col-md-4 mb-md-0">
-														<div class="floating-label floating-label-sm">
-															<label for="state">State</label>
-															<input id="state" class="form-control" type="text" name="state" value="{{ user_info.state }}" required data-ripple-line>
-															<div class="invalid-feedback">
-																Invalid state.
-															</div>
-														</div>
-													</div>
-													<div class="form-group col-md-2 mb-0">
-														<div class="floating-label floating-label-sm">
-															<label for="zipCode">Zip code</label>
-															<input id="zipCode" class="form-control" type="text" name="zipCode" value="{{ user_info.zip }}" required data-ripple-line>
-															<div class="invalid-feedback">
-																Invalid zip code.
-															</div>
-														</div>
-													</div>
-												</div>
-											</div>
-											<div class="card-footer">
-												<button class="d-none d-md-block btn btn-primary" type="submit">Save Changes</button>
-												<button class="d-block d-md-none btn btn-block btn-primary" type="submit">Save Changes</button>
-											</div>
-										</form>
-									</div>
-									<div class="card rounded-3x shadow-1 mt-3">
-										<form id="changePasswordForm" class="needs-validation" method="POST" action="change-password" novalidate>
-											<div class="card-header mb-0">
-												<div class="card-title">Change Password</div>
-											</div>
-											<div class="card-body">
-												<div class="form-group">
-													<div class="floating-label floating-label-sm">
-														<label for="oldPassword">Old password</label>
-														<input id="oldPassword" class="form-control" type="text" name="oldPassword" required data-ripple-line>
-														<div class="invalid-feedback">
-															Invalid old password.
-														</div>
-													</div>
-												</div>
-												<div class="form-group">
-													<div class="floating-label floating-label-sm">
-														<label for="newPassword">New password</label>
-														<input id="newPassword" class="form-control" type="text" name="newPassword" required data-ripple-line>
-														<div class="invalid-feedback">
-															Invalid new password.
-														</div>
-													</div>
-												</div>
-											</div>
-											<div class="card-footer">
-												<button class="d-none d-md-block btn btn-primary" type="submit">Change</button>
-												<button class="d-block d-md-none btn btn-block btn-primary" type="submit">Change</button>
-											</div>
-										</form>
-									</div>
-								</div>
-								<div id="cards" class="tab-pane fade" role="tabpanel">
-									<div class="col-md-12">
-										<div class="col-md-6">
-											<div class="card-entry">
-												<div class="pull-right">
-													<p><a href="#"><i class="fa fa-pencil"></i></a><a href="#"><i class="fa fa-times"></i></a></p>
-												</div>
-												<h3>XXXX XXXX XXXX 2345</h3>
-												<p>Valid Thru 06/17</p>
-												<div class="clearfix"></div>
-												<div class="card-type">
-													<p>Name On Card</p>
-													<div class="pull-left">
-														<h3>Lenore</h3>
-													</div>
-													<div class="pull-right">
-														<img src="assets/images/card/visa.png" alt="cruise">
-													</div>
-												</div>
-											</div>
-										</div>
-										<div class="col-md-6">
-											<div class="user-add-card">
-												<form >
-													<input class="form-control" name="card-number" type="text" required placeholder="Card Number">
-													<input class="form-control" name="cardholder-name" type="text" required placeholder="Cardholder Name">
-													<div class="col-md-6 col-sm-6 col-6 clear-padding">
-														<input class="form-control" name="valid-month" type="text" required placeholder="Expiry Month">
-													</div>
-													<div class="col-md-6 col-sm-6 col-6">
-														<input class="form-control" name="valid-year" type="text" required placeholder="Expiry Year">
-													</div>
-													<div class="clearfix"></div>
-													<div class="col-md-4 clear-padding">
-														<input class="form-control" name="cvv" type="password" required placeholder="CVV">
-													</div>
-													<div class="clearfix"></div>
-													<div>
-														<button type="submit">ADD CARD</button>
-													</div>
-												</form>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
+                                        <div class="col-sm-8 col-xl-9">
+                                            <div class="font-weight-bold font-size-lg text-center text-sm-left mt-3 mb-sm-0">
+                                                {{ user_info.first_name }} {{ user_info.last_name }}
+                                            </div>
+                                            <hr>
+                                            <div class="text-muted">
+                                                <div><i class="text-body fas fa-envelope fa-fw mr-3"></i>{{ user_info.email }}</div>
+                                                <div><i class="text-body fas fa-phone fa-fw mr-3"></i>{{ user_info.mobile }}</div>
+                                                <div><i class="text-body fas fa-calendar-alt fa-fw mr-3"></i>{{ user_info.joined_date }}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <form id="editForm" class="needs-validation" method="POST" action="{{ url_for("edit_info") }}" novalidate>
+                                <div class="row">
+                                    <div class="col-md-3 text-center text-md-left">
+                                        <div class="card-title font-size-lg">Personal Info</div>
+                                        <div class="card-subtitle text-muted">Edit your personal information</div>
+                                        <hr class="d-block d-md-none">
+                                    </div>
+                                    <div class="col-md-6 offset-md-3">
+                                        <div class="form-group">
+                                            <div class="floating-label has-value">
+                                                <label for="firstName">First name</label>
+                                                <input id="firstName" class="form-control" type="text" name="firstName" value="{{ user_info.first_name }}" required data-ripple-line>
+                                                <div class="invalid-feedback">
+                                                    Invalid first name.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="floating-label has-value">
+                                                <label for="lastName">Last name</label>
+                                                <input id="lastName" class="form-control" type="text" name="lastName" value="{{ user_info.last_name }}" required data-ripple-line>
+                                                <div class="invalid-feedback">
+                                                    Invalid last name.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="floating-label has-value">
+                                                <label for="mobile">Mobile number</label>
+                                                <input id="mobile" class="form-control" type="text" name="mobile" value="{{ user_info.mobile }}" required data-ripple-line>
+                                                <div class="invalid-feedback">
+                                                    Invalid mobile number.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-row justify-content-end align-items-center">
+                                            <div class="col-md-6 col-lg-5">
+                                                <button class="btn btn-sm btn-block btn-primary" type="submit">Save Changes</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            <hr>
+                            <form id="changePasswordForm" class="needs-validation" method="POST" action="{{ url_for("change_password") }}" novalidate>
+                                <div class="row">
+                                    <div class="col-md-3 text-center text-md-left">
+                                        <div class="card-title font-size-lg">Password</div>
+                                        <div class="card-subtitle text-muted">Change your password</div>
+                                        <hr class="d-block d-md-none">
+                                    </div>
+                                    <div class="col-md-6 offset-md-3">
+                                        <strong>After the password is changed, you have to sign in back to your account.</strong>
+                                        <div class="form-group mt-3">
+                                            <div class="floating-label">
+                                                <label for="currentPassword">Current password</label>
+                                                <input id="currentPassword" class="form-control" type="password" name="currentPassword" required data-ripple-line data-password>
+                                                <div class="invalid-feedback">
+                                                    Invalid current password.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group mt-3">
+                                            <div class="floating-label">
+                                                <label for="newPassword">New password</label>
+                                                <input id="newPassword" class="form-control" type="password" pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$" name="newPassword" required data-ripple-line
+                                                data-password>
+                                                <div class="invalid-feedback">
+                                                    Invalid password, must at least 8 characters long.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-row justify-content-end align-items-center">
+                                            <div class="col-md-6 col-lg-5">
+                                                <button class="btn btn-sm btn-block btn-primary" type="submit">Change Password</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            <hr>
+                            <form id="deleteAccountForm" class="needs-validation" method="POST" action="{{ url_for("delete_account") }}" novalidate>
+                                <div class="row">
+                                    <div class="col-md-3 text-center text-md-left">
+                                        <div class="card-title font-size-lg text-danger">Delete Account</div>
+                                        <div class="card-subtitle text-muted">This action cannot be undone</div>
+                                        <hr class="d-block d-md-none">
+                                    </div>
+                                    <div class="col-md-6 offset-md-3">
+                                        <strong>Deleting your account will remove all of your information and data from our database permanently. Enter your current password below to confirm your request.</strong>
+                                        <div class="form-group mt-3">
+                                            <div class="floating-label">
+                                                <label for="currentDeletePassword">Current password</label>
+                                                <input id="currentDeletePassword" class="form-control" type="password" name="currentDeletePassword" required data-ripple-line data-password>
+                                                <div class="invalid-feedback">
+                                                    Invalid current password.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-row justify-content-end align-items-center">
+                                            <div class="col-md-6 col-lg-5">
+                                                <button class="btn btn-sm btn-block btn-danger" type="submit">Delete Account</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
 					</div>
 				</div>
 			</section>
     	</main>
-		<!-- END: USER PROFILE -->
 
 		<!-- jQuery first, then Popper.js, then Bootstrap JS -->
 		<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
@@ -365,12 +196,6 @@
 		<script src="../static/js/material.js"></script>
 		<script src="../static/js/snackbar.js"></script>
 		<script src="../static/js/project.js"></script>
-
-		<script>
-			$(function (){
-				$("#snackbarContainer").addClass("snackbar-container-right");
-			});
-		</script>
 
 		{% with messages = get_flashed_messages() %}
 			{% if messages %}

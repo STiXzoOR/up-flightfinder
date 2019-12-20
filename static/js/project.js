@@ -9,9 +9,10 @@ function clearForm(formID) {
     .trigger("change");
 }
 
-function setSameHeight(firstSelector, secondSelector) {
-  $(firstSelector).each(function() {
-    $(this).css("height", $(secondSelector).height() + "px");
+function setSameHeight() {
+  $(".price").each(function() {
+    $(this).css("height", $(".flight").height() + "px");
+    $(".price-body").css("height", $(".flight").height() + "px");
   });
 }
 
@@ -23,59 +24,48 @@ function isset(variable) {
   }
 }
 
-function showSnackbar(options) {
-  if (isset(options)) {
-    if (isset(options.content)) {
-      $("#snackarBody").html(options.content);
-    }
+function genLoading() {
+  var $progress = $("<div/>").attr("class", "progress-circular mx-auto");
+  var $progressWrapper = $("<div/>").attr("class", "progress-circular-wrapper");
+  var $progressBody = $("<div/>").attr("class", "progress-circular-inner");
 
-    if (isset(options.dismiss)) {
-      var btn =
-        '<button id="snackbarDismissBtn" class="snackbar-btn" type="button">Dismiss</button>';
-      $("#snackbar").append($(btn));
-    } else {
-      if ($("#snackbarDismissBtn").length) {
-        $("#snackbarDismissBtn").remove();
-      }
-    }
+  $progressBody.append(
+    $("<div/>")
+      .attr("class", "progress-circular-left")
+      .append($("<div/>").attr("class", "progress-circular-spinner"))
+  );
+  $progressBody.append($("<div/>").attr("class", "progress-circular-gap"));
+  $progressBody.append(
+    $("<div/>")
+      .attr("class", "progress-circular-right")
+      .append($("<div/>").attr("class", "progress-circular-spinner"))
+  );
 
-    if (isset(options.alignleft)) {
-      $("#snackbar").attr("class", "snackbar snackbar-left position-fixed");
-    } else if (isset(options.alignright)) {
-      $("#snackbar").attr("class", "snackbar snackbar-right position-fixed");
-    } else {
-      $("#snackbar").attr("class", "snackbar position-fixed");
-    }
-  }
+  $progressWrapper.append($progressBody);
+  $progress.append($progressWrapper);
 
-  if ($(".snackbar.show").length > 0) {
-    $(".snackbar.show")
-      .removeClass("show")
-      .one("webkitTransitionEnd transitionEnd", function() {
-        $("#snackbar").addClass(function() {
-          setTimeout(function() {
-            $("#snackbar").removeClass("show");
-          }, 5000);
-
-          return "show";
-        });
-      });
-  } else {
-    $("#snackbar").addClass(function() {
-      setTimeout(function() {
-        $("#snackbar").removeClass("show");
-      }, 5000);
-
-      return "show";
-    });
-  }
+  return $progress;
 }
+
+$(function() {
+  $(".uppercase-input").bind("input", function() {
+    $(this)
+      .val(
+        $(this)
+          .val()
+          .toUpperCase()
+      )
+      .trigger("change");
+  });
+});
 
 $(window).on("scroll", function() {
   if ($(window).scrollTop() > 0) {
     $(".toolbar-waterfall").addClass("waterfall");
+    $("#imageLogo").attr("src", "../static/images/svg/logo_light.svg");
   } else {
     $(".toolbar-waterfall").removeClass("waterfall");
+    $("#imageLogo").attr("src", "../static/images/svg/logo_dark.svg");
   }
 });
 
@@ -86,48 +76,50 @@ $(function() {
 });
 
 $(function() {
-  var $password = $("input[type='password'][data-password]");
-  var $icon = $('<i class="material-icons">visibility_off</i>');
+  $("input[type='password'][data-password]").each(function() {
+    var $password = $(this);
+    var $icon = $('<i class="material-icons">visibility_off</i>');
 
-  $password.wrap(
-    $("<div/>", {
-      class: "position-relative",
-    })
-  );
+    $password.wrap(
+      $("<div/>", {
+        class: "position-relative"
+      })
+    );
 
-  $password.css({
-    paddingRight: 32,
+    $password.css({
+      paddingRight: 32
+    });
+
+    $password.after($icon);
+
+    $icon.wrap(
+      $("<div/>", {
+        class: "form-password-icon"
+      }).css({
+        top: $password.outerHeight() / 2 - 16
+      })
+    );
+
+    var invalid_feedback = $password
+      .parent()
+      .parent()
+      .find(".invalid-feedback");
+
+    if (invalid_feedback.length) {
+      $password.after(invalid_feedback.clone());
+      invalid_feedback.remove();
+    }
+
+    var ripple_line = $password
+      .parent()
+      .parent()
+      .find(".form-control-ripple");
+
+    if (ripple_line.length) {
+      $password.after(ripple_line.clone());
+      ripple_line.remove();
+    }
   });
-
-  $password.after($icon);
-
-  $icon.wrap(
-    $("<div/>", {
-      class: "form-password-icon",
-    }).css({
-      top: $password.outerHeight() / 2 - 16,
-    })
-  );
-
-  var invalid_feedback = $password
-    .parent()
-    .parent()
-    .find(".invalid-feedback");
-
-  if (invalid_feedback.length) {
-    $password.after(invalid_feedback.clone());
-    invalid_feedback.remove();
-  }
-
-  var ripple_line = $password
-    .parent()
-    .parent()
-    .find(".form-control-ripple");
-
-  if (ripple_line.length) {
-    $password.after(ripple_line.clone());
-    ripple_line.remove();
-  }
 
   $(".form-password-icon").on("click", function() {
     var clicks = $(this).data("clicks");
@@ -161,7 +153,15 @@ $(function() {
 });
 
 $(function() {
-  $("#flightSearch").click(function() {
+  $("#flightForm").submit(function() {
+    var form = $(this);
+    if (form[0].checkValidity() === false) {
+      event.preventDefault();
+      event.stopPropagation();
+      form.addClass("was-validated");
+      return false;
+    }
+    event.preventDefault();
     $.ajax({
       type: "GET",
       url: $SCRIPT_ROOT + "/search-flights",
@@ -173,30 +173,72 @@ $(function() {
         returnDate: $('input[name="returnDate"]').val(),
         numPassengers: $('select[name="numPassengers"]').val(),
         flightClass: $('select[name="flightClass"]').val(),
+        startLimit: $('input[name="startLimit"]').val(),
+        endLimit: $('input[name="endLimit"]').val()
       },
       cache: false,
-      success: function(response) {
-        if (response === "no_result") {
+      beforeSend: function() {
+        $("#flightSearchResult").html(genLoading());
+      },
+      success: function(data) {
+        if (data.message === "no_result") {
           $.snackbar({
             content: "There aren't any available flights for this route yet.",
-            style: "snackbar-left mb-2",
+            style: "snackbar-left mb-2"
           });
-        } else {
-          $("#flightSearchResult").html(response);
         }
+        $("#flightSearchResult").html(data.content);
       },
       complete: function() {
-        $("#flightsContainer").simpleLoadMore({
-          item: ".more-item",
-          count: 5,
-        });
+        // $("#flightsContainer").simpleLoadMore({
+        //   item: ".more-item",
+        //   count: 5
+        // });
         $(function() {
-          setSameHeight(".price", ".flight");
+          setSameHeight();
+        });
+        return false;
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        alert(errorThrown);
+      }
+    });
+  });
+});
+
+$(function() {
+  $("#loadMoreFlights").click(function(e) {
+    e.preventDefault();
+    $.ajax({
+      type: "GET",
+      url: $SCRIPT_ROOT + "/search-flights",
+      contentType: "application/json; charset=utf-8",
+      data: {
+        fromAirport: $('select[name="fromAirport"]').val(),
+        toAirport: $('select[name="toAirport"]').val(),
+        departDate: $('input[name="departDate"]').val(),
+        returnDate: $('input[name="returnDate"]').val(),
+        numPassengers: $('select[name="numPassengers"]').val(),
+        flightClass: $('select[name="flightClass"]').val(),
+        startLimit: $('input[name="startLimitMore"]').val(),
+        endLimit: $('input[name="endLimitMore"]').val()
+      },
+      cache: false,
+      beforeSend: function() {
+        $("#loadMoreBtn").remove();
+        $("#moreFlightContent").html(genLoading());
+      },
+      success: function(data) {
+        $("#moreFlightContent").html(data.content);
+      },
+      complete: function() {
+        $(function() {
+          setSameHeight();
         });
       },
       error: function(jqXHR, textStatus, errorThrown) {
         alert(errorThrown);
-      },
+      }
     });
   });
 });
@@ -229,7 +271,7 @@ $(function() {
       //   dataType: "json",
       data: JSON.stringify({
         airport: $(this).val(),
-        airports: opts,
+        airports: opts
       }),
       success: function(data) {
         $.each(data.result, function(index) {
@@ -241,7 +283,7 @@ $(function() {
       },
       error: function(jqXHR, textStatus, errorThrown) {
         alert(errorThrown);
-      },
+      }
     });
   });
 });
@@ -264,6 +306,12 @@ $(function() {
     $("#returnDatePicker")
       .val("One Way")
       .trigger("change");
+    $("#flightSearchResult").html("");
+  });
+});
+
+$(function() {
+  $("#nav-booking-tab").click(function() {
     $("#flightSearchResult").html("");
   });
 });
@@ -304,7 +352,7 @@ $("#departDatePicker").pickdate({
   // },
   selectMonths: true,
   selectYears: 5,
-  min: true,
+  min: true
 });
 
 $("#returnDatePicker").pickdate({
@@ -345,7 +393,7 @@ $("#returnDatePicker").pickdate({
   },
   selectMonths: true,
   selectYears: 5,
-  min: true,
+  min: true
 });
 
 function parseDate(str) {
@@ -362,7 +410,7 @@ function parseDate(str) {
     "sep",
     "oct",
     "nov",
-    "dec",
+    "dec"
   ];
 
   var year = parseInt(date[2]);
