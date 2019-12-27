@@ -34,7 +34,7 @@ def create_connection():
     options = {'host': 'localhost',
                'user': 'root',
                'password': '',
-               'db':'FlightFinderDB',
+               'db':'flightfinderdb',
                'charset': 'utf8mb4',
                'cursorclass': DictCursor}
     

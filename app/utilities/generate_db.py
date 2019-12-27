@@ -70,7 +70,7 @@ def create_database():
     cnx.commit()
     cnx.close()
 
-    return 'FlightFinderDB'
+    return 'flightfinderdb'
 
 def configure_database():
     stmts = parse_sql(current_dir + '/schema.sql')
