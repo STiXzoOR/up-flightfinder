@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta content="initial-scale=1, shrink-to-fit=no, width=device-width" name="viewport">
+
+        <!-- CSS -->
+        <link href="../static/css/roboto-family.css" rel="stylesheet">
+        <link href="../static/css/material-icons.css" rel="stylesheet">
+        <link href="../static/css/fontawesome-icons.css" rel="stylesheet">
+
+        <!-- Add Material CSS, replace Bootstrap CSS -->
+        <link href="../static/css/material.css" rel="stylesheet">
+        <link href="../static/css/project.css" rel="stylesheet">
+
+        <!-- favicon -->
+        <!-- ... -->
+
+        <!-- title -->
+        <title>My Bookings - Flight Finder</title>
+    </head>
+    <script>
+        var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    </script>
+  	<body class="body-content">
+        <div class="loader"></div>
+        <header class="navbar navbar-dark navbar-expand-md fixed-top bg-alt-primary toolbar-waterfall">
+            <a class="navbar-brand mr-auto" href="{{ url_for("index") }}">
+                <img src="../static/images/svg/logo_light.svg" width="35" height="35" class="d-inline-block align-top mr-2" alt="">
+                Flight Finder
+            </a>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link p-0" style="opacity: 1;" href="#" id="navbarDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-user-circle fa-2x fa-fw"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="{{ url_for("profile") }}"><i class="fas fa-user-alt fa-fw mr-2"></i>My account</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{{ url_for("sign_out") }}"><i class="fas fa-sign-out-alt fa-fw mr-2"></i>Sign out</a>
+                    </div>
+                </li>
+            </ul>
+        </header>
+        <main role="main" class="px-lg-3">
+            <section class="d-flex align-items-center my-4">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-xl-10">
+                            <div class="row">
+                                <div class="col-md-3 text-center text-md-left">
+                                    <div class="card-title font-size-lg">Upcoming Flights</div>
+                                    <div class="card-subtitle text-muted">View, modify and cancel upcoming flights</div>
+                                    <hr class="d-block d-md-none">
+                                </div>
+                                <div class="col-md-8 offset-md-1">
+                                    {% if upcoming_bookings|length %}
+                                        <div id="upcomingFlightsInfo" class="accordion">
+                                            {% for booking in upcoming_bookings %}
+                                                <form id="upcomingBookingInfo-{{ loop.index }}" class="card shadow-none" method="POST" action="{{ url_for("manage_booking") }}">
+                                                    <input type="hidden" name="bookingID" value="{{ booking.id }}">
+                                                    <input type="hidden" name="lastName" value="{{ booking.last_name }}">
+                                                    <a id="bookingIndex-{{ loop.index }}" aria-controls="upcomingBooking-{{ booking.id }}" aria-expanded="false" class="accordion-toggler text-body collapsed" data-toggle="collapse" href="#upcomingBooking-{{ booking.id }}">
+                                                        <div class="form-row">
+                                                            <div class="col-sm-2 mb-2 mb-sm-0">
+                                                                <strong>ID</strong>
+                                                                <div>{{ booking.id }}</div>
+                                                            </div>
+                                                            <div class="col-sm-5 col-md-4 mb-2 mb-sm-0">
+                                                                <strong>Route</strong>
+                                                                {% if booking.flight_type == "Oneway" %}
+                                                                    {% set flight_type_icon = "fa-long-arrow-alt-right" %}
+                                                                {% else %}
+                                                                    {% set flight_type_icon = "fa-exchange-alt" %}
+                                                                {% endif %}
+                                                                <div>{{ booking.from_city }}<i class="fas {{ flight_type_icon }} fa-fw mx-2"></i>{{ booking.to_city }}</div>
+                                                            </div>
+                                                            <div class="col-sm-3 col-md-4 mb-2 mb-sm-0">
+                                                                <strong>Date</strong>
+                                                                <div>{{ booking.date }}</div>
+                                                            </div>
+                                                            <div class="col-sm-2">
+                                                                <strong>Status</strong>
+                                                                <div class="text-success">{{ booking.status }}</div>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                    <div aria-labelledby="{{ booking.id }}" class="collapse" data-parent="#upcomingFlightsInfo" id="upcomingBooking-{{ booking.id }}">
+                                                        <div class="card-body pb-0">
+                                                            <div class="form-row justify-content-center align-items-center">
+                                                                <div class="col-sm-4 mb-2 mb-sm-0">
+                                                                    <button class="btn btn-sm btn-block btn-primary process-form" type="submit" name="btnState" value="view">View</button>
+                                                                </div>
+                                                                <div class="col-sm-4 mb-2 mb-sm-0">
+                                                                    <button class="btn btn-sm btn-block btn-primary process-form" type="submit" name="btnState" value="modify">Modify</button>
+                                                                </div>
+                                                                <div class="col-sm-4">
+                                                                    <button class="btn btn-sm btn-block btn-danger process-form" type="submit" name="btnState" value="cancel">Cancel</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                                {{ "<hr>"|safe if not loop.last }}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        <div class="text-center">
+                                            <div>There aren't any upcoming flights available yet.</div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-3 text-center text-md-left">
+                                    <div class="card-title font-size-lg">Passed Flights</div>
+                                    <div class="card-subtitle text-muted">View passed flights</div>
+                                    <hr class="d-block d-md-none">
+                                </div>
+                                <div class="col-md-8 offset-md-1">
+                                    {% if passed_bookings|length %}
+                                        <div id="passedFlightsInfo" class="accordion">
+                                            {% for booking in passed_bookings %}
+                                                <form id="passedBookingInfo-{{ loop.index }}" class="card shadow-none" method="POST" action="{{ url_for("manage_booking") }}">
+                                                    <input type="hidden" name="bookingID" value="{{ booking.id }}">
+                                                    <input type="hidden" name="lastName" value="{{ booking.last_name }}">
+                                                    <a id="passedBookingIndex-{{ loop.index }}" aria-controls="passedBooking-{{ booking.id }}" aria-expanded="false" class="accordion-toggler text-body collapsed" data-toggle="collapse" href="#passedBooking-{{ booking.id }}">
+                                                        <div class="form-row">
+                                                            <div class="col-sm-2 mb-2 mb-sm-0">
+                                                                <strong>ID</strong>
+                                                                <div>{{ booking.id }}</div>
+                                                            </div>
+                                                            <div class="col-sm-5 col-md-4 mb-2 mb-sm-0">
+                                                                <strong>Route</strong>
+                                                                {% if booking.flight_type == "Oneway" %}
+                                                                    {% set flight_type_icon = "fa-long-arrow-alt-right" %}
+                                                                {% else %}
+                                                                    {% set flight_type_icon = "fa-exchange-alt" %}
+                                                                {% endif %}
+                                                                <div>{{ booking.from_city }}<i class="fas {{ flight_type_icon }} fa-fw mx-2"></i>{{ booking.to_city }}</div>
+                                                            </div>
+                                                            <div class="col-sm-3 col-md-4 mb-2 mb-sm-0">
+                                                                <strong>Date</strong>
+                                                                <div>{{ booking.date }}</div>
+                                                            </div>
+                                                            <div class="col-sm-2">
+                                                                <strong>Status</strong>
+                                                                <div class="text-danger">{{ booking.status }}</div>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                    <div aria-labelledby="{{ booking.id }}" class="collapse" data-parent="#passedFlightsInfo" id="passedBooking-{{ booking.id }}">
+                                                        <div class="card-body pb-0">
+                                                            <div class="form-row justify-content-end align-items-center">
+                                                                <div class="col-sm-4">
+                                                                    <button class="btn btn-sm btn-block btn-primary process-form" type="submit" name="btnState" value="view">View</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                                {{ "<hr>"|safe if not loop.last }}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        <div class="text-center">
+                                            <div>There aren't any passed flights available yet.</div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <hr>
+                            <form id="addBookingForm" method="POST" action="{{ url_for("add_booking") }}" novalidate>
+                                <div class="row">
+                                    <div class="col-md-3 text-center text-md-left">
+                                        <div class="card-title font-size-lg">Missing Booking</div>
+                                        <div class="card-subtitle text-muted">Add missing booking record</div>
+                                        <hr class="d-block d-md-none">
+                                    </div>
+                                    <div class="col-md-8 offset-md-1">
+                                        <div class="form-row">
+                                            <div class="form-group col-sm-4">
+                                                <div class="floating-label">
+                                                    <label for="bookingID">Booking ID</label>
+                                                    <input id="bookingID" class="form-control uppercase-input" type="text" name="bookingID" required data-ripple-line>
+                                                    <div class="invalid-feedback">
+                                                        Invalid booking id, must be 6 chars long.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-4">
+                                                <div class="floating-label">
+                                                    <label for="firstName">First name</label>
+                                                    <input id="firstName" class="form-control" type="text" name="firstName" required data-ripple-line>
+                                                    <div class="invalid-feedback">
+                                                        Invalid first name.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-4">
+                                                <div class="floating-label">
+                                                    <label for="lastName">Last name</label>
+                                                    <input id="lastName" class="form-control" type="text" name="lastName" required data-ripple-line>
+                                                    <div class="invalid-feedback">
+                                                        Invalid last name.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-row justify-content-end align-items-center">
+                                            <div class="col-sm-4">
+                                                <button class="btn btn-sm btn-block btn-primary process-form" type="submit">Add Booking</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+		<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+		<script src="../static/js/jquery.min.js"></script>
+        <script src="../static/js/popper.min.js"></script>
+        <script src="../static/js/bootstrap.min.js"></script>
+
+		<!-- Then Material JavaScript on top of Bootstrap JavaScript -->
+		<script src="../static/js/material.js"></script>
+		<script src="../static/js/snackbar.js"></script>
+		<script src="../static/js/project.js"></script>
+
+		{% with messages = get_flashed_messages() %}
+			{% if messages %}
+				{% for message in messages %}
+					<script>
+						$(function() {
+							$.snackbar({content: '{{ message }}', style: 'snackbar-left justify-content-center mb-2'});
+						});
+					</script>
+				{% endfor %}
+			{% endif %}
+		{% endwith %}
+    
+	</body>
+</html>

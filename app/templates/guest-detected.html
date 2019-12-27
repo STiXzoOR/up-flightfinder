@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta content="initial-scale=1, shrink-to-fit=no, width=device-width" name="viewport">
+
+        <!-- CSS -->
+        <link href="../static/css/roboto-family.css" rel="stylesheet">
+        <link href="../static/css/material-icons.css" rel="stylesheet">
+        <link href="../static/css/fontawesome-icons.css" rel="stylesheet">
+
+        <!-- Add Material CSS, replace Bootstrap CSS -->
+        <link href="../static/css/material.css" rel="stylesheet">
+        <link href="../static/css/project.css" rel="stylesheet">
+
+        <!-- favicon -->
+        <!-- ... -->
+
+        <!-- title -->
+        <title>Manage Booking - Flight Finder</title>
+    </head>
+    <script>
+        var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    </script>
+  <body class="body-content">
+    <header class="navbar navbar-dark fixed-top bg-alt-primary toolbar-waterfall">
+        <a class="navbar-brand mr-auto" href="{{ url_for("index") }}">
+            <img src="../static/images/svg/logo_light.svg" width="35" height="35" class="d-inline-block align-top mr-2" alt="">
+            Flight Finder
+        </a>
+    </header>
+    <div class="jumbotron jumbotron-fluid jumbotron-bg mb-3 shadow-none"></div>
+    <main role="main">
+        <section class="d-flex align-items-center my-4">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-9">
+                        <form id="guestForm" method="POST">
+                            <div class="card-deck">
+                                <div class="card rounded-3x shadow-sm-none shadow-1">
+                                    <div class="p-3 text-center text-muted">
+                                        <i class="fas fa-question fa-fw fa-5x"></i>
+                                    </div>
+                                    <div class="card-body px-0 px-sm-3">
+                                        <h5 class="card-title text-center">Guest</h5>
+                                        <p class="card-text">Procceed without creating an account. You can create one later.</p>
+                                    </div>
+                                    <div class="card-footer px-0 pb-0 px-sm-3 pb-sm-3">
+                                        <button class="btn btn-sm btn-block btn-primary" type="submit" name="btnState" value="guest">Continue as guest</button>
+                                    </div>
+                                </div>
+                                <hr class="d-block d-sm-none">
+                                <div class="card rounded-3x shadow-sm-none shadow-1">
+                                    <div class="p-3 text-center text-muted">
+                                        <i class="fas fa-user fa-fw fa-5x"></i>
+                                    </div>
+                                    <div class="card-body px-0 px-sm-3">
+                                        <h5 class="card-title text-center">Returning customer</h5>
+                                        <p class="card-text">Sign in to your account and access your saved data.</p>
+                                    </div>
+                                    <div class="card-footer px-0 pb-0 px-sm-3 pb-sm-3">
+                                        <button class="btn btn-sm btn-block btn-primary" type="submit" name="btnState" value="sign_in">Sign in & continue</button>
+                                    </div>
+                                </div>
+                                <hr class="d-block d-sm-none">
+                                <div class="card rounded-3x shadow-sm-none shadow-1">
+                                    <div class="p-3 text-center text-muted">
+                                        <i class="fas fa-user-plus fa-fw fa-5x"></i>
+                                    </div>
+                                    <div class="card-body px-0 px-sm-3">
+                                        <h5 class="card-title text-center">New Customer</h5>
+                                        <p class="card-text">Create an account to keep track of your flights easily.</p>
+                                    </div>
+                                    <div class="card-footer px-0 pb-0 px-sm-3 pb-sm-3">
+                                        <button class="btn btn-sm btn-block btn-primary" type="submit" name="btnState" value="sign_up">Sign up & continue</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="../static/js/jquery.min.js"></script>
+    <script src="../static/js/popper.min.js"></script>
+    <script src="../static/js/bootstrap.min.js"></script>
+
+    <!-- Then Material JavaScript on top of Bootstrap JavaScript -->
+    <script src="../static/js/material.js"></script>
+    <script src="../static/js/snackbar.js"></script>
+    <script src="../static/js/project.js"></script>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <script>
+                    $(function() {
+                        $.snackbar({content: '{{ message }}', style: 'snackbar-left justify-content-center mb-2'});
+                    });
+                </script>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+  </body>
+</html>

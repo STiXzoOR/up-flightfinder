@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta content="initial-scale=1, shrink-to-fit=no, width=device-width" name="viewport">
+
+        <!-- CSS -->
+        <link href="../static/css/roboto-family.css" rel="stylesheet">
+        <link href="../static/css/material-icons.css" rel="stylesheet">
+        <link href="../static/css/fontawesome-icons.css" rel="stylesheet">
+
+        <!-- Add Material CSS, replace Bootstrap CSS -->
+        <link href="../static/css/material.css" rel="stylesheet">
+        <link href="../static/css/project.css" rel="stylesheet">
+
+        <!-- favicon -->
+        <!-- ... -->
+
+        <!-- title -->
+        <title>New Booking - Flight Finder</title>
+    </head>
+    <script>
+        var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    </script>
+  <body class="body-content">
+    <div class="loader"></div>
+    <header class="navbar navbar-dark fixed-top bg-alt-primary toolbar-waterfall">
+        <a class="navbar-brand mr-auto" href="{{ url_for("index") }}">
+            <img src="../static/images/svg/logo_light.svg" width="35" height="35" class="d-inline-block align-top mr-2" alt="">
+            Flight Finder
+        </a>
+    </header>
+    <div class="jumbotron jumbotron-fluid jumbotron-bg mb-3 shadow-none"></div>
+    <main role="main">
+        <section class="d-flex align-items-center my-4">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-lg-7 col-xl-8 order-2 order-lg-1 mt-0 mt-sm-3 mt-lg-0 pr-lg-2">
+                        <form id="bookingForm" method="POST" action="{{ url_for("new_booking") }}" novalidate>
+                            <input type="hidden" name="isRoundtrip" value="{{ is_roundtrip }}">
+                            <div class="card rounded-3x shadow-sm-none shadow-1">
+                                <div class="card-body p-0 px-sm-3 pt-sm-3 pb-sm-1">
+                                    <div class="card rounded-3x shadow-none">
+                                        <div class="card-title text-center text-sm-left font-weight-bold font-size-lg">Passenger Info</div>
+                                        <div class="card-body p-0 px-sm-3">
+                                            <div class="list-group list-group-flush" id="passengersInfo">
+                                                {% for id in range(1,num_passenger+1) %}
+                                                    <div class="expansion-panel list-group-item">
+                                                        <a id="passengerName-{{ id }}" aria-controls="passenger-{{ id }}" aria-expanded="false" class="font-size-90 expansion-panel-toggler px-0 collapsed" href="#passenger-{{ id }}" data-toggle="collapse">
+                                                        Passenger Details #{{ id }}
+                                                            <div class="expansion-panel-icon ml-3 text-black-secondary">
+                                                                <i class="collapsed-show material-icons">keyboard_arrow_down</i>
+                                                                <i class="collapsed-hide material-icons">keyboard_arrow_up</i>
+                                                            </div>
+                                                        </a>
+                                                        <div aria-labelledby="passenger-{{ id }}" class="card-footer pt-2 pb-0 collapse" data-parent="#passengerName-{{ id }}" id="passenger-{{ id }}">
+                                                            <div class="py-0">
+                                                                <div class="form-row align-items-center">
+                                                                    <div class="form-group col-12 col-md-3">
+                                                                        <div class="floating-label">
+                                                                            <label for="firstNamePassenger-{{ id }}">First name</label>
+                                                                            <input class="form-control" id="firstNamePassenger-{{ id }}" type="text" name="firstNamePassenger-{{ id }}" required data-ripple-line>
+                                                                            <div class="invalid-feedback">
+                                                                                Invalid first name.
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group col-12 col-md-3">
+                                                                        <div class="floating-label">
+                                                                            <label for="lastNamePassenger-{{ id }}">Last name</label>
+                                                                            <input class="form-control" id="lastNamePassenger-{{ id }}" type="text" name="lastNamePassenger-{{ id }}" required data-ripple-line>
+                                                                            <div class="invalid-feedback">
+                                                                                Invalid last name.
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group col-12 col-md-3">
+                                                                        <div class="floating-label">
+                                                                            <label for="idPassenger-{{ id }}">ID</label>
+                                                                            <input class="form-control" id="idPassenger-{{ id }}" type="text" pattern="[0-9]{6,10}" maxlength="10" name="idPassenger-{{ id }}" required data-ripple-line>
+                                                                            <div class="invalid-feedback">
+                                                                                Invalid ID, must be at least 6 characters long.
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group col-12 col-md-3">
+                                                                        <a class="btn btn-primary btn-block" data-toggle="modal" href="#selectSeat">Select seat</a>
+                                                                        <input class="form-control d-none" id="seatPassenger-{{ id }}" type="text" name="seatPassenger-{{ id }}" value="">
+                                                                        <div class="invalid-feedback">
+                                                                            Invalid seat.
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr class="mt-1">
+                                    <div class="card rounded-3x shadow-none mt-3">
+                                        <div class="card-title text-center text-sm-left font-weight-bold font-size-lg">Contact Info</div>
+                                        <div class="card-body p-0 px-sm-3">
+                                            <div class="form-row">
+                                                <div class="form-group col-12 col-sm-6">
+                                                    <div class="floating-label">
+                                                        <label for="contactFirstName">First name</label>
+                                                        <input id="contactFirstName" class="form-control" type="text" name="contactFirstName" required data-ripple-line>
+                                                        <div class="invalid-feedback">
+                                                            Invalid first name.
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-12 col-sm-6">
+                                                    <div class="floating-label">
+                                                        <label for="contactLastName">Last name</label>
+                                                        <input id="contactLastName" class="form-control" type="text" name="contactLastName" required data-ripple-line>
+                                                        <div class="invalid-feedback">
+                                                            Invalid last name.
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-12 col-sm-6">
+                                                    <div class="floating-label">
+                                                        <label for="contactEmail">Email address</label>
+                                                        <input id="contactEmail" class="form-control" type="email" name="contactEmail" required data-ripple-line>
+                                                        <div class="invalid-feedback">
+                                                            Invalid email address.
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-12 col-sm-6">
+                                                    <div class="floating-label">
+                                                        <label for="contactMobile">Mobile number</label>
+                                                        <input id="contactMobile" class="form-control" type="text" pattern="[0-9]{6,10}" maxlength="10" name="contactMobile" required data-ripple-line>
+                                                        <div class="invalid-feedback">
+                                                            Invalid mobile number.
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr class="mt-1">
+                                    <div class="card rounded-3x shadow-none mt-3"> 
+                                        <div class="card-title text-center text-sm-left font-weight-bold font-size-lg clearfix">
+                                            Payment Info
+                                            <div class="d-inline-block d-sm-none text-center text-sm-right float-sm-right">
+                                                <i class="fab fa-cc-visa"></i>
+                                                <i class="fab fa-cc-amex"></i>
+                                                <i class="fab fa-cc-mastercard"></i>
+                                            </div>
+                                        </div>
+                                        <div class="card-body p-0 px-sm-3">
+                                            <div class="form-group">
+                                                <div class="floating-label">
+                                                    <label for="cardOwner">Owner name</label>
+                                                    <input id="cardOwner" class="form-control" type="text" name="cardOwner" required data-ripple-line>
+                                                    <div class="invalid-feedback">
+                                                        Invalid owner name.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-row">
+                                                <div class="form-group col-8">
+                                                    <div class="floating-label">
+                                                        <label for="cardNumber">Card number</label>
+                                                        <input id="cardNumber" class="form-control" pattern="[0-9]{16,19}" maxlength="19" placeholder="8888-8888-8888-8888" type="text" name="cardNumber" required data-ripple-line>
+                                                        <div class="invalid-feedback">
+                                                            Invalid card number.
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-4">
+                                                    <div class="floating-label">
+                                                        <label for="cardCCV">CCV</label>
+                                                        <input id="cardCCV" class="form-control" pattern="[0-9]{3}" maxlength="3" placeholder="888" type="text" name="cardCCV" required data-ripple-line>
+                                                        <div class="invalid-feedback">
+                                                            Invalid CVV number.
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-row align-items-center">
+                                                <div class="form-group col-12 col-sm">
+                                                    <div class="input-group input-group-sm">
+                                                        <div class="floating-label">
+                                                            <label for="cardMonth">Month</label>
+                                                            <input id="cardMonth" class="form-control" placeholder="MM" type="number" min="1" max="12" name="cardMonth" required data-ripple-line>
+                                                            <div class="invalid-feedback">
+                                                                Invalid month.
+                                                            </div>
+                                                        </div>
+                                                        <div class="floating-label">
+                                                            <label for="cardYear">Year</label>
+                                                            <input id="cardYear" class="form-control" placeholder="YYYY" type="number" min="2019" max="2030" name="cardYear" required data-ripple-line>
+                                                            <div class="invalid-feedback">
+                                                                Invalid year.
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="d-none d-sm-block col-sm-auto pt-2">
+                                                    <div class="form-group text-center">
+                                                        <div class="d-inline-block">
+                                                            <i class="fab fa-cc-visa fa-2x"></i>
+                                                            <i class="fab fa-cc-amex fa-2x"></i>
+                                                            <i class="fab fa-cc-mastercard fa-2x"></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer px-0 px-sm-3 d-block d-lg-none">
+                                    <div class="card-title font-weight-bold font-size-lg text-center text-sm-left">Price Summary</div>
+                                    <div class="card-body p-0 px-sm-3">
+                                        <div class="form-row">
+                                            <div class="col-6">
+                                                <input type="hidden" name="numPassenger" value="{{ num_passenger }}">
+                                                <div>Adult x{{ num_passenger }}</div>
+                                            </div>
+                                            <div class="col-6 text-right">
+                                                <input type="hidden" name="pricePerPassenger" value="{{ price }}">
+                                                <div id="pricePerPassenger">€{{ price }}</div>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div class="form-row font-weight-bold">
+                                            <div class="col-6">
+                                                <div>Total Price:</div>
+                                            </div>
+                                            <div class="col-6 text-right">
+                                                <input type="hidden" name="totalPrice" value="{{ total_price }}">
+                                                <div id="totalPrice">€{{ total_price }}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer text-right text-sm-left px-0 px-sm-3">
+                                    <div class="form-row justify-content-start align-items-center">
+                                        <div class="col-12 col-sm-3 col-xl-2">
+                                            <button class="btn btn-block btn-primary process-form" type="submit">Book Now</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-5 col-xl-4 order-1 order-lg-2 pl-lg-2">
+                            <div class="card rounded-3x shadow-sm-none shadow-1">
+                                <div class="card-body p-2">
+                                    <div class="accordion" id="flightsInfo">
+                                        {{ picked_flight|safe }}
+                                    </div>
+                                </div>
+                                <div class="card-footer d-none d-lg-block">
+                                    <div class="card-title font-weight-bold font-size-lg">Price Summary</div>
+                                    <div class="card-body pb-1 pt-0">
+                                        <div class="price-list">
+                                            <div class="form-row">
+                                                <div class="col-6">
+                                                    <div>Adult x{{ num_passenger }}</div>
+                                                </div>
+                                                <div class="col-6 text-right">
+                                                    <div id="pricePerPassenger">€{{ price }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div class="form-row font-weight-bold">
+                                            <div class="col-6">
+                                                <div>Total Price:</div>
+                                            </div>
+                                            <div class="col-6 text-right">
+                                                <div id="totalPrice">€{{ total_price }}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="d-block d-sm-none mt-1 mb-3">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="../static/js/jquery.min.js"></script>
+    <script src="../static/js/popper.min.js"></script>
+    <script src="../static/js/bootstrap.min.js"></script>
+
+    <!-- Then Material JavaScript on top of Bootstrap JavaScript -->
+    <script src="../static/js/material.js"></script>
+    <script src="../static/js/snackbar.js"></script>
+    <script src="../static/js/project.js"></script>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <script>
+                    $(function() {
+                        $.snackbar({content: '{{ message }}', style: 'snackbar-left justify-content-center mb-2'});
+                    });
+                </script>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+  </body>
+</html>

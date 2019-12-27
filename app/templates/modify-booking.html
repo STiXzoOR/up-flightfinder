@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta content="initial-scale=1, shrink-to-fit=no, width=device-width" name="viewport">
+
+        <!-- CSS -->
+        <link href="../static/css/roboto-family.css" rel="stylesheet">
+        <link href="../static/css/material-icons.css" rel="stylesheet">
+        <link href="../static/css/fontawesome-icons.css" rel="stylesheet">
+
+        <!-- Add Material CSS, replace Bootstrap CSS -->
+        <link href="../static/css/material.css" rel="stylesheet">
+        <link href="../static/css/project.css" rel="stylesheet">
+
+        <!-- favicon -->
+        <!-- ... -->
+
+        <!-- title -->
+        <title>Modify Booking - Flight Finder</title>
+    </head>
+    <script>
+        var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    </script>
+  <body class="body-content">
+    <div class="loader"></div>
+    <header class="navbar navbar-dark fixed-top bg-alt-primary toolbar-waterfall">
+        <a class="navbar-brand mr-auto" href="{{ url_for("index") }}">
+            <img src="../static/images/svg/logo_light.svg" width="35" height="35" class="d-inline-block align-top mr-2" alt="">
+            Flight Finder
+        </a>
+    </header>
+    <div class="jumbotron jumbotron-fluid jumbotron-bg mb-3 shadow-none"></div>
+    <main role="main">
+        <section class="d-flex align-items-center my-4">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-9">
+                        <form id="bookingForm" method="POST" action="{{ url_for("modify_booking_post") }}" novalidate>
+                            <input type="hidden" name="bookingID" value="{{ booking.ID }}">
+                            <input type="hidden" name="oldContactLastName" value="{{ contact_info.last_name }}">
+                            <div class="text-center text-sm-left mb-sm-3">
+                                <div class="card-title">Modify Booking</div>
+                                <div class="card-subtitle text-muted">Change contact info and add or change passenger seat.</div>
+                            </div>
+                            <hr class="d-block d-sm-none">
+                            <div class="card rounded-3x shadow-sm-none shadow-1">
+                                <div class="card-header px-0 pt-0 p-sm-3">
+                                    <div class="card-title font-weight-bold font-size-lg text-center text-sm-left">Booking Info</div>
+                                    <div class="card-body p-0 px-sm-3">
+                                        <div class="row align-items-center">
+                                            <div class="col-12 col-sm-4 col-md-3">
+                                                <div id="bookingID">
+                                                    <strong>Booking ID</strong>
+                                                    <div class="mt-1 mb-3 my-sm-0">{{ booking.id }}</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-sm-5 col-md-5 offset-md-1">
+                                                <div id="bookingDate">
+                                                    <strong>Date</strong>
+                                                    <div class="mt-1 mb-3 my-sm-0">{{ booking.date }}</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-sm-3">
+                                                <div id="bookingStatus">
+                                                    <strong>Status</strong>
+                                                    <div class="mt-1 my-sm-0">{{ booking.status }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body px-0 px-sm-3">
+                                    <div class="card rounded-3x shadow-none">
+                                        <div class="card-title font-weight-bold font-size-lg text-center text-sm-left">Flight Info</div>
+                                        <div class="card-body p-0 px-sm-3">
+                                            <div id="flightsInfo" class="accordion">
+                                            {{ picked_flight|safe }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="card rounded-3x shadow-none">
+                                        <div class="card-title font-weight-bold font-size-lg text-center text-sm-left mb-2">Passenger Info</div>
+                                        <div class="card-body p-0 px-sm-3">
+                                            <div class="list-group list-group-flush" id="passengersInfo">
+                                                {% for passenger in passenger_info %}
+                                                    <div class="font-size-rg expansion-panel list-group-item">
+                                                        <div id="passengerName-{{ loop.index }}" aria-controls="passenger-{{ loop.index }}" aria-expanded="false" class="expansion-panel-toggler pl-0 collapsed" data-target="#passenger-{{ loop.index }}" data-toggle="collapse" role="button">
+                                                        {{ passenger.first_name }} {{ passenger.last_name }}
+                                                            <div class="expansion-panel-icon ml-3 text-black-secondary small">
+                                                                <i class="collapsed-show material-icons">keyboard_arrow_down</i>
+                                                                <i class="collapsed-hide material-icons">keyboard_arrow_up</i>
+                                                            </div>
+                                                        </div>
+                                                        <div aria-labelledby="{{ passenger.first_name }}" class="collapse" data-parent="#passengerName-{{ loop.index }}" id="passenger-{{ loop.index }}">
+                                                            <div class="expansion-panel-body py-2">
+                                                                <div class="row">
+                                                                    <div class="col-12 col-sm-4 col-xl-3">
+                                                                        <div id="passengerID">
+                                                                            <strong>Identfication</strong>
+                                                                            <div class="mt-1 mb-3 my-sm-0">{{ passenger.id }}</div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-12 col-sm-4 col-xl-3">
+                                                                        <div id="passengerSeat">
+                                                                            <strong>Seat</strong>
+                                                                            <div class="mt-1 mb-3 my-sm-0">{{ passenger.seat }}</div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-12 col-sm-4 col-xl-3">
+                                                                        <div id="passengerSeatClass">
+                                                                            <strong>Seat Class</strong>
+                                                                            <div class="mt-1 mb-3 my-sm-0">{{ passenger.seat_class }}</div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-12 col-xl-3">
+                                                                        <button class="btn btn-primary btn-block" data-toggle="modal" href="#changeSeat">Change seat</button>
+                                                                        <input class="form-control d-none" id="seatPassenger-{{ id }}" type="text" name="seatPassenger-{{ id }}" value="">
+                                                                        <div class="invalid-feedback">
+                                                                            Invalid seat.
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr class="mt-1">
+                                    <div class="card rounded-3x shadow-none mt-3">
+                                        <div class="card-title font-weight-bold font-size-lg text-center text-sm-left">Contact Info</div>
+                                        <div class="card-body p-0 px-sm-3">
+                                            <div class="form-row">
+                                                <div class="form-group col-12 col-md-3">
+                                                    <div class="floating-label has-value">
+                                                        <label for="contactFirstName">First name</label>
+                                                        <input id="contactFirstName" class="form-control" type="text" name="contactFirstName" value="{{ contact_info.first_name }}" required data-ripple-line>
+                                                        <div class="invalid-feedback">
+                                                            Invalid first name.
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-12 col-md-3">
+                                                    <div class="floating-label has-value">
+                                                        <label for="contactLastName">Last name</label>
+                                                        <input id="contactLastName" class="form-control" type="text" name="contactLastName" value="{{ contact_info.last_name }}" required data-ripple-line>
+                                                        <div class="invalid-feedback">
+                                                            Invalid last name.
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-12 col-md-3">
+                                                    <div class="floating-label has-value">
+                                                        <label for="contactEmail">Email address</label>
+                                                        <input id="contactEmail" class="form-control" type="email" name="contactEmail" value="{{ contact_info.email }}" required data-ripple-line>
+                                                        <div class="invalid-feedback">
+                                                            Invalid email address.
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-12 col-md-3">
+                                                    <div class="floating-label has-value">
+                                                        <label for="contactMobile">Mobile number</label>
+                                                        <input id="contactMobile" class="form-control" type="text" pattern="[0-9]{6,10}" maxlength="10" name="contactMobile" value="{{ contact_info.mobile }}" required data-ripple-line>
+                                                        <div class="invalid-feedback">
+                                                            Invalid mobile number.
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer px-0 pb-0 pt-3 p-sm-3">
+                                    <div class="card-title font-weight-bold font-size-lg text-center text-sm-left">Price Summary</div>
+                                    <div class="card-body p-0 px-sm-3">
+                                        <div class="form-row">
+                                            <div class="col-6">
+                                                <div>Adult x{{ booking.total_passengers }}</div>
+                                            </div>
+                                            <div class="col-6 text-right">
+                                                <div id="pricePerPassenger" name="pricePerPassenger" value="{{ booking.price_per_passenger }}">€{{ booking.price_per_passenger }}</div>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div class="form-row font-weight-bold">
+                                            <div class="col-6">
+                                                <div>Total Price:</div>
+                                            </div>
+                                            <div class="col-6 text-right">
+                                                <div id="totalPrice" name="totalPrice" value="{{ booking.total_price }}">€{{ booking.total_price }}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="clearfix mt-3">
+                                {% if go_back is sameas true %}
+                                    <a href="{{ go_back_address }}" class="btn btn-primary float-left">Go Back</a>
+                                {% endif %}
+                                <button class="btn btn-primary process-form float-right" type="submit">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="../static/js/jquery.min.js"></script>
+    <script src="../static/js/popper.min.js"></script>
+    <script src="../static/js/bootstrap.min.js"></script>
+
+    <!-- Then Material JavaScript on top of Bootstrap JavaScript -->
+    <script src="../static/js/material.js"></script>
+    <script src="../static/js/snackbar.js"></script>
+    <script src="../static/js/project.js"></script>
+
+    <script>
+        //$(function() {
+        //   $("img").removeClass("h-75 w-75").addClass("booking-flight-img");
+        //});
+    </script>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <script>
+                    $(function() {
+                        $.snackbar({content: '{{ message }}', style: 'snackbar-left justify-content-center mb-2'});
+                    });
+                </script>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+  </body>
+</html>

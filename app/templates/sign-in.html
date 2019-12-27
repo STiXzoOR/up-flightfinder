@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta content="initial-scale=1, shrink-to-fit=no, width=device-width" name="viewport">
+
+        <!-- CSS -->
+        <link href="../static/css/roboto-family.css" rel="stylesheet">
+        <link href="../static/css/material-icons.css" rel="stylesheet">
+        <link href="../static/css/fontawesome-icons.css" rel="stylesheet">
+
+        <!-- Add Material CSS, replace Bootstrap CSS -->
+        <link href="../static/css/material.css" rel="stylesheet">
+        <link href="../static/css/project.css" rel="stylesheet">
+
+        <!-- favicon -->
+        <!-- ... -->
+
+        <!-- title -->
+        <title>Sign In - Flight Finder</title>
+    </head>
+    <script>
+        var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    </script>
+  <body class="body-content">
+    <div class="loader"></div>
+    <header class="navbar navbar-dark fixed-top bg-alt-primary toolbar-waterfall">
+        <a class="navbar-brand mr-auto" href="{{ url_for("index") }}">
+            <img src="../static/images/svg/logo_light.svg" width="35" height="35" class="d-inline-block align-top mr-2" alt="">
+            Flight Finder
+        </a>
+    </header>
+    <main role="main">
+        <section class="d-flex align-items-center my-4">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-sm-8 col-md-7 col-lg-6 col-xl-5">
+                        <div class="row justify-content-center align-items-center">
+                            <div class="col-9">
+                                <img class="img-fluid" src="../static/images/svg/welcome.svg" alt="Welcome"/>
+                            </div>
+                            <div class="col-12">
+                                <div class="card shadow-none">
+                                    <div class="card-body px-0">
+                                        <div class="text-center text-md-center mt-4 mt-md-0 pb-3">
+                                            <h2 class="font-weight-normal text-monospace">WELCOME BACK!</h2>
+                                            <p class="text-muted">Please sign back in to access your account.</p>
+                                        </div>
+                                        <form method="POST" id="signInForm" class="px-0" novalidate="">
+                                            <div class="form-group">
+                                                <div class="floating-label">
+                                                    <label for="email"><i class="fas fa-envelope fa-fw mr-2"></i>Email Address</label>
+                                                    <input id="email" class="form-control" type="email" name="email" required data-ripple-line>
+                                                    <div class="invalid-feedback">
+                                                        Email address is required.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="floating-label">
+                                                    <label for="password"><i class="fas fa-unlock-alt fa-fw mr-2"></i>Password</label>
+                                                    <input id="password" class="form-control" type="password" name="password" required data-ripple-line data-password>
+                                                    <div class="invalid-feedback">
+                                                        Password is required.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group pt-3">
+                                                <button class="btn btn-primary btn-block process-form" type="submit">Sign in</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    {% if has_next is sameas false %}
+                                        <div class="card-footer">
+                                            <div class="text-center">
+                                                Don't have an account? <a href="{{ url_for("sign_up") }}">Create One</a>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="../static/js/jquery.min.js"></script>
+    <script src="../static/js/popper.min.js"></script>
+    <script src="../static/js/bootstrap.min.js"></script>
+
+    <!-- Then Material JavaScript on top of Bootstrap JavaScript -->
+    <script src="../static/js/material.js"></script>
+    <script src="../static/js/snackbar.js"></script>
+    <script src="../static/js/project.js"></script>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <script>
+                    $(function() {
+                        $.snackbar({content: '{{ message }}', style: 'snackbar-left justify-content-center mb-2'});
+                    });
+                </script>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+  </body>
+</html>
