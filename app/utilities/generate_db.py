@@ -80,7 +80,10 @@ def configure_database():
         for stmt in stmts:
             try:
                 cursor.execute(stmt)
-            except:
+            except (pymysql.err.DatabaseError,
+                pymysql.err.IntegrityError,
+                pymysql.err.MySQLError) as e:
+                print(e)
                 print(stmt)
                 exit(1)
         cnx.commit()
