@@ -139,7 +139,7 @@
                                         <div class="form-group mt-3">
                                             <div class="floating-label">
                                                 <label for="newPassword">New password</label>
-                                                <input id="newPassword" class="form-control" type="password" pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$" name="newPassword" required data-ripple-line
+                                                <input id="newPassword" class="form-control" type="password" pattern="^(?=.*[A-Za-z])[A-Za-z\d\W]{8,}$" name="newPassword" required data-ripple-line
                                                 data-password>
                                                 <div class="invalid-feedback">
                                                     Invalid password, must at least 8 characters long.
