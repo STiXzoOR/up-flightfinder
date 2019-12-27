@@ -59,12 +59,13 @@ def parse_sql(file):
     return stmts
 
 def create_database():
-    queries = ['DROP DATABASE IF EXISTS FlightFinderDB', 'CREATE DATABASE IF NOT EXISTS FlightFinderDB']
+    query = """
+    CREATE DATABASE IF NOT EXISTS FlightFinderDB
+    """
 
     cnx = create_connection()
     cursor = cnx.cursor()
-    for query in queries:
-        cursor.execute(query)
+    cursor.execute(query)
     cursor.close()
     cnx.commit()
     cnx.close()
@@ -77,7 +78,11 @@ def configure_database():
     
     with cnx.cursor() as cursor:
         for stmt in stmts:
-            cursor.execute(stmt)
+            try:
+                cursor.execute(stmt)
+            except:
+                print(stmt)
+                exit(1)
         cnx.commit()
     
     cnx.close()
@@ -111,10 +116,10 @@ def generate_flights():
     date_start = today = datetime.now().date()
     date_end = date_start + timedelta(days=30)
 
-    with open(current_dir + '/csv_data/routes_durations.json', mode='r') as file:
+    with open(current_dir + '/data/routes_durations.json', mode='r') as file:
         durations = json.load(file)
 
-    with open(current_dir + '/csv_data/routes.csv', mode='r') as input_csv:
+    with open(current_dir + '/data/routes.csv', mode='r') as input_csv:
         csv_reader = csv.DictReader(input_csv,
                                     delimiter=';',
                                     fieldnames=['airline', 'from', 'to', 'airplane'])
