@@ -25,6 +25,8 @@ def current_user():
 @app.route('/')
 @app.route('/index.html')
 def index():
+    session.pop('is_guest', None)
+
     return render_template('index.html', airports=get_airports())
 
 from app.routes import error

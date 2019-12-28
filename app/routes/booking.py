@@ -221,17 +221,16 @@ def modify_booking_post():
     mobile = form.get('contactMobile')
     old_last_name = form.get('oldContactLastName')
     customer_type = get_customer_type()
-    current_date = datetime.now().date()
     
     query = """
     UPDATE booking 
-    SET first_name=%s, last_name=%s, email=%s, mobile=%s, last_modify_date=%s 
+    SET first_name=%s, last_name=%s, email=%s, mobile=%s, last_modify_date=CURRENT_DATE 
     WHERE booking_id=%s and last_name=%s
     """
 
     cnx = create_connection()
     cursor = cnx.cursor()
-    cursor.execute(query, (first_name, last_name, email, mobile, current_date, booking_id, old_last_name))
+    cursor.execute(query, (first_name, last_name, email, mobile, booking_id, old_last_name))
     cursor.close()
     cnx.commit()
     cnx.close()

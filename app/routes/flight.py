@@ -1,5 +1,6 @@
-from app import app, restricted, create_connection, get_customer_id, get_customer_type, get_flights, build_flights, build_selected_flights, redirect_guest
+from app import app, restricted, create_connection, get_customer_id, get_customer_type, get_flights, booking_is_active, build_flights, build_selected_flights, redirect_guest
 from flask import render_template, session, request, redirect, flash, url_for, jsonify
+from pymysql.cursors import Cursor
 from datetime import datetime
 
 @app.route('/search-flights', methods=["GET"])
@@ -105,7 +106,27 @@ def search_flights():
 @redirect_guest
 def picked_flight(depart_flight_id='', return_flight_id='', passenger_num=0, price=0, is_roundtrip=False):
     session.pop('is_guest', None)
+    customer_id = get_customer_id()
+    customer_type = get_customer_type()
     is_roundtrip = is_roundtrip == 'True'
+
+    if customer_type == 'USER':
+        query = """
+        SELECT status 
+        FROM booking 
+        WHERE customer_id=%s and depart_flight_id=%s and status="Active"
+        """
+
+        cnx = create_connection()
+        cursor = cnx.cursor()
+        cursor.execute(query, (customer_id, depart_flight_id))
+        result = cursor.fetchone()
+        cursor.close()
+        cnx.close()
+
+        if result is not None:
+            flash('You have already booked this flight route!', 'error')
+            return redirect(url_for('index'))
 
     WHERE = """
     f.flight_id=%s and al.airline_code=f.airline and ap.airplane_model=f.airplane and aprt1.airport_code=f.from_airport and aprt2.airport_code=f.to_airport
@@ -121,24 +142,6 @@ def picked_flight(depart_flight_id='', return_flight_id='', passenger_num=0, pri
         params += (return_flight_id,)
     
     flight = get_flights(is_roundtrip=is_roundtrip, params=params, WHERE=WHERE, FETCH_ALL=False)
-
-    if get_customer_type() == 'USER':
-        check_query = """
-        SELECT status 
-        FROM booking 
-        WHERE customer_id=%s and depart_flight_id=%s and status="Active"
-        """
-
-        cnx = create_connection()
-        cursor = cnx.cursor()
-        cursor.execute(check_query, (get_customer_id(), flight['departFlightID']))
-        result = cursor.fetchone()
-        cursor.close()
-        cnx.close()
-
-        if result is not None:
-            flash('You have already booked this flight route!', 'error')
-            return redirect(url_for('index'))
 
     price = int(price)
     passenger_num = int(passenger_num)

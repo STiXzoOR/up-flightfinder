@@ -53,6 +53,10 @@ def get_customer_type():
 def set_session_user(info={}):
     return session.update(info)
 
+def clear_session_user():
+    for field in ['customer_id', 'email', 'customer_type', 'first_name', 'last_name', 'full_name']:
+        session.pop(field, None)
+
 def build_flight_card(airline_logo='', airline_name='', from_airport='', time_from='', to_airport='', time_to=''):
     return """  <div class="form-row justify-content-center align-items-center">
                     <div class="col-2 col-lg-1 col-xl-2 px-0 px-md-2 px-lg-0 px-xl-2 text-center">
@@ -188,7 +192,7 @@ def get_airports():
     FROM airport
     """
 
-    cnx =create_connection()
+    cnx = create_connection()
     cursor = cnx.cursor()
     cursor.execute(query)
     result = cursor.fetchall()
@@ -218,7 +222,7 @@ def get_flights(is_roundtrip=False, params=(), WHERE='', ORDER_BY='', LIMIT='', 
     if LIMIT:
         query += ' LIMIT {limit}'.format(limit=LIMIT)
 
-    cnx =create_connection()
+    cnx = create_connection()
     cursor = cnx.cursor()
     cursor.execute(query, params)
     data = cursor.fetchall() if FETCH_ALL else cursor.fetchone()
@@ -246,9 +250,25 @@ def booking_exists(booking_id, last_name):
     WHERE booking_id=%s and (last_name=%s {operator} customer_id=%s)
     """.format(operator='or' if customer_type == 'GUEST' else 'and')
 
-    cnx =create_connection()
+    cnx = create_connection()
     cursor = cnx.cursor()
     cursor.execute(query, (booking_id, last_name, customer_id))
+    result = cursor.fetchone()
+    cursor.close()
+    cnx.close()
+
+    return result is not None
+
+def booking_is_active(booking_id, last_name):
+    query = """
+    SELECT status 
+    FROM booking 
+    WHERE booking_id=%s and last_name=%s and status="Active"
+    """
+
+    cnx = create_connection()
+    cursor = cnx.cursor()
+    cursor.execute(query, (booking_id, last_name))
     result = cursor.fetchone()
     cursor.close()
     cnx.close()
@@ -262,7 +282,7 @@ def booking_is_inactive(booking_id, last_name):
     WHERE booking_id=%s and last_name=%s and status in ("Canceled", "Passed")
     """
 
-    cnx =create_connection()
+    cnx = create_connection()
     cursor = cnx.cursor()
     cursor.execute(query, (booking_id, last_name))
     result = cursor.fetchone()
@@ -282,7 +302,7 @@ def get_booking(booking_id='', booking_last_name=''):
     WHERE booking_id=%s and (last_name=%s {operator} customer_id=%s) 
     """.format(operator='or' if customer_type == 'GUEST' else 'and')
 
-    cnx =create_connection()
+    cnx = create_connection()
     cursor = cnx.cursor()
     cursor.execute(query, (booking_id, booking_last_name, customer_id))
     booking_info = cursor.fetchone()

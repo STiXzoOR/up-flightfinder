@@ -1,4 +1,4 @@
-from app import app, restricted, create_connection, get_customer_id, set_session_user
+from app import app, restricted, create_connection, get_customer_id, set_session_user, clear_session_user
 from flask import render_template, session, request, redirect, flash, url_for
 from flask_bcrypt import generate_password_hash as gen_pw_hash
 from flask_bcrypt import check_password_hash as chk_pw_hash
@@ -79,7 +79,7 @@ def sign_up_post():
     
     ins = """
     INSERT INTO customer (customer_id, first_name, last_name, email, password, mobile, gender, joined_date, status, customer_type) 
-    VALUE(%s, %s, %s, %s, %s, %s, %s, %s, "Active", "USER")
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, "Active", "USER")
     """
 
     cursor = cnx.cursor()
@@ -104,7 +104,7 @@ def sign_up_post():
 @app.route('/sign-out.html')
 @restricted(access_level='USER')
 def sign_out():
-    session.clear()
+    clear_session_user()
     return redirect(url_for('index'))
 
 @app.route('/user-profile.html')
@@ -156,10 +156,17 @@ def change_password():
     form = request.form
     current_password = form.get('currentPassword')
     new_password = gen_pw_hash(form.get('newPassword'))
+    customer_id = get_customer_id()
+
+    query = """
+    SELECT password 
+    FROM customer 
+    WHERE customer_id=%s
+    """
 
     cnx = create_connection()
     cursor = cnx.cursor()
-    cursor.execute('SELECT password FROM customer WHERE customer_id=%s', (session['customer_id']))
+    cursor.execute(query, (customer_id))
     db_password = cursor.fetchone()['password']
     cursor.close()
     
@@ -185,9 +192,9 @@ def change_password():
 @app.route('/delete-account', methods=["POST"])
 @restricted(access_level='USER')
 def delete_account():
-    customer_id = get_customer_id()
     form = request.form
     current_password = form.get('currentDeletePassword')
+    customer_id = get_customer_id()
 
     query = """
     SELECT password 
