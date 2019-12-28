@@ -218,7 +218,6 @@ $(function() {
   });
 
   $("#flightForm").submit(function() {
-    var $scrollDistance = flightsElement.offset().top;
     var $form = $(this);
     if (!validateForm($form)) return false;
     event.preventDefault();
@@ -252,7 +251,10 @@ $(function() {
       complete: function() {
         clearTimeout(timeoutVar);
         timeoutVar = setTimeout(setSameHeight(), 500);
-        scrollDown($scrollDistance);
+        var $scrollDistance = $("#flightSearchResult div")
+          .first()
+          .offset().top;
+        scrollDown($scrollDistance - 65);
         return false;
       },
       error: function(jqXHR, textStatus, errorThrown) {
@@ -263,7 +265,7 @@ $(function() {
 
   $(document).on("click", ".load-more-flights", function(e) {
     e.preventDefault();
-    var $currentLocation = $(this).offset().top;
+    var $scrollDistance = $(this).offset().top;
     $.ajax({
       type: "GET",
       url: $SCRIPT_ROOT + "/search-flights",
@@ -290,7 +292,7 @@ $(function() {
       complete: function() {
         clearTimeout(timeoutVar);
         timeoutVar = setTimeout(setSameHeight(), 500);
-        scrollDown($currentLocation);
+        scrollDown($scrollDistance - 65);
       },
       error: function(jqXHR, textStatus, errorThrown) {
         alert(errorThrown);
