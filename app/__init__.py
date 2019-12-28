@@ -2,6 +2,7 @@ from flask import Flask, render_template, g
 from app.functions.functions import *
 
 app = Flask(__name__)
+app.debug = True
 app.config['SECRET_KEY'] = 'FlightFinder2019'
 
 @app.before_request
