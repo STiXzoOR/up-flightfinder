@@ -262,6 +262,7 @@ $(function() {
   });
 
   $(document).on("click", ".load-more-flights", function() {
+    event.preventDefault();
     var $currentLocation = $(this).offset().top;
     $.ajax({
       type: "GET",

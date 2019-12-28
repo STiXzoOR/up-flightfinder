@@ -96,7 +96,7 @@ def search_flights():
     if len(data) == 5:
         flights += """  <div id="loadMoreBtn" class="row justify-content-center">
                             <input type="hidden" name="startLimitMore" value="{start}">
-                            <button id="loadMoreFlights" class="load-more-flights btn btn-primary"><i class="fas fa-spinner fa-fw mr-2"></i>Load More</button>
+                            <a id="loadMoreFlights" class="load-more-flights btn btn-primary" href="#"><i class="fas fa-spinner fa-fw mr-2"></i>Load More</a>
                         </div>""".format(start=start_limit+5)
     
     return jsonify(message='result', content=flights)
