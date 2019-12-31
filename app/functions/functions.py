@@ -92,7 +92,7 @@ def build_selected_flight_card(id='', flight='', flight_id='', airline_name='', 
                         <div class="card-body p-0">
                             <div class="form-row justify-content-center align-items-center">
                                 <div class="col-4 col-lg-4 col-xl-4 pl-3 pl-sm-4 pl-lg-3 pr-0">
-                                    <input type="hidden" name="{flight_type}FlightID" value="{flight_id}">
+                                    <input type="hidden" id="{flight_type}FlightID" name="{flight_type}FlightID" value="{flight_id}">
                                     <div class="font-size-xl mb-3">{flight_id}</div>
                                     <div>{date}</div>
                                     <div>{airline_name}</div>
@@ -230,15 +230,6 @@ def get_flights(is_roundtrip=False, params=(), WHERE='', ORDER_BY='', LIMIT='', 
     cnx.close()
     
     return data
-
-def pick_seat():
-    rows = [str(row) for row in range(1, 21)]
-    cols = ['A', 'B', 'C', 'D', 'E', 'F']
-    seats = [[row+col for col in cols] for row in rows]
-
-    class_seats = {'first class': [seat for row in seats[:2] for seat in row],
-                   'business': [seat for row in seats[2:4] for seat in row],
-                   'economy': [seat for row in seats[4:] for seat in row]}
 
 def booking_exists(booking_id, last_name):
     customer_id = get_customer_id()

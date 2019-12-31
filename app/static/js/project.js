@@ -323,9 +323,9 @@ $(function() {
         airport: $(this).val()
       },
       success: function(data) {
-        $.each(data.result, function(index) {
-          var value = data.result[index].value;
-          var text = data.result[index].text;
+        $.each(data.result, function(index, airport) {
+          var value = airport.value;
+          var text = airport.text;
           $("#toAirport").append(
             $("<option/>")
               .attr("value", value)

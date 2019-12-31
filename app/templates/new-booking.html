@@ -13,6 +13,7 @@
         <!-- Add Material CSS, replace Bootstrap CSS -->
         <link href="../static/css/material.css" rel="stylesheet">
         <link href="../static/css/project.css" rel="stylesheet">
+        <link href="../static/css/seat-charts.css" rel="stylesheet">
 
         <!-- favicon -->
         <!-- ... -->
@@ -56,7 +57,7 @@
                                                         </a>
                                                         <div aria-labelledby="passenger-{{ id }}" class="card-footer pt-2 pb-0 collapse" data-parent="#passengerName-{{ id }}" id="passenger-{{ id }}">
                                                             <div class="py-0">
-                                                                <div class="form-row align-items-center">
+                                                                <div class="form-row">
                                                                     <div class="form-group col-12 col-md-3">
                                                                         <div class="floating-label">
                                                                             <label for="firstNamePassenger-{{ id }}">First name</label>
@@ -85,8 +86,11 @@
                                                                         </div>
                                                                     </div>
                                                                     <div class="form-group col-12 col-md-3">
-                                                                        <a class="btn btn-primary btn-block" data-toggle="modal" href="#selectSeat">Select seat</a>
-                                                                        <input class="form-control d-none" id="seatPassenger-{{ id }}" type="text" name="seatPassenger-{{ id }}" value="">
+                                                                        <button type="button" class="btn btn-primary btn-block mt-md-2" data-toggle="modal" data-target="#selectSeat" data-value="{{ id }}">
+                                                                            Select seat
+                                                                        </button>
+                                                                        <input class="form-control d-none" id="seatPassenger-{{ id }}" type="text" pattern="[A-Z\d]{2,3}" name="seatPassenger-{{ id }}" value="" required>
+                                                                        <input class="form-control d-none" id="seatClassPassenger-{{ id }}" type="text" name="seatClassPassenger-{{ id }}" value="">
                                                                         <div class="invalid-feedback">
                                                                             Invalid seat.
                                                                         </div>
@@ -219,23 +223,23 @@
                                     <div class="card-title font-weight-bold font-size-lg text-center text-sm-left">Price Summary</div>
                                     <div class="card-body p-0 px-sm-3">
                                         <div class="form-row">
-                                            <div class="col-6">
+                                            <div class="price-list-names col-8">
                                                 <input type="hidden" name="numPassenger" value="{{ num_passenger }}">
                                                 <div>Adult x{{ num_passenger }}</div>
                                             </div>
-                                            <div class="col-6 text-right">
+                                            <div class="price-list-prices col-4 text-right">
                                                 <input type="hidden" name="pricePerPassenger" value="{{ price }}">
-                                                <div id="pricePerPassenger">€{{ price }}</div>
+                                                <div>€<span id="pricePerPassenger">{{ price }}</span></div>
                                             </div>
                                         </div>
                                         <hr>
                                         <div class="form-row font-weight-bold">
-                                            <div class="col-6">
+                                            <div class="col-8">
                                                 <div>Total Price:</div>
                                             </div>
-                                            <div class="col-6 text-right">
-                                                <input type="hidden" name="totalPrice" value="{{ total_price }}">
-                                                <div id="totalPrice">€{{ total_price }}</div>
+                                            <div class="col-4 text-right">
+                                                <input type="hidden" id="totalPrice" name="totalPrice" value="{{ total_price }}">
+                                                <div>€<span class="total-price">{{ total_price }}<span></div>
                                             </div>
                                         </div>
                                     </div>
@@ -259,29 +263,72 @@
                                 <div class="card-footer d-none d-lg-block">
                                     <div class="card-title font-weight-bold font-size-lg">Price Summary</div>
                                     <div class="card-body pb-1 pt-0">
-                                        <div class="price-list">
-                                            <div class="form-row">
-                                                <div class="col-6">
-                                                    <div>Adult x{{ num_passenger }}</div>
-                                                </div>
-                                                <div class="col-6 text-right">
-                                                    <div id="pricePerPassenger">€{{ price }}</div>
-                                                </div>
+                                        <div class="form-row">
+                                            <div class="price-list-names col-8">
+                                                <div>Adult x{{ num_passenger }}</div>
+                                            </div>
+                                            <div class="price-list-prices col-4 text-right">
+                                                <div>€<span id="pricePerPassenger">{{ price }}</span></div>
                                             </div>
                                         </div>
                                         <hr>
                                         <div class="form-row font-weight-bold">
-                                            <div class="col-6">
+                                            <div class="col-8">
                                                 <div>Total Price:</div>
                                             </div>
-                                            <div class="col-6 text-right">
-                                                <div id="totalPrice">€{{ total_price }}</div>
+                                            <div class="col-4 text-right">
+                                                <div>€<span class="total-price">{{ total_price }}<span></div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <hr class="d-block d-sm-none mt-1 mb-3">
+                        </div>
+                        <div class="modal fade" id="selectSeat" tabindex="-1" role="dialog" aria-labelledby="selectSeat" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Seat Map</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-md-6 pr-md-0">
+                                                <div id="seat-map">
+                                                    <div class="front-indicator">Front</div>
+                                                </div>
+                                                <hr class="d-block d-md-none">
+                                            </div>
+                                            <div class="d-none d-md-block col-md-1">
+                                                <div class="seatCharts-vertical-divider"></div>
+                                            </div>
+                                            <div class="col-md-5 pl-md-0">
+                                                <div class="card-title font-weight-bold font-size-lg text-center text-sm-left">Cabin Legend</div>
+                                                <div id="legend"></div>
+                                                <hr>
+                                                <div class="card-title font-weight-bold font-size-lg text-center text-sm-left">Selected Seat</div>
+                                                <div id="selectedSeat"></div>
+                                                <hr>
+                                                <div class="form-row font-weight-bold">
+                                                    <div class="col-9">
+                                                        <div>Price:</div>
+                                                    </div>
+                                                    <div class="col-3 text-right">
+                                                        <input type="hidden" name="seatPrice" value="0">
+                                                        <div id="seatPrice"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button id="seatSelectBtn" type="button" class="btn btn-primary" data-dismiss="modal">Select</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -298,6 +345,8 @@
     <script src="../static/js/material.js"></script>
     <script src="../static/js/snackbar.js"></script>
     <script src="../static/js/project.js"></script>
+    <script src="../static/js/seat-charts.js"></script>
+    <script src="../static/js/gen-seat-map.js"></script>
 
     {% with messages = get_flashed_messages() %}
         {% if messages %}

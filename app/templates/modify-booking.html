@@ -13,6 +13,7 @@
         <!-- Add Material CSS, replace Bootstrap CSS -->
         <link href="../static/css/material.css" rel="stylesheet">
         <link href="../static/css/project.css" rel="stylesheet">
+        <link href="../static/css/seat-charts.css" rel="stylesheet">
 
         <!-- favicon -->
         <!-- ... -->
@@ -38,7 +39,7 @@
                 <div class="row justify-content-center">
                     <div class="col-lg-9">
                         <form id="bookingForm" method="POST" action="{{ url_for("modify_booking_post") }}" novalidate>
-                            <input type="hidden" name="bookingID" value="{{ booking.ID }}">
+                            <input type="hidden" name="bookingID" value="{{ booking.id }}">
                             <input type="hidden" name="oldContactLastName" value="{{ contact_info.last_name }}">
                             <div class="text-center text-sm-left mb-sm-3">
                                 <div class="card-title">Modify Booking</div>
@@ -85,6 +86,7 @@
                                         <div class="card-title font-weight-bold font-size-lg text-center text-sm-left mb-2">Passenger Info</div>
                                         <div class="card-body p-0 px-sm-3">
                                             <div class="list-group list-group-flush" id="passengersInfo">
+                                                <input type="hidden" name="numPassengers" value="{{ booking.total_passengers }}">
                                                 {% for passenger in passenger_info %}
                                                     <div class="font-size-rg expansion-panel list-group-item">
                                                         <div id="passengerName-{{ loop.index }}" aria-controls="passenger-{{ loop.index }}" aria-expanded="false" class="expansion-panel-toggler pl-0 collapsed" data-target="#passenger-{{ loop.index }}" data-toggle="collapse" role="button">
@@ -101,23 +103,27 @@
                                                                         <div id="passengerID">
                                                                             <strong>Identfication</strong>
                                                                             <div class="mt-1 mb-3 my-sm-0">{{ passenger.id }}</div>
+                                                                            <input type="hidden" name="idPassenger-{{ loop.index }}" value="{{ passenger.id }}">
                                                                         </div>
                                                                     </div>
                                                                     <div class="col-12 col-sm-4 col-xl-3">
                                                                         <div id="passengerSeat">
                                                                             <strong>Seat</strong>
-                                                                            <div class="mt-1 mb-3 my-sm-0">{{ passenger.seat }}</div>
+                                                                            <div id="currentSeatPassenger-{{ loop.index }}" class="mt-1 mb-3 my-sm-0">{{ passenger.seat }}</div>
                                                                         </div>
                                                                     </div>
                                                                     <div class="col-12 col-sm-4 col-xl-3">
                                                                         <div id="passengerSeatClass">
                                                                             <strong>Seat Class</strong>
-                                                                            <div class="mt-1 mb-3 my-sm-0">{{ passenger.seat_class }}</div>
+                                                                            <div id="currentSeatClassPassenger-{{ loop.index }}" class="mt-1 mb-3 my-sm-0">{{ passenger.seat_class }}</div>
                                                                         </div>
                                                                     </div>
                                                                     <div class="col-12 col-xl-3">
-                                                                        <button class="btn btn-primary btn-block" data-toggle="modal" href="#changeSeat">Change seat</button>
-                                                                        <input class="form-control d-none" id="seatPassenger-{{ id }}" type="text" name="seatPassenger-{{ id }}" value="">
+                                                                        <button type="button" class="btn btn-primary btn-block mt-md-2" data-toggle="modal" data-target="#selectSeat" data-value="{{ loop.index }}">
+                                                                            Change seat
+                                                                        </button>
+                                                                        <input class="form-control d-none" id="seatPassenger-{{ loop.index }}" type="text" pattern="[A-Z\d]{2,3}" name="seatPassenger-{{ loop.index }}" value="{{ passenger.seat }}" required>
+                                                                        <input class="form-control d-none" id="seatClassPassenger-{{ loop.index }}" type="text" name="seatClassPassenger-{{ loop.index }}" value="{{ passenger.seat_class }}">
                                                                         <div class="invalid-feedback">
                                                                             Invalid seat.
                                                                         </div>
@@ -179,12 +185,8 @@
                                     <div class="card-title font-weight-bold font-size-lg text-center text-sm-left">Price Summary</div>
                                     <div class="card-body p-0 px-sm-3">
                                         <div class="form-row">
-                                            <div class="col-6">
-                                                <div>Adult x{{ booking.total_passengers }}</div>
-                                            </div>
-                                            <div class="col-6 text-right">
-                                                <div id="pricePerPassenger" name="pricePerPassenger" value="{{ booking.price_per_passenger }}">€{{ booking.price_per_passenger }}</div>
-                                            </div>
+                                            <div class="price-list-names col-8"></div>
+                                            <div class="price-list-prices col-4 text-right"></div>
                                         </div>
                                         <hr>
                                         <div class="form-row font-weight-bold">
@@ -192,7 +194,8 @@
                                                 <div>Total Price:</div>
                                             </div>
                                             <div class="col-6 text-right">
-                                                <div id="totalPrice" name="totalPrice" value="{{ booking.total_price }}">€{{ booking.total_price }}</div>
+                                                <input type="hidden" id="totalPrice" name="totalPrice" value="0">
+                                                <div>€<span class="total-price">0<span></div>
                                             </div>
                                         </div>
                                     </div>
@@ -203,6 +206,51 @@
                                     <a href="{{ go_back_address }}" class="btn btn-primary float-left">Go Back</a>
                                 {% endif %}
                                 <button class="btn btn-primary process-form float-right" type="submit">Save Changes</button>
+                            </div>
+                            <div class="modal fade" id="selectSeat" tabindex="-1" role="dialog" aria-labelledby="selectSeat" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Seat Map</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-md-6 pr-md-0">
+                                                    <div id="seat-map">
+                                                        <div class="front-indicator">Front</div>
+                                                    </div>
+                                                    <hr class="d-block d-md-none">
+                                                </div>
+                                                <div class="d-none d-md-block col-md-1">
+                                                    <div class="seatCharts-vertical-divider"></div>
+                                                </div>
+                                                <div class="col-md-5 pl-md-0">
+                                                    <div class="card-title font-weight-bold font-size-lg text-center text-sm-left">Cabin Legend</div>
+                                                    <div id="legend"></div>
+                                                    <hr>
+                                                    <div class="card-title font-weight-bold font-size-lg text-center text-sm-left">Selected Seat</div>
+                                                    <div id="selectedSeat"></div>
+                                                    <hr>
+                                                    <div class="form-row font-weight-bold">
+                                                        <div class="col-9">
+                                                            <div>Price:</div>
+                                                        </div>
+                                                        <div class="col-3 text-right">
+                                                            <input type="hidden" name="seatPrice" value="0">
+                                                            <div id="seatPrice"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button id="seatSelectBtn" type="button" class="btn btn-primary" data-dismiss="modal">Select</button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -220,6 +268,8 @@
     <script src="../static/js/material.js"></script>
     <script src="../static/js/snackbar.js"></script>
     <script src="../static/js/project.js"></script>
+    <script src="../static/js/seat-charts.js"></script>
+    <script src="../static/js/gen-seat-map.js"></script>
 
     <script>
         //$(function() {

@@ -1,0 +1,149 @@
+.front-indicator {
+  background-color: #f6f6f6;
+  color: rgba(0, 0, 0, 0.38);
+  text-align: center;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  margin-bottom: 1rem;
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+@media (max-width: 767.98px) {
+  .front-indicator {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+.seatCharts-vertical-divider {
+  border-left: 1px dotted rgba(0, 0, 0, 0.38);
+  height: 100%;
+  left: 50%;
+  position: absolute;
+}
+
+.seatCharts-container {
+  /* border-right: 1px dotted rgba(0, 0, 0, 0.38); */
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
+}
+
+@media (max-width: 767.98px) {
+  .seatCharts-container {
+    border: none;
+  }
+}
+
+.seatCharts-row {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  margin-right: -20px;
+  margin-left: -20px;
+  align-items: center;
+  justify-content: center;
+}
+
+.seatCharts-row-number {
+  text-align: right;
+  margin-right: 0.5rem;
+  width: 1rem;
+}
+
+.seatCharts-cell {
+  height: 2rem;
+  width: 2rem;
+  line-height: 1.7rem;
+  margin: 0.25rem;
+  text-align: center;
+  outline: none;
+  font-weight: 500;
+  color: inherit;
+}
+
+@media (max-width: 365.98px) {
+	.seatCharts-cell {
+		margin: 0.1rem;
+	}
+  }
+
+.seatCharts-seat {
+  color: inherit;
+  cursor: pointer;
+  -webkit-border-radius: 0.5rem;
+  -moz-border-radius: 0.5rem;
+  border-radius: 0.5rem;
+  border: 3px solid rgba(0, 0, 0, 0.12);
+  background-color: #eeeeee;
+}
+
+.seatCharts-space {
+  line-height: 2rem;
+  color: rgba(0, 0, 0, 0.38);
+  background-color: white;
+}
+
+.seatCharts-seat.focused {
+  background-color: #bdbdbd;
+}
+
+.seatCharts-seat.available.business-class {
+  border-color: #9fa8da;
+  background-color: #c5cae9;
+}
+
+.seatCharts-seat.available.first-class {
+  border-color: #5c6bc0;
+  background-color: #7986cb;
+}
+
+.seatCharts-seat.selected {
+  color: #fff;
+  background-color: var(--dark-light);
+}
+
+.seatCharts-seat.unavailable {
+  color: rgba(0, 0, 0, 0.12);
+  background-color: transparent;
+  font-size: 0;
+  position: relative;
+  text-align: center;
+  vertical-align: middle;
+  cursor: default;
+}
+
+.seatCharts-seat.unavailable::after {
+  font-family: "Material Icons";
+  -webkit-font-feature-settings: "liga";
+  font-feature-settings: "liga";
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-size: 1.5rem;
+  font-style: normal;
+  font-weight: normal;
+  letter-spacing: normal;
+  text-rendering: optimizeLegibility;
+  text-transform: none;
+  white-space: nowrap;
+  word-wrap: normal;
+  content: "block";
+  margin-left: 0.05rem;
+}
+
+.seatCharts-legendList {
+  list-style: none;
+  padding-left: 0;
+}
+.seatCharts-legendItem {
+  display: -ms-flexbox;
+  display: flex;
+  margin-top: 0.6rem;
+  line-height: 2;
+  align-items: center;
+}
+
+.seatCharts-legendDescription {
+  margin-left: 0.5rem;
+}

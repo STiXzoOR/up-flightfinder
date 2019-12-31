@@ -1,5 +1,6 @@
 from app import app, restricted, create_connection, get_customer_id, get_customer_type, get_booking, booking_exists, booking_is_inactive, fake
 from flask import render_template, session, request, redirect, flash, url_for, abort
+from pymysql.cursors import Cursor
 from datetime import datetime
 
 @app.route('/new-booking', methods=["POST"])
@@ -83,7 +84,6 @@ def new_booking():
                                                                     values=values)
     cursor = cnx.cursor()
     cursor.execute(query, booking)
-    cnx.commit()
     cursor.close()
 
     query = """
@@ -96,7 +96,6 @@ def new_booking():
     cursor.execute(query, (flight_info['total_passengers'], flight_info['depart_flight_id']))
     if is_roundtrip:
         cursor.execute(query, (flight_info['total_passengers'], flight_info['return_flight_id']))
-    cnx.commit()
     cursor.close()
     
     ins_p = """
@@ -106,22 +105,21 @@ def new_booking():
 
     ins_pb = """
     INSERT INTO pass_has_booking (passenger_id, booking_id, seat, seat_class) 
-    VALUE(%s, %s, "1A", "None")
+    VALUE(%s, %s, %s, %s)
     """
 
     for passenger in passenger_info:
         try:
             cursor = cnx.cursor()
             cursor.execute(ins_p, (passenger['id'], passenger['first_name'], passenger['last_name']))
-            cnx.commit()
             cursor.close()
         except:
             print('Passenger with id={id} exists'.format(id=passenger['id']))
         cursor = cnx.cursor()
-        cursor.execute(ins_pb, (passenger['id'], booking_id))
-        cnx.commit()
+        cursor.execute(ins_pb, (passenger['id'], booking_id, passenger['seat'], passenger['seat_class']))
         cursor.close()
     
+    cnx.commit()
     cnx.close()
 
     return redirect(url_for('view_booking', booking_id=booking_id, booking_last_name=contact_info['last_name'], go_back=False))
@@ -215,23 +213,49 @@ def modify_booking(booking_id='', booking_last_name='', modify=False, go_back=Fa
 def modify_booking_post():
     form = request.form
     booking_id = form.get('bookingID')
+    total_passengers = int(form.get('numPassengers'))
     first_name = form.get('contactFirstName')
     last_name = form.get('contactLastName')
     email = form.get('contactEmail')
     mobile = form.get('contactMobile')
     old_last_name = form.get('oldContactLastName')
+    addtional_price = int(form.get('totalPrice'))
     customer_type = get_customer_type()
-    
+
+    passenger_info = []
+    for i in range(total_passengers):
+        identifier = 'idPassenger-{num}'.format(num=i+1)
+        seat = 'seatPassenger-{num}'.format(num=i+1)
+        seat_class = 'seatClassPassenger-{num}'.format(num=i+1)
+
+        passenger = {'id': form.get(identifier),
+                     'seat': form.get(seat),
+                     'seat_class': form.get(seat_class)}
+        
+        passenger_info.append(passenger)
+
     query = """
     UPDATE booking 
-    SET first_name=%s, last_name=%s, email=%s, mobile=%s, last_modify_date=CURRENT_DATE 
+    SET first_name=%s, last_name=%s, email=%s, mobile=%s, total_price=total_price+%s, last_modify_date=CURRENT_DATE 
     WHERE booking_id=%s and last_name=%s
     """
 
     cnx = create_connection()
     cursor = cnx.cursor()
-    cursor.execute(query, (first_name, last_name, email, mobile, booking_id, old_last_name))
+    cursor.execute(query, (first_name, last_name, email, mobile, addtional_price, booking_id, old_last_name))
     cursor.close()
+    
+    query = """
+    UPDATE pass_has_booking 
+    SET seat=%s, seat_class=%s 
+    WHERE passenger_id=%s and booking_id=%s
+    """
+
+    for passenger in passenger_info:
+        cursor = cnx.cursor()
+        cursor.execute(query, (passenger['seat'], passenger['seat_class'], passenger['id'], booking_id))
+        cursor.close()
+    
     cnx.commit()
     cnx.close()
 
@@ -252,6 +276,29 @@ def cancel_booking(booking_id='', booking_last_name=''):
     cnx = create_connection()
     cursor = cnx.cursor()
     cursor.execute(query, ('Canceled', booking_id, booking_last_name))
+    cursor.close()
+
+    query = """
+    SELECT depart_flight_id, return_flight_id, total_passengers, flight_type
+    FROM booking
+    WHERE booking_id=%s and last_name=%s
+    """
+
+    cursor = cnx.cursor()
+    cursor.execute(query, (booking_id, booking_last_name))
+    booking_info = cursor.fetchone()
+    cursor.close()
+
+    query = """
+    UPDATE flight 
+    SET occupied_capacity=occupied_capacity-%s 
+    WHERE flight_id=%s
+    """
+    
+    cursor = cnx.cursor()
+    cursor.execute(query, (booking_info['total_passengers'], booking_info['depart_flight_id']))
+    if booking_info['flight_type'] == 'Roundtrip':
+        cursor.execute(query, (booking_info['total_passengers'], booking_info['return_flight_id']))
     cursor.close()
     cnx.commit()
     cnx.close()
