@@ -1,9 +1,14 @@
 from flask import Flask, render_template, g
+from dotenv import load_dotenv, find_dotenv
 from app.functions.functions import *
+import os
+
+load_dotenv(find_dotenv())
 
 app = Flask(__name__)
-app.debug = True
-app.config['SECRET_KEY'] = 'FlightFinder2019'
+app.config["DEBUG"] = os.getenv("DEBUG_STATUS", False)
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
+
 
 @app.before_request
 def current_user():
@@ -15,19 +20,21 @@ def current_user():
 
     Connection = create_connection()
     cursor = Connection.cursor()
-    cursor.execute(query, (session.get('customer_id', 0)))
+    cursor.execute(query, (session.get("customer_id", 0)))
     result = cursor.fetchone()
     cursor.close()
     Connection.close()
 
     g.current_customer = result
 
-@app.route('/')
-@app.route('/index.html')
-def index():
-    session.pop('is_guest', None)
 
-    return render_template('index.html', airports=get_airports())
+@app.route("/")
+@app.route("/index.html")
+def index():
+    session.pop("is_guest", None)
+
+    return render_template("index.html", airports=get_airports())
+
 
 from app.routes import error
 from app.routes import guest

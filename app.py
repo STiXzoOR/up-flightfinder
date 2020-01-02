@@ -1,6 +1,6 @@
 from app import app
 from livereload import Server
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     server = Server(app.wsgi_app)
-    server.serve(port=5000)
+    server.serve(host="0.0.0.0", port=5000)

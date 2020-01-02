@@ -5,6 +5,7 @@ from functools import wraps
 from faker import Faker
 import pymysql
 import platform
+import os
 
 
 WINDOWS = platform.system() == 'Windows'
@@ -31,15 +32,14 @@ def redirect_guest(fn):
     return wrapper
 
 def create_connection():
-    options = {'host': 'localhost',
-               'user': 'root',
-               'password': '',
-               'db':'flightfinderdb',
+    options = {'host': os.getenv('DB_HOST'),
+               'user': os.getenv('DB_USER'),
+               'password': os.getenv('DB_PASSWORD'),
+               'db': os.getenv('DB_NAME'),
                'charset': 'utf8mb4',
                'cursorclass': DictCursor}
     
     if OSX:
-        options['password'] = 'root'
         options.update({'unix_socket': '/Applications/MAMP/tmp/mysql/mysql.sock'})
 
     return pymysql.connect(**options)

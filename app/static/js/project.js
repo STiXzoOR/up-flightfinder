@@ -1,6 +1,6 @@
 var flightsElement = $("#flightSearchResult");
 var spinner = $(".loader");
-var returnDateVal = "";
+var returnDateVal;
 var timeoutVar;
 
 var datePickerOptions = {
@@ -24,10 +24,34 @@ var datePickerOptions = {
   min: true
 };
 
-var returnDatePickerOptions = datePickerOptions;
+var returnDatePickerOptions = $.extend({}, datePickerOptions);
 returnDatePickerOptions.onSet = function() {
   returnDateVal = $("#returnDatePicker").val();
 };
+
+function parseDate(str) {
+  var date = str.split(" ");
+  var months = [
+    "jan",
+    "feb",
+    "mar",
+    "apr",
+    "may",
+    "jun",
+    "jul",
+    "aug",
+    "sep",
+    "oct",
+    "nov",
+    "dec"
+  ];
+
+  var year = parseInt(date[2]);
+  var month = months.indexOf(date[1].toLowerCase());
+  var day = parseInt(date[0]);
+
+  return new Date(year, month, day);
+}
 
 function validateForm(form) {
   if (form[0].checkValidity() === false) {
@@ -355,15 +379,11 @@ $(function() {
     $target.val("One Way").trigger("change");
   });
 
-  $(".snackbar-btn").on("click", function() {
-    $(".snackbar").removeClass("show");
-  });
+  $("#departDatePicker")
+    .pickdate(datePickerOptions)
+    .prop("readonly", false);
+
+  $("#returnDatePicker")
+    .pickdate(returnDatePickerOptions)
+    .prop("readonly", false);
 });
-
-$("#departDatePicker")
-  .pickdate(datePickerOptions)
-  .prop("readonly", false);
-
-$("#returnDatePicker")
-  .pickdate(returnDatePickerOptions)
-  .prop("readonly", false);
