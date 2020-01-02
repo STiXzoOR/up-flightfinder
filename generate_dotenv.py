@@ -34,13 +34,9 @@ args = parser.parse_args()
 
 VARS = {
     "DB_NAME": "flightfinderdb",
-    "DB_HOST": args.database_host if args.database_host else "localhost",
-    "DB_USER": args.database_user if args.database_user else "root",
-    "DB_PASSWORD": args.database_password
-    if args.database_password
-    else "root"
-    if OSX
-    else "",
+    "DB_HOST": args.db_host if args.db_host else "localhost",
+    "DB_USER": args.db_user if args.db_user else "root",
+    "DB_PASSWORD": args.db_password if args.db_password else "root" if OSX else "",
     "DEBUG_STATUS": "True",
     "SECRET_KEY": secrets.token_urlsafe(24),
 }
