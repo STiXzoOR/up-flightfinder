@@ -41,12 +41,14 @@ def new_booking():
         identifier = 'idPassenger-{num}'.format(num=i+1)
         seat = 'seatPassenger-{num}'.format(num=i+1)
         seat_class = 'seatClassPassenger-{num}'.format(num=i+1)
+        seat_price = 'seatPricePassenger-{num}'.format(num=i+1)
 
         passenger = {'id': form.get(identifier), 
                      'first_name': form.get(first_name),
                      'last_name': form.get(last_name),
                      'seat': form.get(seat),
-                     'seat_class': form.get(seat_class)}
+                     'seat_class': form.get(seat_class),
+                     'seat_price': form.get(seat_price)}
         
         passenger_info.append(passenger)
     
@@ -98,25 +100,25 @@ def new_booking():
         cursor.execute(query, (flight_info['total_passengers'], flight_info['return_flight_id']))
     cursor.close()
     
-    ins_p = """
+    query_p = """
     INSERT INTO passenger (passenger_id, first_name, last_name) 
     VALUE(%s, %s, %s)
     """
 
-    ins_pb = """
-    INSERT INTO pass_has_booking (passenger_id, booking_id, seat, seat_class) 
-    VALUE(%s, %s, %s, %s)
+    query_pb = """
+    INSERT INTO pass_has_booking (passenger_id, booking_id, seat, seat_class, seat_price) 
+    VALUE(%s, %s, %s, %s, %s)
     """
 
     for passenger in passenger_info:
         try:
             cursor = cnx.cursor()
-            cursor.execute(ins_p, (passenger['id'], passenger['first_name'], passenger['last_name']))
+            cursor.execute(query_p, (passenger['id'], passenger['first_name'], passenger['last_name']))
             cursor.close()
         except:
             print('Passenger with id={id} exists'.format(id=passenger['id']))
         cursor = cnx.cursor()
-        cursor.execute(ins_pb, (passenger['id'], booking_id, passenger['seat'], passenger['seat_class']))
+        cursor.execute(query_pb, (passenger['id'], booking_id, passenger['seat'], passenger['seat_class'], passenger['seat_price']))
         cursor.close()
     
     cnx.commit()
@@ -133,7 +135,7 @@ def my_bookings():
     SELECT b.booking_id as id, b.last_name as last_name, a1.city as from_city, a2.city as to_city, DATE_FORMAT(b.booking_date, "%%d %%b %%Y") as date, b.flight_type as flight_type, b.status as status 
     FROM booking as b, flight as f, airport as a1, airport as a2 
     WHERE b.customer_id=%s and b.status in (%s, %s) and f.flight_id=b.depart_flight_id and a1.airport_code=f.from_airport and a2.airport_code=f.to_airport 
-    ORDER BY date DESC 
+    ORDER BY b.booking_date DESC 
     """
 
     cnx = create_connection()
@@ -180,7 +182,6 @@ def manage_booking():
         return redirect(url_for('manage_booking_page'))
 
     btn_state = form.get('btnState')
-    print(btn_state)
     if btn_state == 'view':
         return redirect(url_for('view_booking', booking_id=booking_id, booking_last_name=booking_last_name, go_back=go_back))
     else:
@@ -227,10 +228,12 @@ def modify_booking_post():
         identifier = 'idPassenger-{num}'.format(num=i+1)
         seat = 'seatPassenger-{num}'.format(num=i+1)
         seat_class = 'seatClassPassenger-{num}'.format(num=i+1)
+        seat_price = 'seatPricePassenger-{num}'.format(num=i+1)
 
         passenger = {'id': form.get(identifier),
                      'seat': form.get(seat),
-                     'seat_class': form.get(seat_class)}
+                     'seat_class': form.get(seat_class),
+                     'seat_price': form.get(seat_price)}
         
         passenger_info.append(passenger)
 
@@ -247,13 +250,13 @@ def modify_booking_post():
     
     query = """
     UPDATE pass_has_booking 
-    SET seat=%s, seat_class=%s 
+    SET seat=%s, seat_class=%s, seat_price=%s 
     WHERE passenger_id=%s and booking_id=%s
     """
 
     for passenger in passenger_info:
         cursor = cnx.cursor()
-        cursor.execute(query, (passenger['seat'], passenger['seat_class'], passenger['id'], booking_id))
+        cursor.execute(query, (passenger['seat'], passenger['seat_class'], passenger['seat_price'], passenger['id'], booking_id))
         cursor.close()
     
     cnx.commit()
@@ -351,10 +354,10 @@ def add_booking():
 
     fields = ', '.join(fields)
     values = ', '.join(values)
-    ins = 'INSERT INTO booking ({fields}) VALUES ({values})'.format(fields=fields,
+    query = 'INSERT INTO booking ({fields}) VALUES ({values})'.format(fields=fields,
                                                                     values=values)
     cursor = cnx.cursor()
-    cursor.execute(ins, booking)
+    cursor.execute(query, booking)
     cnx.commit()
     cursor.close()
     cnx.close()

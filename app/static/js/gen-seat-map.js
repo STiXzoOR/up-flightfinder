@@ -65,6 +65,7 @@ $(function() {
       var seatPrice = this.data().price;
       var $seatPassenger = $("#seatPassenger-" + $btnVal);
       var $seatClassPassenger = $("#seatClassPassenger-" + $btnVal);
+      var $seatPricePassenger = $("#seatPricePassenger-" + $btnVal);
       var $seatPassengerCurrent = $("#currentSeatPassenger-" + $btnVal);
       var $seatClassPassengerCurrent = $(
         "#currentSeatClassPassenger-" + $btnVal
@@ -81,6 +82,7 @@ $(function() {
 
         $seatPassenger.val(seatID).trigger("change");
         $seatClassPassenger.val(seatCategory).trigger("change");
+        $seatPricePassenger.val(seatPrice).trigger("change");
 
         $seatPassengerCurrent.text(seatID);
         $seatClassPassengerCurrent.text(seatCategory);
@@ -114,6 +116,7 @@ $(function() {
 
         $seatPassenger.val("").trigger("change");
         $seatClassPassenger.val("").trigger("change");
+        $seatPricePassenger.val("").trigger("change");
 
         $seatPassengerCurrent.text("None");
         $seatClassPassengerCurrent.text("None");

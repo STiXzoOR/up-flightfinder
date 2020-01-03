@@ -124,6 +124,7 @@
                                                                         </button>
                                                                         <input class="form-control d-none" id="seatPassenger-{{ loop.index }}" type="text" pattern="[A-Z\d]{2,3}" name="seatPassenger-{{ loop.index }}" value="{{ passenger.seat }}" required>
                                                                         <input class="form-control d-none" id="seatClassPassenger-{{ loop.index }}" type="text" name="seatClassPassenger-{{ loop.index }}" value="{{ passenger.seat_class }}">
+                                                                        <input class="form-control d-none" id="seatPricePassenger-{{ loop.index }}" type="text" name="seatPricePassenger-{{ loop.index }}" value="{{ passenger.seat_price }}">
                                                                         <div class="invalid-feedback">
                                                                             Invalid seat.
                                                                         </div>

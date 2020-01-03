@@ -325,7 +325,7 @@ def get_booking(booking_id='', booking_last_name=''):
         picked_flight += return_flight
 
     query = """
-    SELECT p.passenger_id as id, p.first_name as first_name, p.last_name as last_name, phb.seat as seat, phb.seat_class as seat_class
+    SELECT p.passenger_id as id, p.first_name as first_name, p.last_name as last_name, phb.seat as seat, phb.seat_class as seat_class, phb.seat_price as seat_price
     FROM passenger as p, pass_has_booking as phb
     WHERE p.passenger_id=phb.passenger_id and phb.booking_id=%s
     """

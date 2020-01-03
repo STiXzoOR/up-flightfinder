@@ -305,6 +305,7 @@ CREATE TABLE `PASS_HAS_BOOKING` (
   `booking_id` varchar(6) NOT NULL,
   `seat` varchar(5) NOT NULL,
   `seat_class` varchar(50) NOT NULL,
+  `seat_price` int(11) NOT NULL,
   PRIMARY KEY (`passenger_id`,`booking_id`),
   KEY `PASS_HAS_BOOKING_fk1` (`booking_id`),
   CONSTRAINT `PASS_HAS_BOOKING_fk0` FOREIGN KEY (`passenger_id`) REFERENCES `PASSENGER` (`passenger_id`) ON DELETE CASCADE,
