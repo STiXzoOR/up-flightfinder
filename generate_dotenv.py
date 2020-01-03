@@ -1,4 +1,5 @@
 import os
+import sys
 import secrets
 import platform
 import argparse
@@ -42,7 +43,10 @@ VARS = {
 }
 
 with open(".env", "w") as dotenv:
-    print('Generating .env file... ', end='')
+    print("Generating .env file... ", end="")
+    sys.stdout.flush()
+
     for key, value in VARS.items():
         dotenv.write('{key}="{value}"\n'.format(key=key, value=value))
-print('Done!')
+    print("Done!")
+

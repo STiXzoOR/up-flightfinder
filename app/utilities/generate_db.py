@@ -6,12 +6,18 @@ import csv
 import os
 import json
 import platform
+import warnings
+import sys
 
 DB = ''
 WINDOWS = platform.system() == 'Windows'
 OSX = platform.system() == 'Darwin' 
 current_dir = os.getcwd()
 fake = Faker()
+
+def print_stmt(stmt=''):
+    print(stmt, end='')
+    sys.stdout.flush()
 
 def create_connection():
     options = {'host': 'localhost',
@@ -59,13 +65,17 @@ def parse_sql(file):
     return stmts
 
 def create_database():
+    print_stmt('Creating database... ')
+
     query = """
     CREATE DATABASE IF NOT EXISTS FlightFinderDB
     """
 
     cnx = create_connection()
     cursor = cnx.cursor()
-    cursor.execute(query)
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore")
+        cursor.execute(query)
     cursor.close()
     cnx.commit()
     cnx.close()
@@ -74,13 +84,17 @@ def create_database():
     return 'flightfinderdb'
 
 def configure_database():
+    print_stmt('Importing schema file... ')
+
     stmts = parse_sql(current_dir + '/schema.sql')
     cnx = create_connection()
     
     with cnx.cursor() as cursor:
         for stmt in stmts:
             try:
-                cursor.execute(stmt)
+                with warnings.catch_warnings():
+                    warnings.filterwarnings("ignore")
+                    cursor.execute(stmt)
             except (pymysql.err.DatabaseError,
                 pymysql.err.IntegrityError,
                 pymysql.err.MySQLError) as e:
@@ -94,6 +108,8 @@ def configure_database():
 
 
 def generate_flights():
+    print_stmt('Generating flights... ')
+
     def _generate_id(prefix=''):
         query = """
         SELECT flight_id 
@@ -217,11 +233,6 @@ def generate_flights():
     print('Done!')
 
 if __name__ == '__main__':
-    print('Creating database... ', end='')
     DB = create_database()
-    
-    print('Importing schema file... ', end='')
     configure_database()
-    
-    print('Generating flights... ', end='')
     generate_flights()
