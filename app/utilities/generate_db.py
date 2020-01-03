@@ -70,6 +70,7 @@ def create_database():
     cnx.commit()
     cnx.close()
 
+    print('Done!')
     return 'flightfinderdb'
 
 def configure_database():
@@ -89,6 +90,7 @@ def configure_database():
         cnx.commit()
     
     cnx.close()
+    print('Done!')
 
 
 def generate_flights():
@@ -212,16 +214,14 @@ def generate_flights():
                         dep_date += timedelta(days=1)
                         date_start += timedelta(days=1)
     cnx.close()
+    print('Done!')
 
 if __name__ == '__main__':
     print('Creating database... ', end='')
     DB = create_database()
-    print('Done!')
     
     print('Importing schema file... ', end='')
     configure_database()
-    print('Done!')
     
     print('Generating flights... ', end='')
     generate_flights()
-    print('Done!')
