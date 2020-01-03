@@ -213,7 +213,7 @@ $(function() {
   });
 
   $(document).on("click", ".process-form", function(e, clicked) {
-    if (clicked == null) {
+    if (!isset(clicked)) {
       var $btn = $(this);
       var $form = $btn.closest("form");
 
@@ -226,9 +226,15 @@ $(function() {
         setTimeout(function() {
           $btn.trigger("click", ["continue"]);
         }, 2000);
+        return;
       } else {
         return false;
       }
+    } else {
+      spinner.html("");
+      spinner.removeClass("d-flex");
+      $("body").addClass("body-content");
+      $("header, .jumbotron, main").unwrap();
     }
   });
 
