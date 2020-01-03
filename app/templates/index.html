@@ -222,11 +222,6 @@
             </div>
         </div>
     </main>
-    <!-- <footer class="footer">
-        <div id="footer" class="container">
-            <span class="text-center">© 2019 Copyright: FlightRadar</span>
-        </div>
-    </footer> -->
 
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="../static/js/jquery.min.js"></script>
@@ -237,6 +232,7 @@
     <script src="../static/js/material.js"></script>
     <script src="../static/js/snackbar.js"></script>
     <script src="../static/js/project.js"></script>
+    
     <script>
         var resizeId;
         $(window).resize(function() {
@@ -244,6 +240,7 @@
             resizeId = setTimeout(setSameHeight(), 500);
         });
     </script>
+
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for message in messages %}
