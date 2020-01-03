@@ -3,56 +3,6 @@ var spinner = $(".loader");
 var returnDateVal;
 var timeoutVar;
 
-var datePickerOptions = {
-  cancel: "Clear",
-  closeOnCancel: false,
-  closeOnSelect: true,
-  container: "body",
-  containerHidden: "body",
-  firstDay: 1,
-  format: "dd mmm yyyy",
-  formatSubmit: "yyyy-mm-dd",
-  hiddenPrefix: "prefix_",
-  hiddenSuffix: "_suffix",
-  labelMonthNext: "Go to the next month",
-  labelMonthPrev: "Go to the previous month",
-  labelMonthSelect: "Choose a month from the dropdown menu",
-  labelYearSelect: "Choose a year from the dropdown menu",
-  ok: "Close",
-  selectMonths: true,
-  selectYears: 5,
-  min: true
-};
-
-var returnDatePickerOptions = $.extend({}, datePickerOptions);
-returnDatePickerOptions.onSet = function() {
-  returnDateVal = $("#returnDatePicker").val();
-};
-
-function parseDate(str) {
-  var date = str.split(" ");
-  var months = [
-    "jan",
-    "feb",
-    "mar",
-    "apr",
-    "may",
-    "jun",
-    "jul",
-    "aug",
-    "sep",
-    "oct",
-    "nov",
-    "dec"
-  ];
-
-  var year = parseInt(date[2]);
-  var month = months.indexOf(date[1].toLowerCase());
-  var day = parseInt(date[0]);
-
-  return new Date(year, month, day);
-}
-
 function validateForm(form) {
   if (form[0].checkValidity() === false) {
     event.preventDefault();
@@ -133,6 +83,56 @@ $(window).on("scroll", function() {
   } else {
     $(".toolbar-waterfall").removeClass("waterfall");
     $("#imageLogo").attr("src", "../static/images/svg/logo_dark.svg");
+  }
+});
+
+$(function() {
+  $.ajax({
+    type: "GET",
+    url: $SCRIPT_ROOT + "/_get_max_date",
+    success: function(data) {
+      genDatePickers(data.date);
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      alert(errorThrown);
+    }
+  });
+
+  function genDatePickers(maxDate) {
+    var datePickerOptions = {
+      cancel: "Clear",
+      closeOnCancel: false,
+      closeOnSelect: true,
+      container: "body",
+      containerHidden: "body",
+      firstDay: 1,
+      format: "dd mmm yyyy",
+      formatSubmit: "yyyy-mm-dd",
+      hiddenPrefix: "prefix_",
+      hiddenSuffix: "_suffix",
+      labelMonthNext: "Go to the next month",
+      labelMonthPrev: "Go to the previous month",
+      labelMonthSelect: "Choose a month from the dropdown menu",
+      labelYearSelect: "Choose a year from the dropdown menu",
+      ok: "Close",
+      selectMonths: true,
+      selectYears: 5,
+      min: true,
+      max: new Date(maxDate)
+    };
+
+    var returnDatePickerOptions = $.extend({}, datePickerOptions);
+    returnDatePickerOptions.onSet = function() {
+      returnDateVal = $("#returnDatePicker").val();
+    };
+
+    $("#departDatePicker")
+      .pickdate(datePickerOptions)
+      .prop("readonly", false);
+
+    $("#returnDatePicker")
+      .pickdate(returnDatePickerOptions)
+      .prop("readonly", false);
   }
 });
 
@@ -384,12 +384,4 @@ $(function() {
     $target.prop({ disabled: true, required: false });
     $target.val("One Way").trigger("change");
   });
-
-  $("#departDatePicker")
-    .pickdate(datePickerOptions)
-    .prop("readonly", false);
-
-  $("#returnDatePicker")
-    .pickdate(returnDatePickerOptions)
-    .prop("readonly", false);
 });

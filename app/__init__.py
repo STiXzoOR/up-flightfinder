@@ -40,6 +40,7 @@ from app.routes import error
 from app.routes import guest
 from app.routes import airport
 from app.routes import seat
+from app.routes import date
 from app.routes import flight
 from app.routes import customer
 from app.routes import booking
