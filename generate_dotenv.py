@@ -42,5 +42,7 @@ VARS = {
 }
 
 with open(".env", "w") as dotenv:
+    print('Generating .env file... ', end='')
     for key, value in VARS.items():
         dotenv.write('{key}="{value}"\n'.format(key=key, value=value))
+print('Done!')

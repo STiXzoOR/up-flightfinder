@@ -17,7 +17,7 @@ FlightFinder is a flask app that provides users register, log in, search, book a
 - Run `python generate_dotenv.py` to generate .env file.
 - Create a virtual environment using `python -m venv venv` command.
 - Activate virtual environment.
-  - On Windows: `venv\bin\activate.bat`
+  - On Windows: `venv\Scripts\activate`
   - On MacOS/Linux: `source venv/bin/activate`
 - Run `pip install -r requirements.txt` to install dependencies.
 - Navigate to `/app/utilities` and run `python generate_db.py` to create and initialize database.

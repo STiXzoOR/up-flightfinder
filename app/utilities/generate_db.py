@@ -98,7 +98,6 @@ def generate_flights():
         FROM flight
         WHERE flight_id=%s"""
 
-        cnx = create_connection()
         cursor = cnx.cursor()
 
         flight_id = prefix + fake.numerify(text="####")
@@ -109,7 +108,6 @@ def generate_flights():
             cursor.execute(query, flight_id)
             result = cursor.fetchone()
         cursor.close()
-        cnx.close()
 
         return flight_id
     
@@ -127,6 +125,7 @@ def generate_flights():
                                     delimiter=';',
                                     fieldnames=['airline', 'from', 'to', 'airplane'])
 
+        cnx = create_connection()
         for row in csv_reader:
             if row['airline'] != '':
                 airline = row['airline']
@@ -205,17 +204,24 @@ def generate_flights():
                         query = 'INSERT INTO flight ({fields}) VALUES ({values})'.format(fields=fields,
                                                                                          values=values)
                         
-                        cnx = create_connection()
                         cursor = cnx.cursor()
                         cursor.execute(query, flight_record)
                         cnx.commit()
                         cursor.close()
-                        cnx.close()
 
                         dep_date += timedelta(days=1)
                         date_start += timedelta(days=1)
+    cnx.close()
 
 if __name__ == '__main__':
+    print('Creating database... ', end='')
     DB = create_database()
+    print('Done!')
+    
+    print('Importing schema file... ', end='')
     configure_database()
+    print('Done!')
+    
+    print('Generating flights... ', end='')
     generate_flights()
+    print('Done!')
