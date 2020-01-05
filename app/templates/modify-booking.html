@@ -41,6 +41,7 @@
                         <form id="bookingForm" method="POST" action="{{ url_for("modify_booking_post") }}" novalidate>
                             <input type="hidden" name="bookingID" value="{{ booking.id }}">
                             <input type="hidden" name="oldContactLastName" value="{{ contact_info.last_name }}">
+                            <input type="hidden" name="numPassengers" value="{{ booking.total_passengers }}">
                             <div class="text-center text-sm-left mb-sm-3">
                                 <div class="card-title">Modify Booking</div>
                                 <div class="card-subtitle text-muted">Change contact info and add or change passenger seat.</div>
@@ -86,16 +87,15 @@
                                         <div class="card-title font-weight-bold font-size-lg text-center text-sm-left mb-2">Passenger Info</div>
                                         <div class="card-body p-0 px-sm-3">
                                             <div class="list-group list-group-flush" id="passengersInfo">
-                                                <input type="hidden" name="numPassengers" value="{{ booking.total_passengers }}">
                                                 {% for passenger in passenger_info %}
                                                     <div class="font-size-rg expansion-panel list-group-item">
-                                                        <div id="passengerName-{{ loop.index }}" aria-controls="passenger-{{ loop.index }}" aria-expanded="false" class="expansion-panel-toggler pl-0 collapsed" data-target="#passenger-{{ loop.index }}" data-toggle="collapse" role="button">
+                                                        <a id="passengerName-{{ loop.index }}" aria-controls="passenger-{{ loop.index }}" aria-expanded="false" class="expansion-panel-toggler pl-0 collapsed" href="#passenger-{{ loop.index }}" data-toggle="collapse">
                                                         {{ passenger.first_name }} {{ passenger.last_name }}
                                                             <div class="expansion-panel-icon ml-3 text-black-secondary small">
                                                                 <i class="collapsed-show material-icons">keyboard_arrow_down</i>
                                                                 <i class="collapsed-hide material-icons">keyboard_arrow_up</i>
                                                             </div>
-                                                        </div>
+                                                        </a>
                                                         <div aria-labelledby="{{ passenger.first_name }}" class="collapse" data-parent="#passengerName-{{ loop.index }}" id="passenger-{{ loop.index }}">
                                                             <div class="expansion-panel-body py-2">
                                                                 <div class="row">
@@ -119,7 +119,7 @@
                                                                         </div>
                                                                     </div>
                                                                     <div class="col-12 col-xl-3">
-                                                                        <button type="button" class="btn btn-primary btn-block mt-md-2" data-toggle="modal" data-target="#selectSeat" data-value="{{ loop.index }}">
+                                                                        <button type="button" class="btn btn-sm btn-primary btn-block mb-1 mb-xl-0 mt-sm-2 mt-xl-1" data-toggle="modal" data-target="#selectSeat" data-value="{{ loop.index }}">
                                                                             Change seat
                                                                         </button>
                                                                         <input class="form-control d-none" id="seatPassenger-{{ loop.index }}" type="text" pattern="[A-Z\d]{2,3}" name="seatPassenger-{{ loop.index }}" value="{{ passenger.seat }}" required>
@@ -137,7 +137,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <hr class="mt-1">
+                                    <hr class="mt-0">
                                     <div class="card rounded-3x shadow-none mt-3">
                                         <div class="card-title font-weight-bold font-size-lg text-center text-sm-left">Contact Info</div>
                                         <div class="card-body p-0 px-sm-3">
