@@ -279,8 +279,11 @@ $(function() {
         flightsElement.html(data.content);
       },
       complete: function() {
-        clearTimeout(timeoutVar);
-        timeoutVar = setTimeout(setSameHeight(), 500);
+        // setTimeout(setSameHeight(), 500);
+        // $(window).trigger("resize");
+        setTimeout(function() {
+          $(window).trigger("resize");
+        }, 250);
         var $scrollDistance = $("#flightSearchResult div")
           .first()
           .offset().top;
@@ -320,8 +323,11 @@ $(function() {
         flightsElement.append(data.content);
       },
       complete: function() {
-        clearTimeout(timeoutVar);
-        timeoutVar = setTimeout(setSameHeight(), 500);
+        // setTimeout(setSameHeight(), 500);
+        setTimeout(function() {
+          $(window).trigger("resize");
+        }, 250);
+        // $(window).trigger("resize");
         scrollDown($scrollDistance - 65);
       },
       error: function(jqXHR, textStatus, errorThrown) {
