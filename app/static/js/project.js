@@ -231,10 +231,12 @@ $(function() {
         return false;
       }
     } else {
-      spinner.html("");
-      spinner.removeClass("d-flex");
-      $("body").addClass("body-content");
-      $("header, .jumbotron, main").unwrap();
+      setTimeout(function() {
+        spinner.html("");
+        spinner.removeClass("d-flex");
+        $("body").addClass("body-content");
+        $("header, .jumbotron, main").unwrap();
+      }, 250);
     }
   });
 
