@@ -279,8 +279,6 @@ $(function() {
         flightsElement.html(data.content);
       },
       complete: function() {
-        // setTimeout(setSameHeight(), 500);
-        // $(window).trigger("resize");
         setTimeout(function() {
           $(window).trigger("resize");
         }, 250);
@@ -323,11 +321,9 @@ $(function() {
         flightsElement.append(data.content);
       },
       complete: function() {
-        // setTimeout(setSameHeight(), 500);
         setTimeout(function() {
           $(window).trigger("resize");
         }, 250);
-        // $(window).trigger("resize");
         scrollDown($scrollDistance - 65);
       },
       error: function(jqXHR, textStatus, errorThrown) {
@@ -360,12 +356,10 @@ $(function() {
       },
       success: function(data) {
         $.each(data.result, function(index, airport) {
-          var value = airport.value;
-          var text = airport.text;
           $("#toAirport").append(
             $("<option/>")
-              .attr("value", value)
-              .text(text)
+              .attr("value", airport.value)
+              .text(airport.text)
           );
         });
       },
