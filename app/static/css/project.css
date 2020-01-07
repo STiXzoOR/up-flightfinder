@@ -612,19 +612,12 @@ hr.hr-icon::before {
   background-repeat: no-repeat;
   background-size: 100% 100%;
   color: #fff;
-  padding-top: 10rem;
-  padding-bottom: 10rem;
+  padding-bottom: 14rem;
 }
 
-@media (max-width: 575.98px) {
+@media (max-width: 767.98px) {
   .jumbotron-bg {
-    padding-top: 0rem;
-  }
-}
-
-@media (min-width: 576px) {
-  .jumbotron-bg {
-    padding-top: 10rem !important;
+    padding-bottom: 9rem;
   }
 }
 

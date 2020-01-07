@@ -23,7 +23,10 @@ function clearForm(formID) {
 }
 
 function clearFlightsResult() {
-  if (flightsElement.length) flightsElement.html("");
+  if (flightsElement.length) {
+    flightsElement.html("");
+    flightsElement.addClass("d-none");
+  }
 }
 
 function setSameHeight() {
@@ -253,6 +256,9 @@ $(function() {
     var $form = $(this);
     if (!validateForm($form)) return false;
     event.preventDefault();
+
+    var winHeight = $(window).height();
+    var bodyHeight = $("body").height();
     $.ajax({
       type: "GET",
       url: $SCRIPT_ROOT + "/search-flights",
@@ -269,6 +275,7 @@ $(function() {
       },
       cache: false,
       beforeSend: function() {
+        flightsElement.removeClass("d-none");
         flightsElement.html(genLoading());
       },
       success: function(data) {
@@ -284,10 +291,12 @@ $(function() {
         setTimeout(function() {
           $(window).trigger("resize");
         }, 250);
-        var $scrollDistance = $("#flightSearchResult div")
-          .first()
-          .offset().top;
-        scrollDown($scrollDistance - 65);
+        if (bodyHeight > winHeight) {
+          var $scrollDistance = $("#flightSearchResult div")
+            .first()
+            .offset().top;
+          scrollDown($scrollDistance - 65);
+        }
         return false;
       },
       error: function(jqXHR, textStatus, errorThrown) {
@@ -298,6 +307,9 @@ $(function() {
 
   $(document).on("click", ".load-more-flights", function(e) {
     e.preventDefault();
+
+    var winHeight = $(window).height();
+    var bodyHeight = $("body").height();
     var $scrollDistance = $(this).offset().top;
     $.ajax({
       type: "GET",
@@ -326,7 +338,9 @@ $(function() {
         setTimeout(function() {
           $(window).trigger("resize");
         }, 250);
-        scrollDown($scrollDistance - 65);
+        if (bodyHeight > winHeight) {
+          scrollDown($scrollDistance - 65);
+        }
       },
       error: function(jqXHR, textStatus, errorThrown) {
         alert(errorThrown);
