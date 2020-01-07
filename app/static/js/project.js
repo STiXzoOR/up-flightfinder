@@ -79,6 +79,16 @@ function genLoading() {
   return $progress;
 }
 
+$.fn.isPartial = function() {
+  var elementTop = $(this).offset().top;
+  var elementBottom = elementTop + $(this).outerHeight();
+
+  var viewportTop = $(window).scrollTop();
+  var viewportBottom = viewportTop + $(window).height();
+
+  return elementBottom >= viewportBottom;
+};
+
 $(window).on("scroll", function() {
   if ($(window).scrollTop() > 0) {
     $(".toolbar-waterfall").addClass("waterfall");
@@ -257,8 +267,6 @@ $(function() {
     if (!validateForm($form)) return false;
     event.preventDefault();
 
-    var winHeight = $(window).height();
-    var bodyHeight = $("body").height();
     $.ajax({
       type: "GET",
       url: $SCRIPT_ROOT + "/search-flights",
@@ -291,7 +299,7 @@ $(function() {
         setTimeout(function() {
           $(window).trigger("resize");
         }, 250);
-        if (bodyHeight > winHeight) {
+        if (flightsElement.isPartial()) {
           var $scrollDistance = $("#flightSearchResult div")
             .first()
             .offset().top;
@@ -308,8 +316,6 @@ $(function() {
   $(document).on("click", ".load-more-flights", function(e) {
     e.preventDefault();
 
-    var winHeight = $(window).height();
-    var bodyHeight = $("body").height();
     var $scrollDistance = $(this).offset().top;
     $.ajax({
       type: "GET",
@@ -338,7 +344,7 @@ $(function() {
         setTimeout(function() {
           $(window).trigger("resize");
         }, 250);
-        if (bodyHeight > winHeight) {
+        if (flightsElement.isPartial()) {
           scrollDown($scrollDistance - 65);
         }
       },
