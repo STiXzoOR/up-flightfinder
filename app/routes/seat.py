@@ -1,13 +1,14 @@
 from app import app, create_connection
 from flask import request, jsonify
 
-@app.route('/_get_seats', methods=["GET"])
-def return_seats():
-    depart_flight_id = request.args.get('departFlightID')
-    return_flight_id = request.args.get('returnFlightID')
 
-    depart_flight_id = depart_flight_id if depart_flight_id is not None else ''
-    return_flight_id = return_flight_id if return_flight_id is not None else ''
+@app.route("/_get_seats", methods=["GET"])
+def return_seats():
+    depart_flight_id = request.args.get("departFlightID")
+    return_flight_id = request.args.get("returnFlightID")
+
+    depart_flight_id = depart_flight_id if depart_flight_id is not None else ""
+    return_flight_id = return_flight_id if return_flight_id is not None else ""
 
     query = """
     SELECT phb.seat as id

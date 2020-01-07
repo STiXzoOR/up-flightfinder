@@ -1,6 +1,7 @@
 from app import app, create_connection
 from flask import request, jsonify
 
+
 @app.route("/_get_max_date", methods=["GET"])
 def return_date():
     query = """
