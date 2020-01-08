@@ -45,6 +45,7 @@ FlightFinder is a flask app that provides users register, log in, search, book a
 - [Mateuszmarkowski](https://github.com/mateuszmarkowski/jQuery-Seat-Charts/) for the seat map functionality.
 - [Djibe](https://github.com/djibe/Bootstrap-4-Advanced-Components) for the extra functionality of some of the components of material.
 - [Rajendra](https://www.behance.net/gallery/1041969/FlightFinder-Logo-Design) for the logo icon.
+- [UnDraw](https://undraw.co/) for the used illustrations.
 
 ## LICENSE
 
