@@ -92,10 +92,8 @@ $.fn.isPartial = function() {
 $(window).on("scroll", function() {
   if ($(window).scrollTop() > 0) {
     $(".toolbar-waterfall").addClass("waterfall");
-    $("#imageLogo").attr("src", "../static/images/svg/logo_light.svg");
   } else {
     $(".toolbar-waterfall").removeClass("waterfall");
-    $("#imageLogo").attr("src", "../static/images/svg/logo_dark.svg");
   }
 });
 

@@ -9,6 +9,7 @@
         <link href="../static/css/roboto-family.css" rel="stylesheet">
         <link href="../static/css/material-icons.css" rel="stylesheet">
         <link href="../static/css/fontawesome-icons.css" rel="stylesheet">
+        <link href="../static/css/flightfinder-logo.css" rel="stylesheet">
 
         <!-- Add Material CSS, replace Bootstrap CSS -->
         <link href="../static/css/material.css" rel="stylesheet">
@@ -27,8 +28,7 @@
     <div class="loader"></div>
     <header class="navbar navbar-light navbar-expand-md fixed-top toolbar-waterfall">
         <a class="navbar-brand mr-auto" href="{{ url_for("index") }}">
-            <img id="imageLogo" src="../static/images/svg/logo_dark.svg" width="35" height="35" class="d-inline-block align-top mr-2" alt="">
-            Flight Finder
+            <i class="ff ff-logo ff-xl ff-fw mr-1"></i>Flight Finder
         </a>
         <ul class="navbar-nav ml-auto">
             {% if g.current_customer.type == "USER" %}
