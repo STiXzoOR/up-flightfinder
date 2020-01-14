@@ -109,9 +109,9 @@ def search_flights():
 
         flights += """  <div id="flight-{id}" class="my-4">
                             <form id="pickedFlightForm-{id}" action="{post_url}">
-                                <div class="row justify-content-center align-items-center">
+                                <div class="row justify-content-center">
                                     <div class="flight-row col-12 col-sm-8 col-md-9 col-lg-8 col-xl-6 flight-card-padding-right">
-                                        <div id="flightInfo" class="flight card rounded-3x flight-card-sm shadow-1 small">
+                                        <div id="flightInfo" class="flight card rounded-3x flight-card-sm shadow-1 small h-100">
                                             <div class="card-body">""".format(
             id=counter, post_url=post_url
         )
@@ -130,7 +130,7 @@ def search_flights():
                                         </div>
                                     </div>
                                     <div class="d-none d-sm-block col-sm-4 col-md-3 col-lg-2 flight-card-padding-left">
-                                        <div id="flightPrice" class="price card rounded-3x shadow-1 text-center">
+                                        <div id="flightPrice" class="price card rounded-3x shadow-1 text-center h-100">
                                             <div class="price-body card-body d-flex flex-column justify-content-center align-items-center">""".format(
             id=counter, price=price
         )

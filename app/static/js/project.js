@@ -29,13 +29,6 @@ function clearFlightsResult() {
   }
 }
 
-function setSameHeight() {
-  $(".price").each(function() {
-    $(this).css("height", $(".flight").height() + "px");
-    $(".price-body").css("height", $(".flight").height() + "px");
-  });
-}
-
 function scrollDown(distance) {
   $("html, body").animate(
     {
@@ -294,9 +287,6 @@ $(function() {
         flightsElement.html(data.content);
       },
       complete: function() {
-        setTimeout(function() {
-          $(window).trigger("resize");
-        }, 250);
         if (flightsElement.isPartial()) {
           var $scrollDistance = $("#flightSearchResult div")
             .first()
@@ -339,9 +329,6 @@ $(function() {
         flightsElement.append(data.content);
       },
       complete: function() {
-        setTimeout(function() {
-          $(window).trigger("resize");
-        }, 250);
         if (flightsElement.isPartial()) {
           scrollDown($scrollDistance - 65);
         }

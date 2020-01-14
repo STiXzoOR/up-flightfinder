@@ -233,14 +233,6 @@
     <script src="../static/js/snackbar.js"></script>
     <script src="../static/js/project.js"></script>
 
-    <script>
-        var resizeId;
-        $(window).on('resize', function() {
-            clearTimeout(resizeId);
-            resizeId = setTimeout(setSameHeight(), 500);
-        });
-    </script>
-
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for message in messages %}
