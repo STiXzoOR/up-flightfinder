@@ -274,6 +274,7 @@ $(function() {
       },
       cache: false,
       beforeSend: function() {
+        clearFlightsResult();
         flightsElement.removeClass("d-none");
         flightsElement.html(genLoading());
       },

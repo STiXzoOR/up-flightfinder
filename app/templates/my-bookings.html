@@ -89,15 +89,18 @@
                                                     <div aria-labelledby="{{ booking.id }}" class="collapse" data-parent="#upcomingFlightsInfo" id="upcomingBooking-{{ booking.id }}">
                                                         <div class="card-body pb-0">
                                                             <div class="form-row justify-content-center align-items-center">
-                                                                <div class="col-sm-4 mb-2 mb-sm-0">
-                                                                    <button class="btn btn-sm btn-block btn-primary process-form" type="submit" name="btnState" value="view">View</button>
-                                                                </div>
-                                                                <div class="col-sm-4 mb-2 mb-sm-0">
-                                                                    <button class="btn btn-sm btn-block btn-primary process-form" type="submit" name="btnState" value="modify">Modify</button>
-                                                                </div>
-                                                                <div class="col-sm-4">
-                                                                    <button class="btn btn-sm btn-block btn-danger process-form" type="submit" name="btnState" value="cancel">Cancel</button>
-                                                                </div>
+                                                                {% for name in ["View", "Modify", "Cancel"]%}
+                                                                    {% set klasses = "col-sm-4" %}
+                                                                    {% if name == "Cancel" %}
+                                                                        {% set btn_color = "danger" %}
+                                                                    {% else %}
+                                                                        {% set btn_color = "primary" %}
+                                                                        {% set klasses = klasses + " mb-2 mb-sm-0" %}
+                                                                    {% endif %}
+                                                                    <div class="{{ klasses }}">
+                                                                        <button class="btn btn-sm btn-block btn-{{ btn_color }} process-form" type="submit" name="btnState" value="{{ name.lower() }}">{{ name }}</button>
+                                                                    </div>
+                                                                {% endfor %}
                                                             </div>
                                                         </div>
                                                     </div>
