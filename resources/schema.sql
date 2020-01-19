@@ -254,7 +254,7 @@ LOCK TABLES `CUSTOMER` WRITE;
 
 INSERT INTO `CUSTOMER` (`customer_id`, `email`, `password`, `first_name`, `last_name`, `mobile`, `gender`, `joined_date`, `status`, `customer_type`)
 VALUES
-	(0,'None',NULL,NULL,NULL,NULL,NULL,NULL,'Active','GUEST');
+	(0,'None',NULL,NULL,NULL,NULL,NULL,NULL,'Confirmed','GUEST');
 
 /*!40000 ALTER TABLE `CUSTOMER` ENABLE KEYS */;
 UNLOCK TABLES;

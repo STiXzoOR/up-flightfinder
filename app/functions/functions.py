@@ -4,7 +4,6 @@ from itsdangerous import URLSafeTimedSerializer
 from datetime import datetime
 from functools import wraps
 from faker import Faker
-import urllib.parse
 import requests
 import pymysql
 import platform

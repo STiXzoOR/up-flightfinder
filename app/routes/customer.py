@@ -60,14 +60,13 @@ def sign_in_post():
         return redirect(url_for("sign_in", next=next_url))
 
     if not user_is_confirmed(email):
-        session["next_url"] = next_url
-        resend_confirmation()
-
+        send_confirm_account_email(email=email, next_url=next_url)
         flash(
             "Your account needs to be confirmed first. A new email has been sent!",
             "error",
         )
-        return redirect(url_for("unconfirmed"))
+
+        return redirect(url_for("unconfirmed", email=email, next=next_url))
 
     full_name = "{fname} {lname}".format(
         fname=result["first_name"], lname=result["last_name"]
@@ -318,10 +317,6 @@ def unconfirmed():
 def confirm_email(token=""):
     next_url = request.args.get("next")
     email = confirm_token(token)
-
-    # if not email:
-    #     flash("The confirmation link is invalid or has expired.", "error")
-    #     return redirect(url_for("index"))
 
     query = """
     UPDATE customer
