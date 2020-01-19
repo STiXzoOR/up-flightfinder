@@ -31,7 +31,7 @@
             <i class="ff ff-logo ff-xl ff-fw mr-1"></i>Flight Finder
         </a>
         <ul class="navbar-nav ml-auto">
-            {% if g.current_customer.type == "USER" %}
+            {% if g.current_customer.type == "USER" and g.current_customer.status == "Confirmed" %}
                 <li class="nav-item dropdown">
                     <a class="d-none d-sm-flex nav-link py-1 pl-2 pr-1 align-items-center" style="opacity: 1;" href="#" id="navbarDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <div class="d-inline-block mr-1">Welcome, {{ g.current_customer.first_name }}</div>

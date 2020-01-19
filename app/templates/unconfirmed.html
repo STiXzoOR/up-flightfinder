@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta content="initial-scale=1, shrink-to-fit=no, width=device-width" name="viewport">
+
+        <!-- CSS -->
+        <link href="../static/css/roboto-family.css" rel="stylesheet">
+        <link href="../static/css/material-icons.css" rel="stylesheet">
+        <link href="../static/css/fontawesome-icons.css" rel="stylesheet">
+        <link href="../static/css/flightfinder-logo.css" rel="stylesheet">
+
+        <!-- Add Material CSS, replace Bootstrap CSS -->
+        <link href="../static/css/material.css" rel="stylesheet">
+        <link href="../static/css/project.css" rel="stylesheet">
+        <link href="../static/css/pace-top.css" rel="stylesheet">
+        <link href="../static/css/pace-center.css" rel="stylesheet">
+
+        <!-- favicon -->
+        <link href="../static/images/favicon.ico" rel="shortcut icon"/>
+
+        <!-- title -->
+        <title>Confirm Account - Flight Finder</title>
+    </head>
+    <script>
+        var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    </script>
+  <body class="body-content">
+    <div class="loader"></div>
+    <header class="navbar navbar-dark fixed-top bg-alt-primary toolbar-waterfall">
+        <a class="navbar-brand mr-auto" href="{{ url_for("index") }}">
+            <i class="ff ff-logo ff-xl ff-fw mr-1"></i>Flight Finder
+        </a>
+    </header>
+    <main role="main">
+        <section class="d-flex align-items-center my-4">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-9">
+                        <div class="row justify-content-center align-items-center">
+                            <div class="col-9 col-sm-8 col-md-6 col-xl-5">
+                                <img class="img-fluid" src="../static/images/svg/setup.svg" alt="Setup"/>
+                            </div>
+                            <div class="col-12">
+                                <div class="card shadow-none mt-4">
+                                    <div class="card-body px-0 px-sm-3">
+                                        <div class="text-dark text-center mb-4">
+                                            <h2 class="font-weight-normal text-monospace pb-3">ALMOST THERE...</h2>
+                                            <p>An email to confirm your account was sent to:</p>
+                                            <p id="email" class="font-weight-bold font-size-xl my-3">{{ email }}</p>
+                                            <p class="text-left">The link will expire after 10 minutes. Follow the instructions to complete the registration process. If you haven't received the email, please check your spam folder just in case. Otherwise, click the button below to resend you the activation link:</p>
+                                        </div>
+                                        <div class="text-center mb-4">
+                                            <div class="row justify-content-center">
+                                                <div class="col-12 col-sm-4 col-md-3">
+                                                    <button id="btnResend" class="btn btn-primary btn-block" type="button" disabled>Resend</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="text-dark text-center mb-4">
+                                            <h5 class="font-weight-normal text-monospace">Need Help?</h5>
+                                            <p>Contact us: <a href="mailto:info@upflightfinder.live">info@upflightfinder.live</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="../static/js/jquery.min.js"></script>
+    <script src="../static/js/popper.min.js"></script>
+    <script src="../static/js/bootstrap.min.js"></script>
+    <script src="../static/js/pace.min.js"></script>
+
+    <!-- Then Material JavaScript on top of Bootstrap JavaScript -->
+    <script src="../static/js/material.js"></script>
+    <script src="../static/js/snackbar.js"></script>
+    <script src="../static/js/project.js"></script>
+
+    <script>
+        $(function() {
+            startResendTimer();
+        })
+    </script>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <script>
+                    $(function() {
+                        $.snackbar({content: '{{ message }}', style: 'snackbar-left justify-content-center mb-2'});
+                    });
+                </script>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+  </body>
+</html>

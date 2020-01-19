@@ -1,63 +1,177 @@
-from flask import session, request, redirect, g, url_for, abort
-from pymysql.cursors import DictCursor, Cursor
-from datetime import datetime, timedelta
+from flask import session, request, redirect, g, url_for, abort, flash
+from pymysql.cursors import DictCursor
+from itsdangerous import URLSafeTimedSerializer
+from datetime import datetime
 from functools import wraps
 from faker import Faker
+import urllib.parse
+import requests
 import pymysql
 import platform
+import json
 import os
 
 
-WINDOWS = platform.system() == 'Windows'
-OSX = platform.system() == 'Darwin' 
+WINDOWS = platform.system() == "Windows"
+OSX = platform.system() == "Darwin"
 fake = Faker()
 
+
 def restricted(access_level):
-    def decorator(fn):
-        @wraps(fn)
+    def decorator(func):
+        @wraps(func)
         def wrapper(*args, **kwargs):
             if not get_customer_type() == access_level:
                 return abort(403)
-            return fn(*args, **kwargs)
+            return func(*args, **kwargs)
+
         return wrapper
+
     return decorator
 
-def redirect_guest(fn):
-    @wraps(fn)
+
+def redirect_when(_type):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            if get_customer_type() == _type:
+                return url_for("index")
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
+
+
+def redirect_guest(func):
+    @wraps(func)
     def wrapper(*args, **kwargs):
-        if get_customer_type() == 'GUEST' and session.get('is_guest') is None:
-            session['is_guest'] = True
-            return redirect(url_for('guest_detected', next=request.path))
-        return fn(*args, **kwargs)
+        if get_customer_type() == "GUEST" and session.get("is_guest") is None:
+            session["is_guest"] = True
+            return redirect(url_for("guest_detected", next=request.path))
+        return func(*args, **kwargs)
+
     return wrapper
 
+
+def check_unconfirmed(by=""):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            arg = request.args.get(by)
+            arg = arg if arg else request.view_args.get(by)
+
+            if arg is None:
+                return abort(404)
+            else:
+                email = arg if by == "email" else confirm_token(token=arg)
+                if not email:
+                    flash("The requested link is invalid or has expired.", "error")
+                    return redirect(url_for("index"))
+
+                if user_is_confirmed(email):
+                    flash(
+                        "Your account is already confirmed. Please sign in!", "warning"
+                    )
+                    return redirect(url_for("index"))
+
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
+
+
 def create_connection():
-    options = {'host': os.getenv('DB_HOST'),
-               'user': os.getenv('DB_USER'),
-               'password': os.getenv('DB_PASSWORD'),
-               'db': os.getenv('DB_NAME'),
-               'charset': 'utf8mb4',
-               'cursorclass': DictCursor}
-    
+    options = {
+        "host": os.getenv("DB_HOST"),
+        "user": os.getenv("DB_USER"),
+        "password": os.getenv("DB_PASSWORD"),
+        "db": os.getenv("DB_NAME"),
+        "charset": "utf8mb4",
+        "cursorclass": DictCursor,
+    }
+
     if OSX:
-        options.update({'unix_socket': '/Applications/MAMP/tmp/mysql/mysql.sock'})
+        options.update({"unix_socket": "/Applications/MAMP/tmp/mysql/mysql.sock"})
 
     return pymysql.connect(**options)
 
+
 def get_customer_id():
-    return g.current_customer.get('id')
+    return g.current_customer.get("id")
+
 
 def get_customer_type():
-    return g.current_customer.get('type')
+    return g.current_customer.get("type")
+
 
 def set_session_user(info={}):
     return session.update(info)
 
+
 def clear_session_user():
-    for field in ['customer_id', 'email', 'customer_type', 'first_name', 'last_name', 'full_name']:
+    for field in [
+        "customer_id",
+        "email",
+        "customer_type",
+        "first_name",
+        "last_name",
+        "full_name",
+    ]:
         session.pop(field, None)
 
-def build_flight_card(airline_logo='', airline_name='', from_airport='', time_from='', to_airport='', time_to=''):
+
+def user_is_confirmed(email):
+    if email is None:
+        return True
+
+    query = """
+    SELECT status
+    FROM customer
+    WHERE email=%s and status="Confirmed"
+    """
+
+    cnx = create_connection()
+    cursor = cnx.cursor()
+    cursor.execute(query, (email))
+    result = cursor.fetchone()
+    cursor.close()
+    cnx.close()
+
+    return result is not None
+
+
+def get_user_fullname(email=None):
+    if not email:
+        return None
+
+    query = """
+    SELECT first_name, last_name
+    FROM customer
+    WHERE email=%s
+    """
+
+    cnx = create_connection()
+    cursor = cnx.cursor()
+    cursor.execute(query, (email))
+    result = cursor.fetchone()
+    cursor.close()
+    cnx.close()
+
+    return "{fname} {lname}".format(
+        fname=result["first_name"], lname=result["last_name"]
+    )
+
+
+def build_flight_card(
+    airline_logo="",
+    airline_name="",
+    from_airport="",
+    time_from="",
+    to_airport="",
+    time_to="",
+):
     return """  <div class="form-row justify-content-center align-items-center">
                     <div class="col-2 col-lg-1 col-xl-2 px-0 px-md-2 px-lg-0 px-xl-2 text-center">
                         <img src="../static/images/airlines/{airline_logo}.png" class="img-fluid h-75 w-75" alt="{airline_name}"/>
@@ -73,13 +187,37 @@ def build_flight_card(airline_logo='', airline_name='', from_airport='', time_fr
                         <div class="text-left font-weight-bold font-size-lg">{time_to}</div>
                         <div class="text-left text-muted font-size-lg">{to_airport}</div>
                     </div>
-                </div>""".format(airline_logo=airline_logo, airline_name=airline_name, from_airport=from_airport, time_from=time_from, to_airport=to_airport, time_to=time_to)
+                </div>""".format(
+        airline_logo=airline_logo,
+        airline_name=airline_name,
+        from_airport=from_airport,
+        time_from=time_from,
+        to_airport=to_airport,
+        time_to=time_to,
+    )
 
-def build_selected_flight_card(id='', flight='', flight_id='', airline_name='', from_airport='', from_city='', to_airport='', to_city='', date='', klass='', airplane='', duration='', flight_type=''):
+
+def build_selected_flight_card(
+    id="",
+    flight="",
+    flight_id="",
+    airline_name="",
+    from_airport="",
+    from_city="",
+    to_airport="",
+    to_city="",
+    date="",
+    klass="",
+    airplane="",
+    duration="",
+    flight_type="",
+):
     card = """  <div id="{flight_type}Flight" class="card rounded-3x shadow-none">
                     <a aria-controls="picked{flight_type}Flight" aria-expanded="false" class="small accordion-toggler text-body collapsed" data-toggle="collapse" href="#picked{flight_type}Flight">
                         <div class="form-row justify-content-center align-items-center">
-                            <div class="col-11 px-0">""".format(flight_type=flight_type)
+                            <div class="col-11 px-0">""".format(
+        flight_type=flight_type
+    )
     card += flight
     card += """             </div>
                             <div class="col-1 expansion-panel-icon text-black-secondary text-right ml-0">
@@ -124,67 +262,93 @@ def build_selected_flight_card(id='', flight='', flight_id='', airline_name='', 
                             </div>
                         </div>
                     </div>
-                </div>""".format(flight_id=flight_id, airline_name=airline_name, from_airport=from_airport, from_city=from_city, to_airport=to_airport, to_city=to_city, date=date, klass=klass, airplane=airplane, hours=duration.hour, minutes=duration.minute, flight_type=flight_type)
-    
+                </div>""".format(
+        flight_id=flight_id,
+        airline_name=airline_name,
+        from_airport=from_airport,
+        from_city=from_city,
+        to_airport=to_airport,
+        to_city=to_city,
+        date=date,
+        klass=klass,
+        airplane=airplane,
+        hours=duration.hour,
+        minutes=duration.minute,
+        flight_type=flight_type,
+    )
+
     return card
 
-def build_flights(flight='', is_roundtrip=False):
-    depart_flight = build_flight_card(airline_logo=flight['departAirlineCode'],
-                                        airline_name=flight['departAirlineName'], 
-                                        from_airport=flight['departFromAirport'], 
-                                        time_from=flight['departTime'], 
-                                        to_airport=flight['departToAirport'], 
-                                        time_to=flight['departArrivalTime'])
-    return_flight = None                                  
+
+def build_flights(flight="", is_roundtrip=False):
+    depart_flight = build_flight_card(
+        airline_logo=flight["departAirlineCode"],
+        airline_name=flight["departAirlineName"],
+        from_airport=flight["departFromAirport"],
+        time_from=flight["departTime"],
+        to_airport=flight["departToAirport"],
+        time_to=flight["departArrivalTime"],
+    )
+    return_flight = None
     if is_roundtrip:
-        return_flight = build_flight_card(airline_logo=flight['returnAirlineCode'],
-                                            airline_name=flight['returnAirlineName'], 
-                                            from_airport=flight['returnFromAirport'], 
-                                            time_from=flight['returnTime'], 
-                                            to_airport=flight['returnToAirport'], 
-                                            time_to=flight['returnArrivalTime'])
-        
+        return_flight = build_flight_card(
+            airline_logo=flight["returnAirlineCode"],
+            airline_name=flight["returnAirlineName"],
+            from_airport=flight["returnFromAirport"],
+            time_from=flight["returnTime"],
+            to_airport=flight["returnToAirport"],
+            time_to=flight["returnArrivalTime"],
+        )
+
     return depart_flight, return_flight
 
-def build_selected_flights(picked_flight_index=0, flight='', is_roundtrip=False):
-    depart_flight, return_flight = build_flights(flight=flight, is_roundtrip=is_roundtrip)
 
-    duration = flight['departDuration']
+def build_selected_flights(picked_flight_index=0, flight="", is_roundtrip=False):
+    depart_flight, return_flight = build_flights(
+        flight=flight, is_roundtrip=is_roundtrip
+    )
+
+    duration = flight["departDuration"]
     depart_duration = datetime.strptime(duration, "%H:%M").time()
 
-    depart_flight = build_selected_flight_card(id=picked_flight_index+1,
-                                               flight=depart_flight,
-                                               flight_id=flight['departFlightID'],
-                                               airline_name=flight['departAirlineName'],
-                                               from_airport=flight['departFromAirport'],
-                                               from_city=flight['departFromCity'],
-                                               to_airport=flight['departToAirport'],
-                                               to_city=flight['departToCity'],
-                                               date=flight['departDate'],
-                                               klass=flight['departClass'],
-                                               airplane=flight['departAirplaneName'],
-                                               duration=depart_duration,
-                                               flight_type='Depart')
-    
+    depart_flight = build_selected_flight_card(
+        id=picked_flight_index + 1,
+        flight=depart_flight,
+        flight_id=flight["departFlightID"],
+        airline_name=flight["departAirlineName"],
+        from_airport=flight["departFromAirport"],
+        from_city=flight["departFromCity"],
+        to_airport=flight["departToAirport"],
+        to_city=flight["departToCity"],
+        date=flight["departDate"],
+        klass=flight["departClass"],
+        airplane=flight["departAirplaneName"],
+        duration=depart_duration,
+        flight_type="Depart",
+    )
+
     if is_roundtrip:
-        duration = flight['returnDuration']
+        duration = flight["returnDuration"]
         return_duration = datetime.strptime(duration, "%H:%M").time()
 
-        return_flight = build_selected_flight_card(id=picked_flight_index+1, 
-                                                   flight=return_flight, 
-                                                   flight_id=flight['returnFlightID'], 
-                                                   airline_name=flight['returnAirlineName'], 
-                                                   from_airport=flight['returnFromAirport'], 
-                                                   from_city=flight['returnFromCity'], 
-                                                   to_airport=flight['returnToAirport'], 
-                                                   to_city=flight['returnToCity'], 
-                                                   date=flight['returnDate'], 
-                                                   klass=flight['returnClass'], 
-                                                   airplane=flight['returnAirplaneName'], 
-                                                   duration=return_duration,
-                                                   flight_type='Return')
-    
+        return_flight = build_selected_flight_card(
+            id=picked_flight_index + 1,
+            flight=return_flight,
+            flight_id=flight["returnFlightID"],
+            airline_name=flight["returnAirlineName"],
+            from_airport=flight["returnFromAirport"],
+            from_city=flight["returnFromCity"],
+            to_airport=flight["returnToAirport"],
+            to_city=flight["returnToCity"],
+            date=flight["returnDate"],
+            klass=flight["returnClass"],
+            airplane=flight["returnAirplaneName"],
+            duration=return_duration,
+            flight_type="Return",
+        )
+
     return depart_flight, return_flight
+
 
 def get_airports():
     query = """
@@ -235,13 +399,13 @@ def get_flights(
         """
 
     if WHERE:
-        query += ' WHERE {where}'.format(where=WHERE)
-    
+        query += " WHERE {where}".format(where=WHERE)
+
     if ORDER_BY:
-        query += ' ORDER BY {order}'.format(order=ORDER_BY)
-    
+        query += " ORDER BY {order}".format(order=ORDER_BY)
+
     if LIMIT:
-        query += ' LIMIT {limit}'.format(limit=LIMIT)
+        query += " LIMIT {limit}".format(limit=LIMIT)
 
     cnx = create_connection()
     cursor = cnx.cursor()
@@ -249,8 +413,9 @@ def get_flights(
     data = cursor.fetchall() if FETCH_ALL else cursor.fetchone()
     cursor.close()
     cnx.close()
-    
+
     return data
+
 
 def booking_exists(booking_id, last_name):
     customer_id = get_customer_id()
@@ -260,7 +425,9 @@ def booking_exists(booking_id, last_name):
     SELECT booking_id 
     FROM booking
     WHERE booking_id=%s and (last_name=%s {operator} customer_id=%s)
-    """.format(operator='or' if customer_type == 'GUEST' else 'and')
+    """.format(
+        operator="or" if customer_type == "GUEST" else "and"
+    )
 
     cnx = create_connection()
     cursor = cnx.cursor()
@@ -270,6 +437,7 @@ def booking_exists(booking_id, last_name):
     cnx.close()
 
     return result is not None
+
 
 def booking_is_active(booking_id, last_name):
     query = """
@@ -287,6 +455,7 @@ def booking_is_active(booking_id, last_name):
 
     return result is not None
 
+
 def booking_is_inactive(booking_id, last_name):
     query = """
     SELECT status 
@@ -303,7 +472,8 @@ def booking_is_inactive(booking_id, last_name):
 
     return result is not None
 
-def get_booking(booking_id='', booking_last_name=''):
+
+def get_booking(booking_id="", booking_last_name=""):
     customer_id = get_customer_id()
     customer_type = get_customer_type()
     is_roundtrip = False
@@ -312,7 +482,9 @@ def get_booking(booking_id='', booking_last_name=''):
     SELECT booking_id as id, depart_flight_id, return_flight_id, DATE_FORMAT(booking_date, "%%d %%b %%Y") as date, total_passengers, price_per_passenger, total_price, flight_type, status
     FROM booking
     WHERE booking_id=%s and (last_name=%s {operator} customer_id=%s) 
-    """.format(operator='or' if customer_type == 'GUEST' else 'and')
+    """.format(
+        operator="or" if customer_type == "GUEST" else "and"
+    )
 
     cnx = create_connection()
     cursor = cnx.cursor()
@@ -324,20 +496,23 @@ def get_booking(booking_id='', booking_last_name=''):
     f.flight_id=%s and al.airline_code=f.airline and ap.airplane_model=f.airplane and aprt1.airport_code=f.from_airport and aprt2.airport_code=f.to_airport
     """
 
-    params = (booking_info['depart_flight_id'],)
+    params = (booking_info["depart_flight_id"],)
 
-    if booking_info['flight_type'] == 'Roundtrip':
+    if booking_info["flight_type"] == "Roundtrip":
         is_roundtrip = True
 
         WHERE = """
         f1.flight_id=%s and f2.flight_id=%s and al1.airline_code=f1.airline and ap1.airplane_model=f1.airplane and aprt1.airport_code=f1.from_airport and aprt2.airport_code=f1.to_airport and al2.airline_code=f2.airline and ap2.airplane_model=f2.airplane and aprt3.airport_code=f2.from_airport and aprt4.airport_code=f2.to_airport
         """
 
-        params += (booking_info['return_flight_id'],)
-    
-    flight = get_flights(is_roundtrip=is_roundtrip, params=params, WHERE=WHERE, FETCH_ALL=False)
-    depart_flight, return_flight = build_selected_flights(flight=flight, 
-                                                          is_roundtrip=is_roundtrip)
+        params += (booking_info["return_flight_id"],)
+
+    flight = get_flights(
+        is_roundtrip=is_roundtrip, params=params, WHERE=WHERE, FETCH_ALL=False
+    )
+    depart_flight, return_flight = build_selected_flights(
+        flight=flight, is_roundtrip=is_roundtrip
+    )
 
     picked_flight = depart_flight
 
@@ -360,7 +535,9 @@ def get_booking(booking_id='', booking_last_name=''):
     SELECT first_name, last_name, email, mobile
     FROM booking
     WHERE booking_id=%s and (last_name=%s {operator} customer_id=%s)
-    """.format(operator='or' if customer_type == 'GUEST' else 'and')
+    """.format(
+        operator="or" if customer_type == "GUEST" else "and"
+    )
 
     cursor = cnx.cursor()
     cursor.execute(query, (booking_id, booking_last_name, customer_id))
@@ -368,9 +545,86 @@ def get_booking(booking_id='', booking_last_name=''):
     cursor.close()
     cnx.close()
 
-    data = {'booking_info': booking_info,
-            'flight': picked_flight,
-            'passenger_info': passenger_info,
-            'contact_info': contact_info}
+    data = {
+        "booking_info": booking_info,
+        "flight": picked_flight,
+        "passenger_info": passenger_info,
+        "contact_info": contact_info,
+    }
 
     return data
+
+
+def send_email_mailgun(data={}):
+    api_key = os.getenv("MAILGUN_API_KEY")
+    api_base_url = os.getenv("MAILGUN_API_BASE_URL")
+    api_domain = os.getenv("MAILGUN_API_DOMAIN")
+    api_email = os.getenv("MAILGUN_API_SENDER_EMAIL")
+
+    api_url = "{base_url}/{domain}/messages".format(
+        base_url=api_base_url, domain=api_domain
+    )
+    sender = "Flight Finder <{email}>".format(email=api_email)
+
+    return requests.post(
+        api_url,
+        auth=("api", api_key),
+        data={
+            "from": sender,
+            "to": data.get("recipient"),
+            "subject": data.get("subject"),
+            "template": data.get("template"),
+            "h:X-Mailgun-Variables": json.dumps({"action_url": data.get("action_url")}),
+        },
+    )
+
+
+def generate_token(email=""):
+    serializer = URLSafeTimedSerializer(os.getenv("SECRET_KEY"))
+    return serializer.dumps(email, salt=os.getenv("SECURITY_PASSWORD_SALT"))
+
+
+def confirm_token(token="", expiration=600):
+    serializer = URLSafeTimedSerializer(os.getenv("SECRET_KEY"))
+
+    try:
+        email = serializer.loads(
+            token, salt=os.getenv("SECURITY_PASSWORD_SALT"), max_age=expiration
+        )
+    except:
+        return False
+
+    return email
+
+
+def send_confirm_account_email(email="", next_url=None):
+    token = generate_token(email)
+    confirm_url = url_for("confirm_email", token=token, next=next_url, _external=True)
+    recipient = "{fullname} <{email}>".format(
+        fullname=get_user_fullname(email), email=email,
+    )
+
+    data = {
+        "recipient": recipient,
+        "subject": "Please confirm your account!",
+        "template": "confirm_account",
+        "action_url": confirm_url,
+    }
+
+    return send_email_mailgun(data=data)
+
+
+def send_reset_password_email(email="", token=""):
+    reset_url = url_for("reset_password", token=token, _external=True)
+    recipient = "{fullname} <{email}>".format(
+        fullname=get_user_fullname(email), email=email,
+    )
+
+    data = {
+        "recipient": recipient,
+        "subject": "Forgot your password?",
+        "template": "reset_password",
+        "action_url": reset_url,
+    }
+
+    return send_email_mailgun(data=data)

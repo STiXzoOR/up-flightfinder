@@ -72,6 +72,22 @@ function genLoading() {
   return $progress;
 }
 
+function startResendTimer() {
+  var $btn = $("#btnResend");
+  var btnOriginalText = "Resend";
+  var secs = 30;
+
+  $btn.text(btnOriginalText + " (" + secs + ")").prop({ disabled: true });
+
+  var timer = setInterval(function() {
+    secs--;
+    $btn.text(btnOriginalText + " (" + secs + ")");
+    if (secs === 0) {
+      $btn.text(btnOriginalText).prop({ disabled: false });
+      clearInterval(timer);
+    }
+  }, 1000);
+}
 $.fn.isPartial = function() {
   var elementTop = $(this).offset().top;
   var elementBottom = elementTop + $(this).outerHeight();
@@ -404,5 +420,37 @@ $(function() {
     var $target = $("#returnDatePicker");
     $target.prop({ disabled: true, required: false });
     $target.val("One Way").trigger("change");
+  });
+
+  $("#btnResend").on("click", function() {
+    var $that = $(this);
+    $.ajax({
+      type: "GET",
+      url: $SCRIPT_ROOT + "/resend",
+      contentType: "application/json; charset=utf-8",
+      data: {
+        email: $("#email").text(),
+        next: searchParams.get("next")
+      },
+      beforeSend: function() {
+        $that.text("Sending...");
+      },
+      success: function(data) {
+        if (!isset(data.message)) {
+          window.location = "/index.html";
+        } else {
+          $.snackbar({
+            content: data.message,
+            style: "snackbar-left justify-content-center mb-2"
+          });
+        }
+      },
+      complete: function() {
+        startResendTimer();
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        alert(errorThrown);
+      }
+    });
   });
 });

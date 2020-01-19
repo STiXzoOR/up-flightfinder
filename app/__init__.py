@@ -1,19 +1,25 @@
-from flask import Flask, render_template, g
+from flask import Flask, render_template, g, session
 from dotenv import load_dotenv, find_dotenv
 from app.functions.functions import *
 import os
 
-load_dotenv(find_dotenv())
+try:
+    load_dotenv(find_dotenv())
+except:
+    print(
+        "ERROR: Looks like you haven't generated a valid .env file. Please run: python generate_dotenv.py"
+    )
+    exit(1)
 
 app = Flask(__name__)
-app.config["DEBUG"] = os.getenv("DEBUG_STATUS", False)
+app.config["DEBUG"] = os.getenv("DEBUG_STATUS") == "True"
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
 
 @app.before_request
 def current_user():
     query = """
-    SELECT customer_id as id, first_name, customer_type as type
+    SELECT customer_id as id, first_name, customer_type as type, status
     FROM customer
     WHERE customer_id=%s
     """
