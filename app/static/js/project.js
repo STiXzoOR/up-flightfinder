@@ -249,7 +249,7 @@ $(function() {
     validateForm($form);
   });
 
-  $(":input", "#flightForm").change(function() {
+  $(":input", "#flightForm").on("change", function() {
     clearFlightsResult();
   });
 
@@ -275,7 +275,6 @@ $(function() {
       cache: false,
       beforeSend: function() {
         clearFlightsResult();
-        flightsElement.removeClass("d-none");
         flightsElement.html(genLoading());
       },
       success: function(data) {
@@ -288,6 +287,7 @@ $(function() {
         flightsElement.html(data.content);
       },
       complete: function() {
+        flightsElement.removeClass("d-none");
         if (flightsElement.isPartial()) {
           var $scrollDistance = $("#flightSearchResult div")
             .first()
@@ -340,20 +340,19 @@ $(function() {
     });
   });
 
-  $("#fromAirport").change(function() {
-    if ($(this).val() != "") {
-      $("#toAirport").prop("disabled", false);
-    } else {
-      $("#toAirport").prop("disabled", true);
+  $("#fromAirport").on("change", function() {
+    var $target = $("#toAirport");
+
+    if ($(this).val() === "") {
+      $target
+        .find("option")
+        .remove()
+        .end()
+        .append("<option/>")
+        .prop("disabled", true)
+        .trigger("change");
       return;
     }
-
-    $("#toAirport")
-      .find("option")
-      .remove()
-      .end()
-      .append("<option/>")
-      .trigger("change");
 
     $.ajax({
       type: "GET",
@@ -362,14 +361,26 @@ $(function() {
       data: {
         airport: $(this).val()
       },
+      beforeSend: function() {
+        $target
+          .find("option")
+          .remove()
+          .end()
+          .append("<option/>")
+          .prop("disabled", true)
+          .trigger("change");
+      },
       success: function(data) {
         $.each(data.result, function(index, airport) {
-          $("#toAirport").append(
+          $target.append(
             $("<option/>")
               .attr("value", airport.value)
               .text(airport.text)
           );
         });
+      },
+      complete: function() {
+        $target.prop("disabled", false);
       },
       error: function(jqXHR, textStatus, errorThrown) {
         alert(errorThrown);
