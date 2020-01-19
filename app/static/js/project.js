@@ -1,3 +1,4 @@
+var searchParams = new URLSearchParams(window.location.search);
 var flightsElement = $("#flightSearchResult");
 var spinner = $(".loader");
 var returnDateVal;
