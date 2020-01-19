@@ -198,10 +198,31 @@ def get_airports():
     result = cursor.fetchall()
     cursor.close()
     cnx.close()
-        
+
     return result
 
-def get_flights(is_roundtrip=False, params=(), WHERE='', ORDER_BY='', LIMIT='', FETCH_ALL=True):
+
+def get_popular_destinations():
+    query = """
+    SELECT CASE WHEN ap.airport_code IN ("ATH", "LCA", "SHA") THEN ap.country ELSE ap.city END as name, MIN(f.price) as price 
+    FROM FLIGHT as f, AIRPORT as ap 
+    WHERE f.dep_date = CURRENT_DATE and ap.airport_code = f.from_airport and f.from_airport in ( "ATH", "LCA", "DME", "HND", "JFK", "LHR", "ORY", "MAD", "SHA" ) 
+    GROUP BY ap.city, ap.country, ap.airport_code
+    """
+
+    cnx = create_connection()
+    cursor = cnx.cursor()
+    cursor.execute(query)
+    result = cursor.fetchall()
+    cursor.close()
+    cnx.close()
+
+    return result
+
+
+def get_flights(
+    is_roundtrip=False, params=(), WHERE="", ORDER_BY="", LIMIT="", FETCH_ALL=True
+):
     query = """
     SELECT f.flight_id as departFlightID, f.airline as departAirlineCode, al.airline_name as departAirlineName, DATE_FORMAT(f.dep_date, "%%d %%b %%Y") as departDate, f.from_airport as departFromAirport, aprt1.city as departFromCity, TIME_FORMAT(f.dep_time, "%%H:%%i") as departTime, f.to_airport as departToAirport, aprt2.city as departToCity, TIME_FORMAT(f.arr_time, "%%H:%%i") as departArrivalTime, f.price as departPrice, f.class as departClass, TIME_FORMAT(f.duration, "%%H:%%i") as departDuration, ap.airplane_name as departAirplaneName
     FROM flight as f, airline as al, airplane as ap, airport as aprt1, airport as aprt2

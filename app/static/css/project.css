@@ -654,6 +654,16 @@ hr.hr-icon::before {
   border-bottom-right-radius: 6px;
 }
 
+@media (max-width: 767.98px) {
+  .card-deck {
+    display: block !important;
+    -ms-flex-flow: unset !important;
+    flex-flow: unset !important;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+  }
+}
+
 .loader {
   display: none;
   position: fixed;

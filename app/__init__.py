@@ -33,7 +33,9 @@ def current_user():
 def index():
     session.pop("is_guest", None)
 
-    return render_template("index.html", airports=get_airports())
+    return render_template(
+        "index.html", airports=get_airports(), destinations=get_popular_destinations()
+    )
 
 
 from app.routes import error
