@@ -155,6 +155,8 @@ $(function() {
     "[data-ripple-line]"
   );
 
+  $("[data-border]").css({ border: "0.5rem solid #fff" });
+
   $("input[type='password'][data-password]").each(function() {
     var $password = $(this);
     var $icon = $('<i class="material-icons">visibility_off</i>');
