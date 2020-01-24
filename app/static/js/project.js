@@ -454,6 +454,7 @@ $(function() {
       }
     });
   });
+
   $(".reverse-destinations").on("click", function() {
     var $btn = $(this);
     var $icon = $btn.children().first();
@@ -478,5 +479,23 @@ $(function() {
         .removeClass("text-alt-primary");
       $to.val(fromVal).trigger("change");
     }, 500);
+  });
+
+  $(".accordion-toggler").hover(function() {
+    var $accordion = $(this);
+    var $hr = $accordion.children().find("hr");
+
+    if (!$accordion.is(":focus")) {
+      $hr.toggleClass("hr-icon-fix");
+    }
+  });
+
+  $(".accordion-toggler").blur(function() {
+    var $accordion = $(this);
+    var $hr = $accordion.children().find("hr");
+
+    if ($hr.hasClass("hr-icon-fix")) {
+      $hr.removeClass("hr-icon-fix");
+    }
   });
 });

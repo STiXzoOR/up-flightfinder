@@ -605,6 +605,10 @@ hr.hr-icon::before {
   padding: 0.2rem 0.4rem;
 }
 
+.hr-icon-fix::before {
+  background: #eeeeee !important;
+}
+
 .jumbotron-bg {
   background-color: #fff;
   background-image: url(../images/svg/aircraft_flipped.svg);

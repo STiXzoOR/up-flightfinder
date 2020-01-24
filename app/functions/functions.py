@@ -180,7 +180,7 @@ def build_flight_card(
                         <div class="text-right text-muted font-size-lg">{from_airport}</div>
                     </div>
                     <div class="col-4 col-sm-6">
-                        <hr data-content="" class="flight-indicator hr-text hr-icon">
+                        <hr data-content="" class="hr-text hr-icon">
                     </div>
                     <div class="col-3 col-sm-2">
                         <div class="text-left font-weight-bold font-size-lg">{time_to}</div>
