@@ -14,13 +14,25 @@ FlightFinder is a flask app that provides users register, log in, search, book a
 
 - Clone the repo or download as zip.
 - Navigate to the folder where you cloned/extracted the repo.
-- Run `python generate_dotenv.py` to generate .env file.
+- Run `python generate_dotenv.py` without any arguments to generate the default .env file. Accepted arguments:
+  - `--debug`: whether to run flask app in debug mode. Defualt: disabled.
+  - `--database-user`: database username. **Default: root**.
+  - `--database-password`: database password. **Default: '' or root**.
+  - `--database-host`: database host location. **Default: localhost**.
+  - `--use-mailgun`: use mailgun service to send emails. **Default: disabled**.
+    - `--mailgun-api-key`: mailgun generated api key.
+    - `--mailgun-base-url`: mailgun base url server. **Default: US**.
+    - `--mailgun-api-domain`: mailgun api assigned domain.
+    - `--mailgun-sender-email`: mailgun sender email.
 - Create a virtual environment using `python -m venv venv` command.
 - Activate virtual environment.
   - On Windows: `venv\Scripts\activate`
   - On MacOS/Linux: `source venv/bin/activate`
-- Run `pip install -r requirements.txt` to install dependencies.
-- Navigate to `/app/utilities` and run `python generate_db.py` to create and initialize database.
+- Run `pip install -r requirements.txt` to install the dependencies.
+- Navigate to `./app/utilities` and run `python generate_db.py` without any arguments to create, initialize and fill the database. Accepted arguments:
+  - `--create-db`: creates the empty database if not exists.
+  - `--init-db`: initializes/resets database with the default values.
+  - `--generate-flights`: generates flights for one month.
 
 ## Running App
 

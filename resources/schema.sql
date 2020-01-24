@@ -7,7 +7,7 @@
 --
 -- Host: localhost (MySQL 5.7.26)
 -- Database: FlightFinderDB
--- Generation Time: 2019-12-27 20:57:57 +0000
+-- Generation Time: 2020-01-24 18:43:48 +0000
 -- ************************************************************
 
 
@@ -28,7 +28,7 @@ DROP TABLE IF EXISTS `AIRLINE`;
 CREATE TABLE `AIRLINE` (
   `airline_code` varchar(2) NOT NULL,
   `airline_name` varchar(50) NOT NULL,
-  PRIMARY KEY (`airline_code`)
+  PRIMARY KEY (`airline_code`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 LOCK TABLES `AIRLINE` WRITE;
@@ -108,7 +108,7 @@ CREATE TABLE `AIRPLANE` (
   `airplane_model` varchar(3) NOT NULL,
   `airplane_name` varchar(100) NOT NULL,
   `capacity` int(11) NOT NULL,
-  PRIMARY KEY (`airplane_model`)
+  PRIMARY KEY (`airplane_model`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 LOCK TABLES `AIRPLANE` WRITE;
@@ -165,7 +165,7 @@ CREATE TABLE `AIRPORT` (
   `airport_name` varchar(50) NOT NULL,
   `city` varchar(50) NOT NULL,
   `country` varchar(50) NOT NULL,
-  PRIMARY KEY (`airport_code`)
+  PRIMARY KEY (`airport_code`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 LOCK TABLES `AIRPORT` WRITE;
@@ -219,7 +219,7 @@ CREATE TABLE `BOOKING` (
   `total_price` int(11) NOT NULL,
   `flight_type` varchar(50) NOT NULL,
   `status` varchar(50) NOT NULL,
-  PRIMARY KEY (`booking_id`,`customer_id`,`depart_flight_id`),
+  PRIMARY KEY (`booking_id`,`customer_id`,`depart_flight_id`) USING BTREE,
   KEY `BOOKING_fk0` (`customer_id`),
   KEY `BOOKING_fk1` (`depart_flight_id`),
   KEY `BOOKING_fk2` (`return_flight_id`),
@@ -236,7 +236,7 @@ CREATE TABLE `BOOKING` (
 DROP TABLE IF EXISTS `CUSTOMER`;
 
 CREATE TABLE `CUSTOMER` (
-  `customer_id` int(11) NOT NULL,
+  `customer_id` int(11) NOT NULL AUTO_INCREMENT,
   `email` varchar(255) NOT NULL,
   `password` binary(60) DEFAULT NULL,
   `first_name` varchar(50) DEFAULT NULL,
@@ -246,15 +246,16 @@ CREATE TABLE `CUSTOMER` (
   `joined_date` date DEFAULT NULL,
   `status` varchar(50) DEFAULT NULL,
   `customer_type` varchar(10) DEFAULT NULL,
-  PRIMARY KEY (`customer_id`,`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`customer_id`) USING BTREE,
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
 LOCK TABLES `CUSTOMER` WRITE;
 /*!40000 ALTER TABLE `CUSTOMER` DISABLE KEYS */;
 
 INSERT INTO `CUSTOMER` (`customer_id`, `email`, `password`, `first_name`, `last_name`, `mobile`, `gender`, `joined_date`, `status`, `customer_type`)
 VALUES
-	(0,'None',NULL,NULL,NULL,NULL,NULL,NULL,'Confirmed','GUEST');
+	(1,'None',NULL,NULL,NULL,NULL,NULL,NULL,'Confirmed','GUEST');
 
 /*!40000 ALTER TABLE `CUSTOMER` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -283,7 +284,7 @@ CREATE TABLE `FLIGHT` (
   `discount` decimal(5,0) NOT NULL,
   `occupied_capacity` int(11) NOT NULL,
   `status` varchar(50) NOT NULL,
-  PRIMARY KEY (`flight_id`),
+  PRIMARY KEY (`flight_id`,`dep_date`,`class`) USING BTREE,
   KEY `FLIGHT_fk0` (`airline`),
   KEY `FLIGHT_fk1` (`airplane`),
   KEY `FLIGHT_fk2` (`from_airport`),
@@ -293,6 +294,7 @@ CREATE TABLE `FLIGHT` (
   CONSTRAINT `FLIGHT_fk2` FOREIGN KEY (`from_airport`) REFERENCES `airport` (`airport_code`) ON UPDATE CASCADE,
   CONSTRAINT `FLIGHT_fk3` FOREIGN KEY (`to_airport`) REFERENCES `airport` (`airport_code`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 
 -- Dump of table PASS_HAS_BOOKING
@@ -305,11 +307,13 @@ CREATE TABLE `PASS_HAS_BOOKING` (
   `booking_id` varchar(6) NOT NULL,
   `seat` varchar(5) NOT NULL,
   `seat_class` varchar(50) NOT NULL,
-  PRIMARY KEY (`passenger_id`,`booking_id`),
+  `seat_price` int(11) NOT NULL,
+  PRIMARY KEY (`passenger_id`,`booking_id`) USING BTREE,
   KEY `PASS_HAS_BOOKING_fk1` (`booking_id`),
   CONSTRAINT `PASS_HAS_BOOKING_fk0` FOREIGN KEY (`passenger_id`) REFERENCES `PASSENGER` (`passenger_id`) ON DELETE CASCADE,
   CONSTRAINT `PASS_HAS_BOOKING_fk1` FOREIGN KEY (`booking_id`) REFERENCES `BOOKING` (`booking_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 
 -- Dump of table PASSENGER
@@ -321,8 +325,10 @@ CREATE TABLE `PASSENGER` (
   `passenger_id` varchar(10) NOT NULL,
   `first_name` varchar(50) NOT NULL,
   `last_name` varchar(50) NOT NULL,
-  PRIMARY KEY (`passenger_id`)
+  PRIMARY KEY (`passenger_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 
 
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
