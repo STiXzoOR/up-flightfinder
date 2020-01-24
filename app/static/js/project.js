@@ -454,4 +454,29 @@ $(function() {
       }
     });
   });
+  $(".reverse-destinations").on("click", function() {
+    var $btn = $(this);
+    var $icon = $btn.children().first();
+    var $from = $('select[name="fromAirport"]');
+    var $to = $('select[name="toAirport"]');
+    var fromVal = $from.val();
+
+    $icon
+      .removeClass("fa-exchange-alt")
+      .addClass("fa-sync")
+      .addClass("fa-spin")
+      .addClass("text-alt-primary");
+
+    $from.val($to.val()).trigger("change");
+
+    clearTimeout(timeoutVar);
+    timeoutVar = setTimeout(function() {
+      $icon
+        .removeClass("fa-spin")
+        .removeClass("fa-sync")
+        .addClass("fa-exchange-alt")
+        .removeClass("text-alt-primary");
+      $to.val(fromVal).trigger("change");
+    }, 500);
+  });
 });

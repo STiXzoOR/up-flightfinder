@@ -70,7 +70,7 @@
     <div class="jumbotron jumbotron-fluid jumbotron-bg mb-3 shadow-none"></div>
     <main role="main" class="container">
         <div class="row justify-content-center mt-md-3">
-            <div class="col-lg-10 col-xl-8">
+            <div class="col-lg-10 col-xl-9">
                 <div class="card rounded-3x shadow-sm-none shadow-1 mb-3">
                     <div class="card-body">
                         <nav class="nav nav-tabs nav-justified mb-3" id="nav-tab" role="tablist">
@@ -84,28 +84,37 @@
                             <div class="tab-pane show fade active" id="nav-roundtrip-info" role="tabpanel" aria-labelledby="roundtrip-tab">
                                 <form id="flightForm" novalidate>
                                     <div class="form-row">
-                                        <div class="form-group col-sm-6 col-md-3">
-                                            <div class="floating-label">
-                                                <label for="fromAirport"><i class="fas fa-plane-departure fa-fw mr-2"></i>From</label>
-                                                <select class="form-control custom-select" id="fromAirport" name="fromAirport" required data-ripple-line>
-                                                    <option></option>
-                                                    {% for airport in airports %}
-                                                        <option value="{{ airport.code }}">{{ airport.city }} ({{ airport.code }})</option>
-                                                    {% endfor %}
-                                                </select>
-                                                <div class="invalid-feedback">
-                                                    Invalid source airport.
+                                        <div class="form-group col-sm-12 col-md-6">
+                                            <div class="form-row justify-content-center">
+                                                <div class="col-sm mb-4 mb-sm-0">
+                                                    <div class="floating-label">
+                                                        <label for="fromAirport"><i class="fas fa-plane-departure fa-fw mr-2"></i>From</label>
+                                                        <select class="form-control custom-select" id="fromAirport" name="fromAirport" required data-ripple-line>
+                                                            <option></option>
+                                                            {% for airport in airports %}
+                                                                <option value="{{ airport.code }}">{{ airport.city }} ({{ airport.code }})</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                        <div class="invalid-feedback">
+                                                            Invalid source airport.
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </div>
-                                        <div class="form-group col-sm-6 col-md-3">
-                                            <div class="floating-label">
-                                                <label for="toAirport"><i class="fas fa-plane-arrival fa-fw mr-2"></i>To</label>
-                                                <select class="form-control custom-select" id="toAirport" name="toAirport" disabled required data-ripple-line>
-                                                    <option></option>
-                                                </select>
-                                                <div class="invalid-feedback">
-                                                    Invalid destination airport.
+                                                <div class="reverse-destinations-switch">
+                                                    <div class="reverse-destinations" role="button">
+                                                        <i class="fas fa-exchange-alt fa-fw fa-lg rotate-on-xs"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm">
+                                                    <div class="floating-label">
+                                                        <label for="toAirport"><i class="fas fa-plane-arrival fa-fw mr-2"></i>To</label>
+                                                        <select class="form-control custom-select" id="toAirport" name="toAirport" disabled required data-ripple-line>
+                                                            <option></option>
+                                                        </select>
+                                                        <div class="invalid-feedback">
+                                                            Invalid destination airport.
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
