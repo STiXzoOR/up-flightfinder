@@ -1,4 +1,3 @@
-import os
 import sys
 import secrets
 import platform
@@ -7,6 +6,12 @@ import argparse
 OSX = platform.system() == "Darwin"
 parser = argparse.ArgumentParser()
 
+parser.add_argument(
+    "--debug",
+    default=False,
+    action="store_true",
+    help="enabled debugging mode (default: disabled)",
+)
 parser.add_argument(
     "--database-host",
     metavar="host",
@@ -75,25 +80,42 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-if args.use_mailgun and args.mailgun_base_url and not (args.mailgun_api_key and args.mailgun_api_domain and args.mailgun_sender_email):
+if (
+    args.use_mailgun
+    and args.mailgun_base_url
+    and not (
+        args.mailgun_api_key and args.mailgun_api_domain and args.mailgun_sender_email
+    )
+):
     parser.error(
         "You can't use --mailgun-base-url without --mailgun-api-key, --mailgun-api-domain and --mailgun-sender-email!"
     )
-elif args.use_mailgun and not (args.mailgun_api_key and args.mailgun_api_domain and args.mailgun_sender_email):
+elif args.use_mailgun and not (
+    args.mailgun_api_key and args.mailgun_api_domain and args.mailgun_sender_email
+):
     parser.error(
         "You have to specify --mailgun-api-key, --mailgun-sender-email and --mailgun-api-domain when using the mailgun service! Optional argument --mailgun-base-url."
     )
-elif not args.use_mailgun and (args.mailgun_api_key or args.mailgun_api_domain or args.mailgun_sender_email or args.mailgun_base_url):
+elif not args.use_mailgun and (
+    args.mailgun_api_key
+    or args.mailgun_api_domain
+    or args.mailgun_sender_email
+    or args.mailgun_base_url
+):
     parser.error(
         "You can't pass --mailgun-api-key, --mailgun-api-domain, --mailgun-sender-email or --mailgun-base-url without using the mailgun service!"
     )
 
 if args.use_mailgun:
-    base = '.{base}'.format(base=args.mailgun_base_url.lower()) if args.mailgun_base_url and args.mailgun_base_url.lower() == "eu" else ""
+    base = (
+        ".{base}".format(base=args.mailgun_base_url.lower())
+        if args.mailgun_base_url and args.mailgun_base_url.lower() == "eu"
+        else ""
+    )
     args.mailgun_base_url = "https://api{base}.mailgun.net/v3".format(base=base)
 
 VARS = {
-    "DEBUG_STATUS": True,
+    "DEBUG_STATUS": args.debug,
     "SECRET_KEY": secrets.token_urlsafe(24),
     "SECURITY_PASSWORD_SALT": secrets.token_urlsafe(24),
     "DB_NAME": "flightfinderdb",
