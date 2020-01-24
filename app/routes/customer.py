@@ -4,7 +4,6 @@ from app import (
     redirect_when,
     check_unconfirmed,
     create_connection,
-    get_customer_id,
     get_customer_type,
     set_session_user,
     clear_session_user,
@@ -111,7 +110,7 @@ def sign_up_post():
 
     cnx = create_connection()
     cursor = cnx.cursor()
-    cursor.execute("SELECT * FROM customer WHERE email=%s", (email))
+    cursor.execute("SELECT email FROM customer WHERE email=%s", (email))
     result = cursor.fetchone()
     cursor.close()
 
@@ -119,21 +118,15 @@ def sign_up_post():
         flash("The user already exists", "error")
         return redirect(url_for("sign_up", next=next_url))
 
-    cursor = cnx.cursor()
-    cursor.execute("SELECT COUNT(*) as next_id FROM customer")
-    customer_id = int(cursor.fetchone()["next_id"])
-    cursor.close()
-
     query = """
-    INSERT INTO customer (customer_id, first_name, last_name, email, password, mobile, gender, joined_date, status, customer_type) 
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, "USER")
+    INSERT INTO customer (first_name, last_name, email, password, mobile, gender, joined_date, status, customer_type) 
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, "USER")
     """
 
     cursor = cnx.cursor()
     cursor.execute(
         query,
         (
-            customer_id,
             first_name,
             last_name,
             email,
@@ -145,33 +138,14 @@ def sign_up_post():
         ),
     )
     cursor.close()
-
-    if use_mailgun:
-        cnx.commit()
-        cnx.close()
-
-        response = send_confirm_account_email(email=email, next_url=next_url)
-
-        return redirect(url_for("unconfirmed", email=email, next=next_url))
-
-    full_name = "{fname} {lname}".format(fname=first_name, lname=last_name)
-    info = {
-        "customer_id": customer_id,
-        "email": email,
-        "customer_type": "USER",
-        "first_name": first_name,
-        "last_name": last_name,
-        "full_name": full_name,
-    }
-
-    set_session_user(info)
-
     cnx.commit()
     cnx.close()
 
-    return redirect(
-        urllib.parse.quote(next_url) if next_url is not None else url_for("index")
-    )
+    if use_mailgun:
+        send_confirm_account_email(email=email, next_url=next_url)
+        return redirect(url_for("unconfirmed", email=email, next=next_url))
+
+    return redirect(url_for("sign_in", next=next_url))
 
 
 @app.route("/sign-out.html")
@@ -184,16 +158,15 @@ def sign_out():
 @app.route("/user-profile.html")
 @restricted(access_level="USER")
 def profile():
-    cnx = create_connection()
-
     query = """
     SELECT first_name, last_name, email, mobile, gender, DATE_FORMAT(joined_date, "%%d %%b %%Y") as joined_date
     FROM customer
     WHERE customer_id=%s
     """
 
+    cnx = create_connection()
     cursor = cnx.cursor()
-    cursor.execute(query, (session["customer_id"]))
+    cursor.execute(query, (session.get("customer_id")))
     user_info = cursor.fetchone()
     cursor.close()
     cnx.close()
@@ -218,7 +191,14 @@ def edit_info():
     cnx = create_connection()
     cursor = cnx.cursor()
     cursor.execute(
-        query, (first_name, last_name, mobile, session["customer_id"], session["email"])
+        query,
+        (
+            first_name,
+            last_name,
+            mobile,
+            session.get("customer_id"),
+            session.get("email"),
+        ),
     )
     cursor.close()
     cnx.commit()
@@ -234,7 +214,6 @@ def change_password():
     form = request.form
     current_password = form.get("currentPassword")
     new_password = gen_pw_hash(form.get("newPassword"))
-    customer_id = get_customer_id()
 
     query = """
     SELECT password 
@@ -244,7 +223,7 @@ def change_password():
 
     cnx = create_connection()
     cursor = cnx.cursor()
-    cursor.execute(query, (customer_id))
+    cursor.execute(query, (session.get("customer_id")))
     db_password = cursor.fetchone()["password"]
     cursor.close()
 
@@ -260,7 +239,9 @@ def change_password():
     """
 
     cursor = cnx.cursor()
-    cursor.execute(query, (new_password, session["customer_id"], session["email"]))
+    cursor.execute(
+        query, (new_password, session.get("customer_id"), session.get("email"))
+    )
     cursor.close()
     cnx.commit()
     cnx.close()
@@ -273,7 +254,6 @@ def change_password():
 def delete_account():
     form = request.form
     current_password = form.get("currentDeletePassword")
-    customer_id = get_customer_id()
 
     query = """
     SELECT password 
@@ -283,7 +263,7 @@ def delete_account():
 
     cnx = create_connection()
     cursor = cnx.cursor()
-    cursor.execute(query, (customer_id))
+    cursor.execute(query, (session.get("customer_id")))
     db_password = cursor.fetchone()["password"]
     cursor.close()
 
@@ -298,7 +278,7 @@ def delete_account():
     """
 
     cursor = cnx.cursor()
-    cursor.execute(query, (customer_id, session["email"]))
+    cursor.execute(query, (session.get("customer_id"), session.get("email")))
     cursor.close()
     cnx.commit()
     cnx.close()
@@ -342,7 +322,7 @@ def confirm_email(token=""):
         "action_url": url_for("sign_in", _external=True),
     }
 
-    response = send_email_mailgun(data=data)
+    send_email_mailgun(data=data)
     flash("Your account has been confirmed. Thanks!", "success")
 
     return redirect(url_for("sign_in", next=next_url))
@@ -382,7 +362,7 @@ def forgot_password_post():
     token = generate_token(email)
 
     if use_mailgun:
-        response = send_reset_password_email(email=email, token=token)
+        send_reset_password_email(email=email, token=token)
 
         flash("An email was sent with instructions to reset your password!", "success")
         return redirect(url_for("index"))
@@ -431,7 +411,7 @@ def reset_password(token=""):
             "action_url": url_for("sign_in", _external=True),
         }
 
-        response = send_email_mailgun(data=data)
+        send_email_mailgun(data=data)
 
     flash("Your password has been updated! Please sign in.", "success")
 
