@@ -15,6 +15,8 @@
         <link href="../static/css/material.css" rel="stylesheet">
         <link href="../static/css/project.css" rel="stylesheet">
         <link href="../static/css/seat-charts.css" rel="stylesheet">
+        <link href="../static/css/pace-top.css" rel="stylesheet">
+        <link href="../static/css/pace-center.css" rel="stylesheet">
 
         <!-- favicon -->
         <link href="../static/images/favicon.ico" rel="shortcut icon"/>
@@ -26,7 +28,6 @@
         var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
     </script>
   <body class="body-content">
-    <div class="loader"></div>
     <header class="navbar navbar-dark fixed-top bg-alt-primary toolbar-waterfall">
         <a class="navbar-brand mr-auto" href="{{ url_for("index") }}">
             <i class="ff ff-logo ff-xl ff-fw mr-1"></i>Flight Finder
@@ -264,6 +265,7 @@
     <script src="../static/js/jquery.min.js"></script>
     <script src="../static/js/popper.min.js"></script>
     <script src="../static/js/bootstrap.min.js"></script>
+    <script src="../static/js/pace.min.js"></script>
 
     <!-- Then Material JavaScript on top of Bootstrap JavaScript -->
     <script src="../static/js/material.js"></script>

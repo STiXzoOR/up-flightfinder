@@ -147,11 +147,6 @@ a.text-alt-secondary:hover {
   border-left: 0.3125rem solid var(--alt-primary);
 }
 
-.blurred {
-  filter: blur(5px);
-  padding-top: 65px;
-}
-
 .btn-primary {
   background-color: var(--alt-primary);
 }
@@ -207,169 +202,85 @@ a.text-alt-secondary:hover {
     inset 0 0 0 1px var(--alt-primary);
 }
 
-.card.rounded-3x > .table:first-child,
-.card.rounded-3x > .table:first-child > :first-child,
-.card.rounded-3x > .table:first-child > :first-child > tr:first-child,
-.card.rounded-3x > .table-responsive > .table:first-child,
-.card.rounded-3x > .table-responsive > .table:first-child > :first-child,
-.card.rounded-3x
-  > .table-responsive
-  > .table:first-child
-  > :first-child
-  > tr:first-child {
+.card.rounded-3x>.table:first-child,
+.card.rounded-3x>.table:first-child> :first-child,
+.card.rounded-3x>.table:first-child> :first-child>tr:first-child,
+.card.rounded-3x>.table-responsive>.table:first-child,
+.card.rounded-3x>.table-responsive>.table:first-child> :first-child,
+.card.rounded-3x>.table-responsive>.table:first-child> :first-child>tr:first-child {
   border-top-left-radius: 6px;
   border-top-right-radius: 6px;
 }
 
-.card.rounded-3x
-  > .table:first-child
-  > :first-child
-  > tr:first-child
-  td:first-child,
-.card.rounded-3x
-  > .table:first-child
-  > :first-child
-  > tr:first-child
-  th:first-child,
-.card.rounded-3x
-  > .table-responsive
-  > .table:first-child
-  > :first-child
-  > tr:first-child
-  td:first-child,
-.card.rounded-3x
-  > .table-responsive
-  > .table:first-child
-  > :first-child
-  > tr:first-child
-  th:first-child {
+.card.rounded-3x>.table:first-child> :first-child>tr:first-child td:first-child,
+.card.rounded-3x>.table:first-child> :first-child>tr:first-child th:first-child,
+.card.rounded-3x>.table-responsive>.table:first-child> :first-child>tr:first-child td:first-child,
+.card.rounded-3x>.table-responsive>.table:first-child> :first-child>tr:first-child th:first-child {
   border-top-left-radius: 6px;
 }
 
-.card.rounded-3x
-  > .table:first-child
-  > :first-child
-  > tr:first-child
-  td:last-child,
-.card.rounded-3x
-  > .table:first-child
-  > :first-child
-  > tr:first-child
-  th:last-child,
-.card.rounded-3x
-  > .table-responsive
-  > .table:first-child
-  > :first-child
-  > tr:first-child
-  td:last-child,
-.card.rounded-3x
-  > .table-responsive
-  > .table:first-child
-  > :first-child
-  > tr:first-child
-  th:last-child {
+.card.rounded-3x>.table:first-child> :first-child>tr:first-child td:last-child,
+.card.rounded-3x>.table:first-child> :first-child>tr:first-child th:last-child,
+.card.rounded-3x>.table-responsive>.table:first-child> :first-child>tr:first-child td:last-child,
+.card.rounded-3x>.table-responsive>.table:first-child> :first-child>tr:first-child th:last-child {
   border-top-right-radius: 6px;
 }
 
-.card.rounded-3x > .table:last-child,
-.card.rounded-3x > .table:last-child > :last-child,
-.card.rounded-3x > .table:last-child > :last-child > tr:last-child,
-.card.rounded-3x > .table-responsive > .table:last-child,
-.card.rounded-3x > .table-responsive > .table:last-child > :last-child,
-.card.rounded-3x
-  > .table-responsive
-  > .table:last-child
-  > :last-child
-  > tr:last-child {
+.card.rounded-3x>.table:last-child,
+.card.rounded-3x>.table:last-child> :last-child,
+.card.rounded-3x>.table:last-child> :last-child>tr:last-child,
+.card.rounded-3x>.table-responsive>.table:last-child,
+.card.rounded-3x>.table-responsive>.table:last-child> :last-child,
+.card.rounded-3x>.table-responsive>.table:last-child> :last-child>tr:last-child {
   border-bottom-right-radius: 6px;
   border-bottom-left-radius: 6px;
 }
 
-.card.rounded-3x
-  > .table:last-child
-  > :last-child
-  > tr:last-child
-  td:first-child,
-.card.rounded-3x
-  > .table:last-child
-  > :last-child
-  > tr:last-child
-  th:first-child,
-.card.rounded-3x
-  > .table-responsive
-  > .table:last-child
-  > :last-child
-  > tr:last-child
-  td:first-child,
-.card.rounded-3x
-  > .table-responsive
-  > .table:last-child
-  > :last-child
-  > tr:last-child
-  th:first-child {
+.card.rounded-3x>.table:last-child> :last-child>tr:last-child td:first-child,
+.card.rounded-3x>.table:last-child> :last-child>tr:last-child th:first-child,
+.card.rounded-3x>.table-responsive>.table:last-child> :last-child>tr:last-child td:first-child,
+.card.rounded-3x>.table-responsive>.table:last-child> :last-child>tr:last-child th:first-child {
   border-bottom-left-radius: 6px;
 }
 
-.card.rounded-3x
-  > .table:last-child
-  > :last-child
-  > tr:last-child
-  td:last-child,
-.card.rounded-3x
-  > .table:last-child
-  > :last-child
-  > tr:last-child
-  th:last-child,
-.card.rounded-3x
-  > .table-responsive
-  > .table:last-child
-  > :last-child
-  > tr:last-child
-  td:last-child,
-.card.rounded-3x
-  > .table-responsive
-  > .table:last-child
-  > :last-child
-  > tr:last-child
-  th:last-child {
+.card.rounded-3x>.table:last-child> :last-child>tr:last-child td:last-child,
+.card.rounded-3x>.table:last-child> :last-child>tr:last-child th:last-child,
+.card.rounded-3x>.table-responsive>.table:last-child> :last-child>tr:last-child td:last-child,
+.card.rounded-3x>.table-responsive>.table:last-child> :last-child>tr:last-child th:last-child {
   border-bottom-right-radius: 6px;
 }
 
-.custom-file-input:focus ~ .custom-file-label,
-.custom-file-input:hover ~ .custom-file-label {
+.custom-file-input:focus~.custom-file-label,
+.custom-file-input:hover~.custom-file-label {
   border-bottom-color: var(--alt-secondary);
   box-shadow: inset 0 -2px 0 -1px var(--alt-primary);
 }
 
-.custom-control-input:checked ~ .custom-control-label::after {
+.custom-control-input:checked~.custom-control-label::after {
   color: var(--alt-primary);
 }
 
-.custom-control-input:checked ~ .custom-control-label::before {
+.custom-control-input:checked~.custom-control-label::before {
   background-color: var(--alt-primary);
 }
 
-.custom-switch .custom-control-input:checked ~ .custom-control-label::after {
+.custom-switch .custom-control-input:checked~.custom-control-label::after {
   background-color: var(--alt-primary);
 }
 
-.custom-switch .custom-control-input:checked ~ .custom-control-track {
-  /* background-color: rgba(3, 169, 244, 0.5); */
+.custom-switch .custom-control-input:checked~.custom-control-track {
   background-color: rgba(63, 81, 181, 0.5);
 }
 
 .custom-range:focus::-moz-range-thumb {
-  /* box-shadow: 0 0 0 0.75rem rgba(3, 169, 244, 0.12); */
   box-shadow: 0 0 0 0.75rem rgba(63, 81, 181, 0.12);
 }
 
 .custom-range:focus::-ms-range-thumb {
-  /* box-shadow: 0 0 0 0.75rem rgba(3, 169, 244, 0.12); */
   box-shadow: 0 0 0 0.75rem rgba(63, 81, 181, 0.12);
 }
 
 .custom-range:focus::-webkit-slider-thumb {
-  /* box-shadow: 0 0 0 0.75rem rgba(3, 169, 244, 0.12); */
   box-shadow: 0 0 0 0.75rem rgba(63, 81, 181, 0.12);
 }
 
@@ -408,7 +319,7 @@ a.text-alt-secondary:hover {
   box-shadow: none;
 }
 
-.form-control:focus + .form-control-ripple {
+.form-control:focus+.form-control-ripple {
   -webkit-transform: scaleX(1);
   -ms-transform: scaleX(1);
   transform: scaleX(1);
@@ -428,27 +339,27 @@ a.text-alt-secondary:hover {
   z-index: 2;
 }
 
-.is-invalid.form-control ~ .form-control-ripple,
-.is-invalid.custom-select ~ .form-control-ripple,
-.is-invalid.form-control-file ~ .form-control-ripple,
-.is-invalid.form-control ~ .form-control-ripple,
-.is-invalid.custom-select ~ .form-control-ripple,
-.is-invalid.form-control-file ~ .form-control-ripple,
-.was-validated .form-control:invalid ~ .form-control-ripple,
-.was-validated .custom-select:invalid ~ .form-control-ripple,
-.was-validated .form-control-file:invalid ~ .form-control-ripple {
+.is-invalid.form-control~.form-control-ripple,
+.is-invalid.custom-select~.form-control-ripple,
+.is-invalid.form-control-file~.form-control-ripple,
+.is-invalid.form-control~.form-control-ripple,
+.is-invalid.custom-select~.form-control-ripple,
+.is-invalid.form-control-file~.form-control-ripple,
+.was-validated .form-control:invalid~.form-control-ripple,
+.was-validated .custom-select:invalid~.form-control-ripple,
+.was-validated .form-control-file:invalid~.form-control-ripple {
   background-color: var(--danger);
 }
 
-.is-valid.form-control ~ .form-control-ripple,
-.is-valid.custom-select ~ .form-control-ripple,
-.is-valid.form-control-file ~ .form-control-ripple,
-.is-valid.form-control ~ .form-control-ripple,
-.is-valid.custom-select ~ .form-control-ripple,
-.is-valid.form-control-file ~ .form-control-ripple,
-.was-validated .form-control:valid ~ .form-control-ripple,
-.was-validated .custom-select:valid ~ .form-control-ripple,
-.was-validated .form-control-file:valid ~ .form-control-ripple {
+.is-valid.form-control~.form-control-ripple,
+.is-valid.custom-select~.form-control-ripple,
+.is-valid.form-control-file~.form-control-ripple,
+.is-valid.form-control~.form-control-ripple,
+.is-valid.custom-select~.form-control-ripple,
+.is-valid.form-control-file~.form-control-ripple,
+.was-validated .form-control:valid~.form-control-ripple,
+.was-validated .custom-select:valid~.form-control-ripple,
+.was-validated .form-control-file:valid~.form-control-ripple {
   background-color: var(--success);
 }
 
@@ -468,10 +379,10 @@ a.text-alt-secondary:hover {
 }
 
 select.form-control:focus[multiple],
-select.form-control:focus[size]:not([size="1"]),
-textarea.form-control:focus:not([rows="1"]),
+select.form-control:focus[size]:not([size='1']),
+textarea.form-control:focus:not([rows='1']),
 .custom-select:focus[multiple],
-.custom-select:focus[size]:not([size="1"]) {
+.custom-select:focus[size]:not([size='1']) {
   box-shadow: inset 2px 2px 0 -1px var(--alt-primary),
     inset -2px -2px 0 -1px var(--alt-primary);
 }
@@ -492,7 +403,7 @@ textarea.form-control:focus:not([rows="1"]),
 .flight-legend-point::after,
 .flight-legend-point::before {
   border-top: 1px solid #bdbdbd;
-  content: "";
+  content: '';
   display: block;
   position: absolute;
 }
@@ -539,6 +450,7 @@ textarea.form-control:focus:not([rows="1"]),
   .flight-card-padding-left {
     padding-left: 0.05rem !important;
   }
+
   .flight-card-padding-right {
     padding-right: 0.05rem !important;
   }
@@ -554,8 +466,8 @@ textarea.form-control:focus:not([rows="1"]),
   color: var(--alt-primary);
 }
 
-.floating-label.is-focused ~ .input-group-icon,
-.form-control:focus ~ .input-group-icon {
+.floating-label.is-focused~.input-group-icon,
+.form-control:focus~.input-group-icon {
   color: var(--alt-primary);
 }
 
@@ -599,7 +511,7 @@ hr.hr-text::before {
 }
 
 hr.hr-icon::before {
-  font-family: "Font Awesome 5 Free";
+  font-family: 'Font Awesome 5 Free';
   content: attr(data-content);
   font-weight: 900;
   padding: 0.2rem 0.4rem;
@@ -668,23 +580,6 @@ hr.hr-icon::before {
   }
 }
 
-.loader {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
-  min-height: 100vh;
-  overflow: hidden;
-  z-index: 2000;
-  -webkit-box-align: center !important;
-  -ms-flex-align: center !important;
-  align-items: center !important;
-}
-
 .modal-footer .btn-primary,
 .modal-footer .btn-primary:active,
 .modal-footer .btn-primary:focus,
@@ -720,7 +615,7 @@ hr.hr-icon::before {
   color: var(--alt-primary);
 }
 
-.navdrawer-nav .active > .nav-link {
+.navdrawer-nav .active>.nav-link {
   color: var(--alt-primary);
 }
 
@@ -729,14 +624,15 @@ hr.hr-icon::before {
   color: var(--alt-primary);
 }
 
-.active > .nav-link .navdrawer-nav-icon {
+.active>.nav-link .navdrawer-nav-icon {
   color: var(--alt-primary);
 }
 
 @media (min-width: 992px) {
-  .navdrawer-permanent-lg ~ .main-content,
-  .navdrawer-permanent-lg ~ .jumbotron-bg,
-  .navdrawer-permanent-lg ~ .hero-section {
+
+  .navdrawer-permanent-lg~.main-content,
+  .navdrawer-permanent-lg~.jumbotron-bg,
+  .navdrawer-permanent-lg~.hero-section {
     margin-left: 17.5rem;
   }
 }
@@ -837,10 +733,10 @@ hr.hr-icon::before {
 }
 
 .textfield-box select.form-control:focus[multiple],
-.textfield-box select.form-control:focus[size]:not([size="1"]),
-.textfield-box textarea.form-control:focus:not([rows="1"]),
+.textfield-box select.form-control:focus[size]:not([size='1']),
+.textfield-box textarea.form-control:focus:not([rows='1']),
 .textfield-box .custom-select:focus[multiple],
-.textfield-box .custom-select:focus[size]:not([size="1"]) {
+.textfield-box .custom-select:focus[size]:not([size='1']) {
   box-shadow: inset 0 -2px 0 -1px var(--alt-primary);
 }
 
@@ -968,6 +864,7 @@ hr.hr-icon::before {
 .rounded-3x {
   border-radius: 6px;
 }
+
 .rounded-4x {
   border-radius: 8px;
 }

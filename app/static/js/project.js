@@ -89,6 +89,18 @@ function startResendTimer() {
     }
   }, 1000);
 }
+
+function fixPacePosition() {
+  var $header = $(".toolbar-waterfall");
+  var $pace = $(".pace-top > .pace > .pace-progress");
+
+  if ($header.hasClass("bg-alt-primary") || $header.hasClass("waterfall")) {
+    $pace.css({ top: $header.outerHeight() + "px" });
+  } else {
+    $pace.css({ top: 0 });
+  }
+}
+
 $.fn.isPartial = function() {
   var elementTop = $(this).offset().top;
   var elementBottom = elementTop + $(this).outerHeight();
@@ -100,10 +112,15 @@ $.fn.isPartial = function() {
 };
 
 $(window).on("scroll", function() {
+  var $header = $(".toolbar-waterfall");
+  var $pace = $(".pace-top > .pace > .pace-progress");
+
   if ($(window).scrollTop() > 0) {
-    $(".toolbar-waterfall").addClass("waterfall");
+    $header.addClass("waterfall");
+    $pace.css({ top: $header.outerHeight() + "px" });
   } else {
-    $(".toolbar-waterfall").removeClass("waterfall");
+    $header.removeClass("waterfall");
+    fixPacePosition();
   }
 });
 
@@ -158,6 +175,16 @@ $(function() {
 });
 
 $(function() {
+  $("body").addClass("pace-top");
+
+  $(document).ajaxStart(function() {
+    $("body")
+      .removeClass("pace-center")
+      .addClass("pace-top");
+    Pace.restart();
+    fixPacePosition();
+  });
+
   $(".uppercase-input").bind("input", function() {
     $(this)
       .val(
@@ -236,30 +263,57 @@ $(function() {
   });
 
   $(document).on("click", ".process-form", function(e, clicked) {
-    if (!isset(clicked)) {
-      var $btn = $(this);
-      var $form = $btn.closest("form");
+    var $btn = $(this);
+    var $form = $btn.closest("form");
 
-      if (validateForm($form)) {
-        e.preventDefault();
-        spinner.html(genLoading());
-        spinner.addClass("d-flex");
-        $("header, .jumbotron, main").wrapAll("<div class='blurred'/>");
-        $("body").removeClass("body-content");
-        setTimeout(function() {
-          $btn.trigger("click", ["continue"]);
-        }, 2000);
-        return;
-      } else {
-        return false;
-      }
-    } else {
+    if (validateForm($form)) {
+      $("body")
+        .removeClass("pace-top")
+        .addClass("pace-center");
+
+      // START OF HACKY WORKAROUND
+      // Hacky workardound to prevent pace from timeout if body is already loaded
+      $("body").append(
+        $("<input/>").attr({ id: "dummyCounter", type: "hidden", value: 0 })
+      );
+
+      var timer = setInterval(function() {
+        for (var i = 0; i < 1000; i++) {
+          var val = parseInt($("#dummyCounter").val()) + 1;
+          $("#dummyCounter")
+            .val(val)
+            .text(val)
+            .trigger("change");
+        }
+      }, 10);
+
       setTimeout(function() {
-        spinner.html("");
-        spinner.removeClass("d-flex");
-        $("body").addClass("body-content");
+        clearInterval(timer);
+      }, 10000);
+      // END OF HACKY WORKAROUND
+
+      $("html, body").css({
+        overflow: "hidden",
+        height: "100%"
+      });
+
+      $("header, .jumbotron, main").wrapAll("<div class='fullscreen-pace'/>");
+      Pace.restart();
+      var $pace = $(".pace-center > .pace > .pace-progress");
+      $pace.append(genLoading());
+
+      Pace.on("hide", function() {
         $("header, .jumbotron, main").unwrap();
-      }, 250);
+        $("html, body").css({
+          overflow: "",
+          height: ""
+        });
+        $("#dummyCounter").remove();
+      });
+
+      return;
+    } else {
+      return false;
     }
   });
 

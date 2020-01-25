@@ -1,0 +1,57 @@
+/* This is a compiled file, you should be editing the file in the templates directory */
+.pace-center .pace {
+    z-index: 2000;
+    position: fixed;
+    -webkit-pointer-events: none;
+    pointer-events: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+.pace-center .pace-inactive {
+    display: none;
+}
+
+.pace-center .pace .pace-progress {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 100vh;
+    overflow: hidden;
+    z-index: 2000;
+    -webkit-box-align: center !important;
+    -ms-flex-align: center !important;
+    align-items: center !important;
+    justify-content: center !important;
+    -webkit-transform: none !important;
+    -ms-transform: none !important;
+    transform: none !important;
+}
+
+.pace-center.pace-running .fullscreen-pace {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 100vh;
+    opacity: 0.1;
+    -webkit-pointer-events: none;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.pace-center.pace-done .fullscreen-pace {
+    opacity: 1;
+    -webkit-transition: opacity 1s linear;
+    -moz-transition: opacity 1s linear;
+    -o-transition: opacity 1s linear;
+    transition: opacity 1s linear;
+}
