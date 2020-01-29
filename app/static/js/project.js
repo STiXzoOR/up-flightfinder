@@ -4,6 +4,8 @@ var spinner = $(".loader");
 var returnDateVal;
 var timeoutVar;
 
+$("body").addClass("pace-top");
+
 function validateForm(form) {
   if (form[0].checkValidity() === false) {
     event.preventDefault();
