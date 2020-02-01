@@ -1,20 +1,43 @@
-from app import app, restricted, create_connection, get_customer_id, get_customer_type, get_booking, booking_exists, booking_is_inactive, fake
+from app import (
+    app,
+    restricted,
+    create_connection,
+    get_customer_id,
+    get_customer_type,
+    get_booking,
+    booking_exists,
+    booking_is_inactive,
+    fake,
+)
 from flask import render_template, session, request, redirect, flash, url_for, abort
-from pymysql.cursors import Cursor
 from datetime import datetime
 
 @app.route('/new-booking', methods=["POST"])
 def new_booking():
     customer_id = get_customer_id()
     form = request.form
-    is_roundtrip = form.get('isRoundtrip') == 'True'
+    is_roundtrip = form.get("isRoundtrip") == "True"
 
-    flight_info = {'depart_flight_id': form.get('DepartFlightID'),
-                   'return_flight_id': form.get('ReturnFlightID') if is_roundtrip else None,
-                   'type': 'Roundtrip' if is_roundtrip else 'Oneway',
-                   'total_passengers': int(form.get('numPassenger')),
-                   'price_per_passenger': form.get('pricePerPassenger'),
-                   'total_price': form.get('totalPrice')}
+    flight_info = {
+        "depart_flight_id": form.get("DepartFlightID"),
+        "return_flight_id": form.get("ReturnFlightID", None),
+        "depart_flight_date": form.get("DepartDate"),
+        "return_flight_date": form.get("ReturnDate", None),
+        "flight_class": form.get("flightClass"),
+        "type": "Roundtrip" if is_roundtrip else "Oneway",
+        "total_passengers": int(form.get("numPassenger")),
+        "price_per_passenger": form.get("pricePerPassenger"),
+        "total_price": form.get("totalPrice"),
+    }
+
+    flight_info["depart_flight_date"] = datetime.strptime(
+        flight_info["depart_flight_date"], "%d %b %Y"
+    ).date()
+
+    if flight_info["return_flight_date"]:
+        flight_info["return_flight_date"] = datetime.strptime(
+            flight_info["return_flight_date"], "%d %b %Y"
+        ).date()
 
     query = """
     SELECT booking_id 
@@ -24,66 +47,79 @@ def new_booking():
     cnx = create_connection()
     cursor = cnx.cursor()
 
-    booking_id = fake.lexify(text="??????", letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+    booking_id = fake.lexify(
+        text="??????", letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    )
     cursor.execute(query, booking_id)
     result = cursor.fetchone()
     while result is not None:
-        booking_id = fake.lexify(text="??????", letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+        booking_id = fake.lexify(
+            text="??????", letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        )
         cursor.execute(query, booking_id)
         result = cursor.fetchone()
     cursor.close()
 
     current_date = datetime.today().date()
     passenger_info = []
-    for i in range(flight_info['total_passengers']):
-        first_name = 'firstNamePassenger-{num}'.format(num=i+1)
-        last_name = 'lastNamePassenger-{num}'.format(num=i+1)
-        identifier = 'idPassenger-{num}'.format(num=i+1)
-        seat = 'seatPassenger-{num}'.format(num=i+1)
-        seat_class = 'seatClassPassenger-{num}'.format(num=i+1)
-        seat_price = 'seatPricePassenger-{num}'.format(num=i+1)
+    for i in range(flight_info["total_passengers"]):
+        first_name = "firstNamePassenger-{num}".format(num=i + 1)
+        last_name = "lastNamePassenger-{num}".format(num=i + 1)
+        identifier = "idPassenger-{num}".format(num=i + 1)
+        seat = "seatPassenger-{num}".format(num=i + 1)
+        seat_class = "seatClassPassenger-{num}".format(num=i + 1)
+        seat_price = "seatPricePassenger-{num}".format(num=i + 1)
 
-        passenger = {'id': form.get(identifier), 
-                     'first_name': form.get(first_name),
-                     'last_name': form.get(last_name),
-                     'seat': form.get(seat),
-                     'seat_class': form.get(seat_class),
-                     'seat_price': form.get(seat_price)}
-        
+        passenger = {
+            "id": form.get(identifier),
+            "first_name": form.get(first_name),
+            "last_name": form.get(last_name),
+            "seat": form.get(seat),
+            "seat_class": form.get(seat_class),
+            "seat_price": form.get(seat_price),
+        }
+
         passenger_info.append(passenger)
-    
-    contact_info = {'first_name': form.get('contactFirstName'),
-                    'last_name': form.get('contactLastName'),
-                    'email': form.get('contactEmail'),
-                    'mobile': form.get('contactMobile')}
 
-    booking = {'booking_id': booking_id,
-               'customer_id': customer_id,
-               'depart_flight_id': flight_info['depart_flight_id'], 
-               'return_flight_id': flight_info['return_flight_id'],	
-               'first_name': contact_info['first_name'],
-               'last_name': contact_info['last_name'],
-               'email': contact_info['email'],
-               'mobile': contact_info['mobile'],
-               'booking_date': current_date,
-               'last_modify_date': current_date,
-               'total_passengers': flight_info['total_passengers'],
-               'price_per_passenger': flight_info['price_per_passenger'],
-               'total_price': flight_info['total_price'],
-               'flight_type': flight_info['type'],
-               'status': 'Active'
-            }
-    
+    contact_info = {
+        "first_name": form.get("contactFirstName"),
+        "last_name": form.get("contactLastName"),
+        "email": form.get("contactEmail"),
+        "mobile": form.get("contactMobile"),
+    }
+
+    booking = {
+        "booking_id": booking_id,
+        "customer_id": customer_id,
+        "depart_flight_id": flight_info["depart_flight_id"],
+        "return_flight_id": flight_info["return_flight_id"],
+        "depart_flight_date": flight_info["depart_flight_date"],
+        "return_flight_date": flight_info["return_flight_date"],
+        "flight_class": flight_info["flight_class"],
+        "first_name": contact_info["first_name"],
+        "last_name": contact_info["last_name"],
+        "email": contact_info["email"],
+        "mobile": contact_info["mobile"],
+        "booking_date": current_date,
+        "last_modify_date": current_date,
+        "total_passengers": flight_info["total_passengers"],
+        "price_per_passenger": flight_info["price_per_passenger"],
+        "total_price": flight_info["total_price"],
+        "flight_type": flight_info["type"],
+        "status": "Upcoming",
+    }
+
     fields = []
     values = []
     for key in booking.keys():
         fields.append(key)
-        values.append('%({key})s'.format(key=key))
+        values.append("%({key})s".format(key=key))
 
-    fields = ', '.join(fields)
-    values = ', '.join(values)
-    query = 'INSERT INTO booking ({fields}) VALUES ({values})'.format(fields=fields,
-                                                                    values=values)
+    fields = ", ".join(fields)
+    values = ", ".join(values)
+    query = "INSERT INTO booking ({fields}) VALUES ({values})".format(
+        fields=fields, values=values
+    )
     cursor = cnx.cursor()
     cursor.execute(query, booking)
     cursor.close()
@@ -93,13 +129,17 @@ def new_booking():
     SET occupied_capacity=occupied_capacity+%s 
     WHERE flight_id=%s
     """
-    
+
     cursor = cnx.cursor()
-    cursor.execute(query, (flight_info['total_passengers'], flight_info['depart_flight_id']))
+    cursor.execute(
+        query, (flight_info["total_passengers"], flight_info["depart_flight_id"])
+    )
     if is_roundtrip:
-        cursor.execute(query, (flight_info['total_passengers'], flight_info['return_flight_id']))
+        cursor.execute(
+            query, (flight_info["total_passengers"], flight_info["return_flight_id"])
+        )
     cursor.close()
-    
+
     query_p = """
     INSERT INTO passenger (passenger_id, first_name, last_name) 
     VALUE(%s, %s, %s)
@@ -113,18 +153,37 @@ def new_booking():
     for passenger in passenger_info:
         try:
             cursor = cnx.cursor()
-            cursor.execute(query_p, (passenger['id'], passenger['first_name'], passenger['last_name']))
+            cursor.execute(
+                query_p,
+                (passenger["id"], passenger["first_name"], passenger["last_name"]),
+            )
             cursor.close()
         except:
-            print('Passenger with id={id} exists'.format(id=passenger['id']))
+            print("Passenger with id={id} exists".format(id=passenger["id"]))
         cursor = cnx.cursor()
-        cursor.execute(query_pb, (passenger['id'], booking_id, passenger['seat'], passenger['seat_class'], passenger['seat_price']))
+        cursor.execute(
+            query_pb,
+            (
+                passenger["id"],
+                booking_id,
+                passenger["seat"],
+                passenger["seat_class"],
+                passenger["seat_price"],
+            ),
+        )
         cursor.close()
-    
+
     cnx.commit()
     cnx.close()
 
-    return redirect(url_for('view_booking', booking_id=booking_id, booking_last_name=contact_info['last_name'], go_back=False))
+    return redirect(
+        url_for(
+            "view_booking",
+            booking_id=booking_id,
+            booking_last_name=contact_info["last_name"],
+            go_back=False,
+        )
+    )
 
 @app.route('/my-bookings.html')
 @restricted(access_level='USER')
@@ -134,18 +193,18 @@ def my_bookings():
     query = """
     SELECT b.booking_id as id, b.last_name as last_name, a1.city as from_city, a2.city as to_city, DATE_FORMAT(b.booking_date, "%%d %%b %%Y") as date, b.flight_type as flight_type, b.status as status 
     FROM booking as b, flight as f, airport as a1, airport as a2 
-    WHERE b.customer_id=%s and b.status in (%s, %s) and f.flight_id=b.depart_flight_id and a1.airport_code=f.from_airport and a2.airport_code=f.to_airport 
-    ORDER BY b.booking_date DESC 
+    WHERE b.customer_id=%s and b.status in (%s, %s) and f.flight_id=b.depart_flight_id and f.dep_date=b.depart_flight_date and f.class=b.flight_class and a1.airport_code=f.from_airport and a2.airport_code=f.to_airport
+    ORDER BY date DESC 
     """
 
     cnx = create_connection()
     cursor = cnx.cursor()
-    cursor.execute(query, (customer_id, 'Active', '""'))
+    cursor.execute(query, (customer_id, "Active", "Upcoming"))
     upcoming_bookings = cursor.fetchall()
     cursor.close()
 
     cursor = cnx.cursor()
-    cursor.execute(query, (customer_id, 'Passed', 'Canceled'))
+    cursor.execute(query, (customer_id, "Passed", "Canceled"))
     passed_bookings = cursor.fetchall()
     cursor.close()
     cnx.close()

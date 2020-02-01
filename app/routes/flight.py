@@ -102,8 +102,11 @@ def search_flights():
             "picked_flight",
             depart_flight_id=depart_flight_id,
             return_flight_id=return_flight_id,
+            depart_date=depart_date,
+            return_date=return_date if is_roundtrip else "None",
             passenger_num=passenger_num,
             price=price,
+            flight_class=flight_class,
             is_roundtrip=is_roundtrip,
         )
 
@@ -168,14 +171,17 @@ def search_flights():
 
 
 @app.route(
-    "/new_booking?depart_flight_id=<depart_flight_id>&return_flight_id=<return_flight_id>&passenger_num=<passenger_num>&price=<price>&is_roundtrip=<is_roundtrip>"
+    "/booking/new_booking?depart_flight_id=<depart_flight_id>&return_flight_id=<return_flight_id>&depart_date=<depart_date>&return_date=<return_date>&passenger_num=<passenger_num>&price=<price>&flight_class=<flight_class>&is_roundtrip=<is_roundtrip>"
 )
 @redirect_guest
 def picked_flight(
     depart_flight_id="",
     return_flight_id="",
+    depart_date="",
+    return_date="",
     passenger_num=0,
     price=0,
+    flight_class="",
     is_roundtrip=False,
 ):
     session.pop("is_guest", None)
@@ -187,7 +193,7 @@ def picked_flight(
         query = """
         SELECT status 
         FROM booking 
-        WHERE customer_id=%s and depart_flight_id=%s and status="Active"
+        WHERE customer_id=%s and depart_flight_id=%s and status in ("Active", "Upcoming")
         """
 
         cnx = create_connection()
@@ -202,17 +208,25 @@ def picked_flight(
             return redirect(url_for("index"))
 
     WHERE = """
-    f.flight_id=%s and al.airline_code=f.airline and ap.airplane_model=f.airplane and aprt1.airport_code=f.from_airport and aprt2.airport_code=f.to_airport
+    f.flight_id=%s and f.dep_date=%s and f.class=%s and al.airline_code=f.airline and ap.airplane_model=f.airplane and aprt1.airport_code=f.from_airport and aprt2.airport_code=f.to_airport
     """
 
-    params = (depart_flight_id,)
+    params = (
+        depart_flight_id,
+        depart_date,
+        flight_class,
+    )
 
     if is_roundtrip:
         WHERE = """
-        f1.flight_id=%s and f2.flight_id=%s and al1.airline_code=f1.airline and ap1.airplane_model=f1.airplane and aprt1.airport_code=f1.from_airport and aprt2.airport_code=f1.to_airport and al2.airline_code=f2.airline and ap2.airplane_model=f2.airplane and aprt3.airport_code=f2.from_airport and aprt4.airport_code=f2.to_airport
+        f1.flight_id=%s and f1.dep_date=%s and f1.class=%s and f2.flight_id=%s and f2.dep_date=%s and f2.class=%s and al1.airline_code=f1.airline and ap1.airplane_model=f1.airplane and aprt1.airport_code=f1.from_airport and aprt2.airport_code=f1.to_airport and al2.airline_code=f2.airline and ap2.airplane_model=f2.airplane and aprt3.airport_code=f2.from_airport and aprt4.airport_code=f2.to_airport
         """
 
-        params += (return_flight_id,)
+        params += (
+            return_flight_id,
+            return_date,
+            flight_class,
+        )
 
     flight = get_flights(
         is_roundtrip=is_roundtrip, params=params, WHERE=WHERE, FETCH_ALL=False
@@ -235,6 +249,7 @@ def picked_flight(
     return render_template(
         "new-booking.html",
         picked_flight=picked_flight,
+        flight_class=flight_class,
         num_passenger=passenger_num,
         price=price,
         total_price=total_price,

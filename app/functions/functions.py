@@ -34,7 +34,7 @@ def redirect_when(_type):
         @wraps(func)
         def wrapper(*args, **kwargs):
             if get_customer_type() == _type:
-                return url_for("index")
+                return redirect(url_for("index"))
             return func(*args, **kwargs)
 
         return wrapper
@@ -57,7 +57,7 @@ def check_unconfirmed(by=""):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            arg = request.args.get(by)
+            arg = request.values.get(by)
             arg = arg if arg else request.view_args.get(by)
 
             if arg is None:
@@ -158,8 +158,12 @@ def get_user_fullname(email=None):
     cursor.close()
     cnx.close()
 
-    return "{fname} {lname}".format(
-        fname=result["first_name"], lname=result["last_name"]
+    return (
+        None
+        if "first_name" not in result
+        else "{fname} {lname}".format(
+            fname=result["first_name"], lname=result["last_name"]
+        )
     )
 
 
@@ -230,6 +234,7 @@ def build_selected_flight_card(
                             <div class="form-row justify-content-center align-items-center">
                                 <div class="col-4 col-lg-4 col-xl-4 pl-3 pl-sm-4 pl-lg-3 pr-0">
                                     <input type="hidden" id="{flight_type}FlightID" name="{flight_type}FlightID" value="{flight_id}">
+                                    <input type="hidden" id="{flight_type}Date" name="{flight_type}Date" value="{date}">
                                     <div class="font-size-xl mb-3">{flight_id}</div>
                                     <div>{date}</div>
                                     <div>{airline_name}</div>
@@ -442,7 +447,7 @@ def booking_is_active(booking_id, last_name):
     query = """
     SELECT status 
     FROM booking 
-    WHERE booking_id=%s and last_name=%s and status="Active"
+    WHERE booking_id=%s and last_name=%s and status in ("Active", "Upcoming")
     """
 
     cnx = create_connection()
@@ -478,7 +483,7 @@ def get_booking(booking_id="", booking_last_name=""):
     is_roundtrip = False
 
     query = """
-    SELECT booking_id as id, depart_flight_id, return_flight_id, DATE_FORMAT(booking_date, "%%d %%b %%Y") as date, total_passengers, price_per_passenger, total_price, flight_type, status
+    SELECT booking_id as id, depart_flight_id, depart_flight_date, return_flight_id, return_flight_date, flight_class, DATE_FORMAT(booking_date, "%%d %%b %%Y") as date, total_passengers, price_per_passenger, total_price, flight_type, status
     FROM booking
     WHERE booking_id=%s and (last_name=%s {operator} customer_id=%s) 
     """.format(
@@ -492,19 +497,27 @@ def get_booking(booking_id="", booking_last_name=""):
     cursor.close()
 
     WHERE = """
-    f.flight_id=%s and al.airline_code=f.airline and ap.airplane_model=f.airplane and aprt1.airport_code=f.from_airport and aprt2.airport_code=f.to_airport
+    f.flight_id=%s and f.dep_date=%s and f.class=%s and al.airline_code=f.airline and ap.airplane_model=f.airplane and aprt1.airport_code=f.from_airport and aprt2.airport_code=f.to_airport
     """
 
-    params = (booking_info["depart_flight_id"],)
+    params = (
+        booking_info["depart_flight_id"],
+        booking_info["depart_flight_date"],
+        booking_info["flight_class"],
+    )
 
     if booking_info["flight_type"] == "Roundtrip":
         is_roundtrip = True
 
         WHERE = """
-        f1.flight_id=%s and f2.flight_id=%s and al1.airline_code=f1.airline and ap1.airplane_model=f1.airplane and aprt1.airport_code=f1.from_airport and aprt2.airport_code=f1.to_airport and al2.airline_code=f2.airline and ap2.airplane_model=f2.airplane and aprt3.airport_code=f2.from_airport and aprt4.airport_code=f2.to_airport
+        f1.flight_id=%s and f1.dep_date=%s and f1.class=%s and f2.flight_id=%s and f2.dep_date=%s and f2.class=%s and al1.airline_code=f1.airline and ap1.airplane_model=f1.airplane and aprt1.airport_code=f1.from_airport and aprt2.airport_code=f1.to_airport and al2.airline_code=f2.airline and ap2.airplane_model=f2.airplane and aprt3.airport_code=f2.from_airport and aprt4.airport_code=f2.to_airport
         """
 
-        params += (booking_info["return_flight_id"],)
+        params += (
+            booking_info["return_flight_id"],
+            booking_info["return_flight_date"],
+            booking_info["flight_class"],
+        )
 
     flight = get_flights(
         is_roundtrip=is_roundtrip, params=params, WHERE=WHERE, FETCH_ALL=False
@@ -605,7 +618,7 @@ def send_confirm_account_email(email="", next_url=None):
 
     data = {
         "recipient": recipient,
-        "subject": "Please confirm your account!",
+        "subject": "Confirm your acount",
         "template": "confirm_account",
         "action_url": confirm_url,
     }

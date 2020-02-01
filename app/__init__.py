@@ -49,6 +49,32 @@ def change_flight_status():
     )
 
 
+def change_booking_status():
+    query = """
+    UPDATE booking as b, flight as f
+    SET b.status = CASE
+    WHEN (f.status = "Active") THEN "Active" 
+    WHEN (f.status = "Inactive" ) THEN "Passed" 
+    ELSE b.status 
+    END 
+    WHERE b.depart_flight_id in (SELECT DISTINCT flight_id FROM flight)
+    """
+
+    cnx = create_connection()
+    cursor = cnx.cursor()
+    rows = cursor.execute(query)
+    cursor.close()
+    cnx.commit()
+    cnx.close()
+
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(
+        "[{timestamp}] LOG - Booking status changed for {number} bookings.".format(
+            timestamp=timestamp, number=rows
+        )
+    )
+
+
 def remove_inactive_flights():
     query = """
     DELETE FROM flight
@@ -71,6 +97,7 @@ def remove_inactive_flights():
 
 
 scheduler = BackgroundScheduler()
+scheduler.add_job(func=change_booking_status, trigger="interval", minutes=10)
 scheduler.add_job(func=change_flight_status, trigger="interval", minutes=10)
 scheduler.add_job(func=remove_inactive_flights, trigger="interval", days=15)
 scheduler.start()

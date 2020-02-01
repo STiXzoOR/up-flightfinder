@@ -177,8 +177,6 @@ $(function() {
 });
 
 $(function() {
-  $("body").addClass("pace-top");
-
   $(document).ajaxStart(function() {
     $("body")
       .removeClass("pace-center")
