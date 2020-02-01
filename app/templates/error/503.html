@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta content="initial-scale=1, shrink-to-fit=no, width=device-width" name="viewport">
+
+        <!-- CSS -->
+        <link href="../../static/css/roboto-family.css" rel="stylesheet">
+        <link href="../../static/css/material-icons.css" rel="stylesheet">
+        <link href="../../static/css/fontawesome-icons.css" rel="stylesheet">
+
+        <!-- Add Material CSS, replace Bootstrap CSS -->
+        <link rel="stylesheet" type="text/css" href="../../static/css/material.css">
+        <link rel="stylesheet" type="text/css" href="../../static/css/project.css">
+
+        <!-- favicon -->
+        <link href="../../static/images/favicon.ico" rel="shortcut icon"/>
+
+        <!-- title -->
+        <title>Server Maintenance - Flight Finder</title>
+    </head>
+  <body>
+    <main role="main">
+        <section class="d-flex justify-content-center align-items-center my-3 my-md-0" style="min-height: calc(100vh - 80px); height: 100%;">
+            <div class="container">
+                <div class="row justify-content-center align-items-center">
+                    <div class="col-sm-8 text-center">
+                        <img class="img-fluid mb-4" src="../../static/images/svg/warning.svg" alt="Server Down"/>
+                        <h1 class="text-monospace text-dark">Website is under maintenance...</h1>
+                        <p class="mb-4 text-muted">
+                            Sorry for the inconvenience. Please come back later.
+                        </p>
+                        <a class="btn btn-primary" href="{{ url_for("index") }}">Return Home</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+  </body>
+</html>

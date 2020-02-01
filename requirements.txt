@@ -14,6 +14,7 @@ Faker==3.0.0
 flake8==3.7.9
 Flask==1.1.1
 Flask-Bcrypt==0.7.1
+Flask-Maintenance==0.0.1
 gunicorn==20.0.4
 idna==2.8
 isort==4.3.21

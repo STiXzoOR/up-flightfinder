@@ -1,7 +1,9 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, render_template, g, session
 from dotenv import load_dotenv, find_dotenv
+from flask_maintenance import Maintenance
 from app.functions.functions import *
+from datetime import datetime
 import atexit
 import os
 
@@ -16,6 +18,9 @@ except:
 app = Flask(__name__)
 app.config["DEBUG"] = os.getenv("DEBUG_STATUS") == "True"
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
+
+Maintenance(app)
+
 
 # EXPIREMENTAL - Real time flight status update
 def change_flight_status():
