@@ -333,7 +333,7 @@ $(function() {
 
     $.ajax({
       type: "GET",
-      url: $SCRIPT_ROOT + "/search-flights",
+      url: $SCRIPT_ROOT + "/flights/search-flights",
       contentType: "application/json; charset=utf-8",
       data: {
         fromAirport: $('select[name="fromAirport"]').val(),
@@ -348,7 +348,6 @@ $(function() {
       cache: false,
       beforeSend: function() {
         clearFlightsResult();
-        flightsElement.html(genLoading());
       },
       success: function(data) {
         if (data.message === "no_result") {
@@ -381,7 +380,7 @@ $(function() {
     var $scrollDistance = $(this).offset().top;
     $.ajax({
       type: "GET",
-      url: $SCRIPT_ROOT + "/search-flights",
+      url: $SCRIPT_ROOT + "/flights/search-flights",
       contentType: "application/json; charset=utf-8",
       data: {
         fromAirport: $('select[name="fromAirport"]').val(),
@@ -396,7 +395,6 @@ $(function() {
       cache: false,
       beforeSend: function() {
         $("#loadMoreBtn").remove();
-        flightsElement.append(genLoading());
       },
       success: function(data) {
         $("#loadingSpinner").remove();
@@ -480,8 +478,8 @@ $(function() {
   $("#btnResend").on("click", function() {
     var $that = $(this);
     $.ajax({
-      type: "GET",
-      url: $SCRIPT_ROOT + "/resend",
+      type: "POST",
+      url: $SCRIPT_ROOT + "/customer/resend",
       contentType: "application/json; charset=utf-8",
       data: {
         email: $("#email").text(),

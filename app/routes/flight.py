@@ -1,21 +1,18 @@
 from app import (
     app,
-    restricted,
     create_connection,
     get_customer_id,
     get_customer_type,
     get_flights,
-    booking_is_active,
     build_flights,
     build_selected_flights,
     redirect_guest,
 )
 from flask import render_template, session, request, redirect, flash, url_for, jsonify
-from pymysql.cursors import Cursor
 from datetime import datetime
 
 
-@app.route("/search-flights", methods=["GET"])
+@app.route("/flights/search-flights", methods=["GET"])
 def search_flights():
     is_roundtrip = False
 
@@ -247,7 +244,7 @@ def picked_flight(
         picked_flight += return_flight
 
     return render_template(
-        "new-booking.html",
+        "booking/new-booking.html",
         picked_flight=picked_flight,
         flight_class=flight_class,
         num_passenger=passenger_num,

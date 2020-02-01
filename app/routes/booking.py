@@ -12,7 +12,8 @@ from app import (
 from flask import render_template, session, request, redirect, flash, url_for, abort
 from datetime import datetime
 
-@app.route('/new-booking', methods=["POST"])
+
+@app.route("/booking/new-booking", methods=["POST"])
 def new_booking():
     customer_id = get_customer_id()
     form = request.form
@@ -185,8 +186,9 @@ def new_booking():
         )
     )
 
-@app.route('/my-bookings.html')
-@restricted(access_level='USER')
+
+@app.route("/customer/my-bookings.html")
+@restricted(access_level="USER")
 def my_bookings():
     customer_id = get_customer_id()
 
@@ -209,91 +211,151 @@ def my_bookings():
     cursor.close()
     cnx.close()
 
-    return render_template('/my-bookings.html', upcoming_bookings=upcoming_bookings, passed_bookings=passed_bookings)
+    return render_template(
+        "customer/my-bookings.html",
+        upcoming_bookings=upcoming_bookings,
+        passed_bookings=passed_bookings,
+    )
 
-@app.route('/manage-booking.html')
-@restricted(access_level='GUEST')
+
+@app.route("/booking/manage-booking.html")
+@restricted(access_level="GUEST")
 def manage_booking_page():
-    messages = {'not_found': 'We are unable to find the booking reference you provided. Please validate that your information is correct and try again.',
-                'inactive': 'We are unable unable to perform the task you have asked. The booking may be inactive or canceled.',
-                'canceled': 'Your booking has been successfully canceled.'}
+    messages = {
+        "not_found": "We are unable to find the booking reference you provided. Please validate that your information is correct and try again.",
+        "inactive": "We are unable unable to perform the task you have asked. The booking may be inactive or canceled.",
+        "canceled": "Your booking has been successfully canceled.",
+    }
 
-    error = session.pop('error', None)
-    success = session.pop('success', None)
-    
-    message = messages[success] if success is not None else messages[error] if error is not None else False
+    error = session.pop("error", None)
+    success = session.pop("success", None)
+
+    message = (
+        messages[success]
+        if success is not None
+        else messages[error]
+        if error is not None
+        else False
+    )
     show_alert = True if message else False
 
-    alert = {'type': 'success' if success is not None else 'error',
-             'message': message}
+    alert = {"type": "success" if success is not None else "error", "message": message}
 
-    return render_template('manage-booking.html', show_alert=show_alert, alert=alert)
+    return render_template(
+        "/booking/manage-booking.html", show_alert=show_alert, alert=alert
+    )
 
-@app.route('/manage-booking', methods=['POST'])
+
+@app.route("/booking/manage-booking", methods=["POST"])
 def manage_booking():
     form = request.form
-    booking_id = form.get('bookingID')
-    booking_last_name = form.get('lastName')
+    booking_id = form.get("bookingID")
+    booking_last_name = form.get("lastName")
     go_back = False if get_customer_id() == 0 else True
-    
-    if get_customer_type() == 'GUEST' and not booking_exists(booking_id, booking_last_name):
-        session['error'] = 'not_found'
-        return redirect(url_for('manage_booking_page'))
 
-    btn_state = form.get('btnState')
-    if btn_state == 'view':
-        return redirect(url_for('view_booking', booking_id=booking_id, booking_last_name=booking_last_name, go_back=go_back))
+    if get_customer_type() == "GUEST" and not booking_exists(
+        booking_id, booking_last_name
+    ):
+        session["error"] = "not_found"
+        return redirect(url_for("manage_booking_page"))
+
+    btn_state = form.get("btnState")
+    if btn_state == "view":
+        return redirect(
+            url_for(
+                "view_booking",
+                booking_id=booking_id,
+                booking_last_name=booking_last_name,
+                go_back=go_back,
+            )
+        )
     else:
-        if get_customer_type() == 'GUEST' and booking_is_inactive(booking_id, booking_last_name):
-            session['error'] = 'inactive'
-            return redirect(url_for('manage_booking_page'))
+        if get_customer_type() == "GUEST" and booking_is_inactive(
+            booking_id, booking_last_name
+        ):
+            session["error"] = "inactive"
+            return redirect(url_for("manage_booking_page"))
 
-        if btn_state == 'modify':
-            return redirect(url_for('modify_booking', booking_id=booking_id, booking_last_name=booking_last_name, go_back=True))
-        elif btn_state == 'cancel':
-            return redirect(url_for('cancel_booking', booking_id=booking_id, booking_last_name=booking_last_name))
-    
+        if btn_state == "modify":
+            return redirect(
+                url_for(
+                    "modify_booking",
+                    booking_id=booking_id,
+                    booking_last_name=booking_last_name,
+                    go_back=True,
+                )
+            )
+        elif btn_state == "cancel":
+            return redirect(
+                url_for(
+                    "cancel_booking",
+                    booking_id=booking_id,
+                    booking_last_name=booking_last_name,
+                )
+            )
+
     return abort(500)
 
-@app.route('/view-booking/<booking_id>&<booking_last_name>&<go_back>')
-def view_booking(booking_id='', booking_last_name='', modify=False, go_back=False):
-    go_back_address = 'my_bookings'
+
+@app.route("/booking/view-booking/<booking_id>&<booking_last_name>&<go_back>")
+def view_booking(booking_id="", booking_last_name="", modify=False, go_back=False):
+    go_back_address = "my_bookings"
     data = get_booking(booking_id, booking_last_name)
 
-    return render_template('get-booking.html', booking=data['booking_info'], picked_flight=data['flight'], passenger_info=data['passenger_info'], contact_info=data['contact_info'], go_back=go_back == 'True', go_back_address=url_for(go_back_address))
+    return render_template(
+        "booking/get-booking.html",
+        booking=data["booking_info"],
+        picked_flight=data["flight"],
+        passenger_info=data["passenger_info"],
+        contact_info=data["contact_info"],
+        go_back=go_back == "True",
+        go_back_address=url_for(go_back_address),
+    )
 
-@app.route('/modify-booking/<booking_id>&<booking_last_name>&<go_back>')
-def modify_booking(booking_id='', booking_last_name='', modify=False, go_back=False):
-    go_back_address = 'index' if get_customer_type() == 'GUEST' else 'my_bookings'
+
+@app.route("/modify-booking/<booking_id>&<booking_last_name>&<go_back>")
+def modify_booking(booking_id="", booking_last_name="", modify=False, go_back=False):
+    go_back_address = "index" if get_customer_type() == "GUEST" else "my_bookings"
     data = get_booking(booking_id, booking_last_name)
 
-    return render_template('modify-booking.html', booking=data['booking_info'], picked_flight=data['flight'], passenger_info=data['passenger_info'], contact_info=data['contact_info'], go_back=go_back == 'True', go_back_address=url_for(go_back_address))
+    return render_template(
+        "booking/modify-booking.html",
+        booking=data["booking_info"],
+        picked_flight=data["flight"],
+        passenger_info=data["passenger_info"],
+        contact_info=data["contact_info"],
+        go_back=go_back == "True",
+        go_back_address=url_for(go_back_address),
+    )
 
-@app.route('/modify-booking', methods=['POST'])
+
+@app.route("/booking/modify-booking", methods=["POST"])
 def modify_booking_post():
     form = request.form
-    booking_id = form.get('bookingID')
-    total_passengers = int(form.get('numPassengers'))
-    first_name = form.get('contactFirstName')
-    last_name = form.get('contactLastName')
-    email = form.get('contactEmail')
-    mobile = form.get('contactMobile')
-    old_last_name = form.get('oldContactLastName')
-    addtional_price = int(form.get('totalPrice'))
+    booking_id = form.get("bookingID")
+    total_passengers = int(form.get("numPassengers"))
+    first_name = form.get("contactFirstName")
+    last_name = form.get("contactLastName")
+    email = form.get("contactEmail")
+    mobile = form.get("contactMobile")
+    old_last_name = form.get("oldContactLastName")
+    addtional_price = int(form.get("totalPrice"))
     customer_type = get_customer_type()
 
     passenger_info = []
     for i in range(total_passengers):
-        identifier = 'idPassenger-{num}'.format(num=i+1)
-        seat = 'seatPassenger-{num}'.format(num=i+1)
-        seat_class = 'seatClassPassenger-{num}'.format(num=i+1)
-        seat_price = 'seatPricePassenger-{num}'.format(num=i+1)
+        identifier = "idPassenger-{num}".format(num=i + 1)
+        seat = "seatPassenger-{num}".format(num=i + 1)
+        seat_class = "seatClassPassenger-{num}".format(num=i + 1)
+        seat_price = "seatPricePassenger-{num}".format(num=i + 1)
 
-        passenger = {'id': form.get(identifier),
-                     'seat': form.get(seat),
-                     'seat_class': form.get(seat_class),
-                     'seat_price': form.get(seat_price)}
-        
+        passenger = {
+            "id": form.get(identifier),
+            "seat": form.get(seat),
+            "seat_class": form.get(seat_class),
+            "seat_price": form.get(seat_price),
+        }
+
         passenger_info.append(passenger)
 
     query = """
@@ -304,9 +366,20 @@ def modify_booking_post():
 
     cnx = create_connection()
     cursor = cnx.cursor()
-    cursor.execute(query, (first_name, last_name, email, mobile, addtional_price, booking_id, old_last_name))
+    cursor.execute(
+        query,
+        (
+            first_name,
+            last_name,
+            email,
+            mobile,
+            addtional_price,
+            booking_id,
+            old_last_name,
+        ),
+    )
     cursor.close()
-    
+
     query = """
     UPDATE pass_has_booking 
     SET seat=%s, seat_class=%s, seat_price=%s 
@@ -315,18 +388,35 @@ def modify_booking_post():
 
     for passenger in passenger_info:
         cursor = cnx.cursor()
-        cursor.execute(query, (passenger['seat'], passenger['seat_class'], passenger['seat_price'], passenger['id'], booking_id))
+        cursor.execute(
+            query,
+            (
+                passenger["seat"],
+                passenger["seat_class"],
+                passenger["seat_price"],
+                passenger["id"],
+                booking_id,
+            ),
+        )
         cursor.close()
-    
+
     cnx.commit()
     cnx.close()
 
-    go_back = False if customer_type == 'GUEST' else True
+    go_back = False if customer_type == "GUEST" else True
 
-    return redirect(url_for('view_booking', booking_id=booking_id, booking_last_name=last_name, go_back=go_back))
+    return redirect(
+        url_for(
+            "view_booking",
+            booking_id=booking_id,
+            booking_last_name=last_name,
+            go_back=go_back,
+        )
+    )
 
-@app.route('/cancel-booking/<booking_id>&<booking_last_name>')
-def cancel_booking(booking_id='', booking_last_name=''):
+
+@app.route("/booking/cancel-booking/<booking_id>&<booking_last_name>")
+def cancel_booking(booking_id="", booking_last_name=""):
     customer_type = get_customer_type()
 
     query = """
@@ -334,10 +424,10 @@ def cancel_booking(booking_id='', booking_last_name=''):
     SET status=%s 
     WHERE booking_id=%s and last_name=%s
     """
-    
+
     cnx = create_connection()
     cursor = cnx.cursor()
-    cursor.execute(query, ('Canceled', booking_id, booking_last_name))
+    cursor.execute(query, ("Canceled", booking_id, booking_last_name))
     cursor.close()
 
     query = """
@@ -356,30 +446,39 @@ def cancel_booking(booking_id='', booking_last_name=''):
     SET occupied_capacity=occupied_capacity-%s 
     WHERE flight_id=%s
     """
-    
+
     cursor = cnx.cursor()
-    cursor.execute(query, (booking_info['total_passengers'], booking_info['depart_flight_id']))
-    if booking_info['flight_type'] == 'Roundtrip':
-        cursor.execute(query, (booking_info['total_passengers'], booking_info['return_flight_id']))
+    cursor.execute(
+        query, (booking_info["total_passengers"], booking_info["depart_flight_id"])
+    )
+    if booking_info["flight_type"] == "Roundtrip":
+        cursor.execute(
+            query, (booking_info["total_passengers"], booking_info["return_flight_id"])
+        )
     cursor.close()
     cnx.commit()
     cnx.close()
-    
-    if customer_type == 'GUEST':
-        session['success'] = 'canceled'
+
+    if customer_type == "GUEST":
+        session["success"] = "canceled"
     else:
-        flash('The booking has been successfully canceled', 'success')
+        flash("The booking has been successfully canceled", "success")
 
-    return redirect(url_for('manage_booking_page') if customer_type == 'GUEST' else url_for('my_bookings'))
+    return redirect(
+        url_for("manage_booking_page")
+        if customer_type == "GUEST"
+        else url_for("my_bookings")
+    )
 
-@app.route('/add-booking', methods=['POST'])
-@restricted(access_level='USER')
+
+@app.route("/booking/add-booking", methods=["POST"])
+@restricted(access_level="USER")
 def add_booking():
     form = request.form
 
-    booking_id = form.get('bookingID')
-    first_name = form.get('firstName')
-    last_name = form.get('lastName')
+    booking_id = form.get("bookingID")
+    first_name = form.get("firstName")
+    last_name = form.get("lastName")
 
     query = """
     SELECT *
@@ -395,31 +494,33 @@ def add_booking():
     cnx.close()
 
     if booking is None:
-        flash('The booking you are trying to add doesn\'t exists!', 'error')
-        return redirect(url_for('my_bookings'))
+        flash("The booking you are trying to add doesn't exists!", "error")
+        return redirect(url_for("my_bookings"))
 
     if booking_exists(booking_id, last_name):
-        flash('The booking you are trying to add already exists!', 'error')
-        return redirect(url_for('my_bookings'))
+        flash("The booking you are trying to add already exists!", "error")
+        return redirect(url_for("my_bookings"))
 
     cnx = create_connection()
-    booking['customer_id'] = session['customer_id']
-    
+    booking["customer_id"] = session["customer_id"]
+
     fields = []
     values = []
     for key in booking.keys():
         fields.append(key)
-        values.append('%({key})s'.format(key=key))
+        values.append("%({key})s".format(key=key))
 
-    fields = ', '.join(fields)
-    values = ', '.join(values)
-    query = 'INSERT INTO booking ({fields}) VALUES ({values})'.format(fields=fields,
-                                                                    values=values)
+    fields = ", ".join(fields)
+    values = ", ".join(values)
+    query = "INSERT INTO booking ({fields}) VALUES ({values})".format(
+        fields=fields, values=values
+    )
     cursor = cnx.cursor()
     cursor.execute(query, booking)
     cnx.commit()
     cursor.close()
     cnx.close()
 
-    flash('The booking has been successfully added to your account', 'success')
-    return redirect(url_for('my_bookings'))
+    flash("The booking has been successfully added to your account", "success")
+    return redirect(url_for("my_bookings"))
+

@@ -177,7 +177,7 @@ def build_flight_card(
 ):
     return """  <div class="form-row justify-content-center align-items-center">
                     <div class="col-2 col-lg-1 col-xl-2 px-0 px-md-2 px-lg-0 px-xl-2 text-center">
-                        <img src="../static/images/airlines/{airline_logo}.png" class="img-fluid h-75 w-75" alt="{airline_name}"/>
+                        <img src="../../static/images/airlines/{airline_logo}.png" class="img-fluid h-75 w-75" alt="{airline_name}"/>
                     </div>
                     <div class="col-3 col-sm-2">
                         <div class="text-right font-weight-bold font-size-lg">{time_from}</div>

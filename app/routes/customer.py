@@ -23,14 +23,14 @@ import urllib.parse
 import os
 
 
-@app.route("/sign-in.html")
+@app.route("/customer/sign-in.html")
 @redirect_when(_type="USER")
 def sign_in():
     has_next = request.args.get("next") is not None
-    return render_template("sign-in.html", has_next=has_next)
+    return render_template("customer/sign-in.html", has_next=has_next)
 
 
-@app.route("/sign-in.html", methods=["POST"])
+@app.route("/customer/sign-in.html", methods=["POST"])
 @redirect_when(_type="USER")
 def sign_in_post():
     email = request.form.get("email")
@@ -86,14 +86,14 @@ def sign_in_post():
     )
 
 
-@app.route("/sign-up.html")
+@app.route("/customer/sign-up.html")
 @redirect_when(_type="USER")
 def sign_up():
     has_next = request.args.get("next") is not None
-    return render_template("sign-up.html", has_next=has_next)
+    return render_template("customer/sign-up.html", has_next=has_next)
 
 
-@app.route("/sign-up.html", methods=["POST"])
+@app.route("/customer/sign-up.html", methods=["POST"])
 @redirect_when(_type="USER")
 def sign_up_post():
     use_mailgun = os.getenv("MAILGUN_ENABLED", False) == "True"
@@ -143,19 +143,20 @@ def sign_up_post():
 
     if use_mailgun:
         send_confirm_account_email(email=email, next_url=next_url)
-        return redirect(url_for("unconfirmed", email=email, next=next_url))
+        token = generate_token(email=email, TIMED=False)
+        return redirect(url_for("unconfirmed", token=token, next=next_url))
 
     return redirect(url_for("sign_in", next=next_url))
 
 
-@app.route("/sign-out.html")
+@app.route("/customer/sign-out")
 @restricted(access_level="USER")
 def sign_out():
     clear_session_user()
     return redirect(url_for("index"))
 
 
-@app.route("/user-profile.html")
+@app.route("/customer/user-profile.html")
 @restricted(access_level="USER")
 def profile():
     query = """
@@ -171,10 +172,10 @@ def profile():
     cursor.close()
     cnx.close()
 
-    return render_template("user-profile.html", user_info=user_info)
+    return render_template("customer/user-profile.html", user_info=user_info)
 
 
-@app.route("/edit-info", methods=["POST"])
+@app.route("/customer/edit-info", methods=["POST"])
 @restricted(access_level="USER")
 def edit_info():
     form = request.form
@@ -208,7 +209,7 @@ def edit_info():
     return redirect(url_for("profile"))
 
 
-@app.route("/change-password", methods=["POST"])
+@app.route("/customer/change-password", methods=["POST"])
 @restricted(access_level="USER")
 def change_password():
     form = request.form
@@ -249,7 +250,7 @@ def change_password():
     return redirect(url_for("sign_out"))
 
 
-@app.route("/delete-account", methods=["POST"])
+@app.route("/customer/delete-account", methods=["POST"])
 @restricted(access_level="USER")
 def delete_account():
     form = request.form
@@ -283,16 +284,19 @@ def delete_account():
     cnx.commit()
     cnx.close()
 
-    return redirect(url_for("sign_out"))
+    clear_session_user()
+    return redirect(url_for("index"))
 
 
-@app.route("/unconfirmed.html")
-@check_unconfirmed(by="email")
+@app.route("/customer/unconfirmed.html")
+@check_unconfirmed(by="token", TIMED=False)
 def unconfirmed():
-    return render_template("unconfirmed.html", email=request.args.get("email"))
+    token = request.args.get("token")
+    email = confirm_token(token=token, TIMED=False)
+    return render_template("customer/unconfirmed.html", email=email)
 
 
-@app.route("/confirm?token=<token>")
+@app.route("/customer/confirm?token=<token>")
 @check_unconfirmed(by="token")
 def confirm_email(token=""):
     next_url = request.args.get("next")
@@ -328,11 +332,11 @@ def confirm_email(token=""):
     return redirect(url_for("sign_in", next=next_url))
 
 
-@app.route("/resend", methods=["GET"])
+@app.route("/customer/resend", methods=["POST"])
 @check_unconfirmed(by="email")
 def resend_confirmation():
-    email = request.args.get("email")
-    next_url = request.args.get("next")
+    email = request.form.get("email")
+    next_url = request.form.get("next")
     message = "A new confirmation email has been sent."
 
     send_confirm_account_email(email=email, next_url=next_url)
@@ -340,12 +344,12 @@ def resend_confirmation():
     return jsonify(message=message)
 
 
-@app.route("/forgot-password.html")
+@app.route("/customer/forgot-password.html")
 def forgot_password():
-    return render_template("forgot-password.html")
+    return render_template("customer/forgot-password.html")
 
 
-@app.route("/forgot-password.html", methods=["POST"])
+@app.route("/customer/forgot-password.html", methods=["POST"])
 def forgot_password_post():
     use_mailgun = os.getenv("MAILGUN_ENABLED") == "True"
     email = request.form.get("email")
@@ -370,7 +374,7 @@ def forgot_password_post():
     return redirect(url_for("reset_password", token=token))
 
 
-@app.route("/reset-password?token=<token>", methods=["GET", "POST"])
+@app.route("/customer/reset-password?token=<token>", methods=["GET", "POST"])
 def reset_password(token=""):
     use_mailgun = os.getenv("MAILGUN_ENABLED") == "True"
     email = confirm_token(token)
@@ -382,7 +386,7 @@ def reset_password(token=""):
         return redirect(url_for("index"))
 
     if request.method == "GET":
-        return render_template("reset-password.html")
+        return render_template("customer/reset-password.html")
 
     password = gen_pw_hash(request.form.get("password"))
 

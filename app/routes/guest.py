@@ -3,12 +3,12 @@ from app import app
 import urllib.parse
 
 
-@app.route("/guest-detected.html")
+@app.route("/guest/guest-detected.html")
 def guest_detected():
-    return render_template("guest-detected.html")
+    return render_template("guest/guest-detected.html")
 
 
-@app.route("/guest-detected.html", methods=["POST"])
+@app.route("/guest/guest-detected.html", methods=["POST"])
 def guest_detected_post():
     form = request.form
 

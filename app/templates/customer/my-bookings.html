@@ -6,19 +6,19 @@
         <meta content="initial-scale=1, shrink-to-fit=no, width=device-width" name="viewport">
 
         <!-- CSS -->
-        <link href="../static/css/roboto-family.css" rel="stylesheet">
-        <link href="../static/css/material-icons.css" rel="stylesheet">
-        <link href="../static/css/fontawesome-icons.css" rel="stylesheet">
-        <link href="../static/css/flightfinder-logo.css" rel="stylesheet">
+        <link href="../../static/css/roboto-family.css" rel="stylesheet">
+        <link href="../../static/css/material-icons.css" rel="stylesheet">
+        <link href="../../static/css/fontawesome-icons.css" rel="stylesheet">
+        <link href="../../static/css/flightfinder-logo.css" rel="stylesheet">
 
         <!-- Add Material CSS, replace Bootstrap CSS -->
-        <link href="../static/css/material.css" rel="stylesheet">
-        <link href="../static/css/project.css" rel="stylesheet">
-        <link href="../static/css/pace-top.css" rel="stylesheet">
-        <link href="../static/css/pace-center.css" rel="stylesheet">
+        <link href="../../static/css/material.css" rel="stylesheet">
+        <link href="../../static/css/project.css" rel="stylesheet">
+        <link href="../../static/css/pace-top.css" rel="stylesheet">
+        <link href="../../static/css/pace-center.css" rel="stylesheet">
 
         <!-- favicon -->
-        <link href="../static/images/favicon.ico" rel="shortcut icon"/>
+        <link href="../../static/images/favicon.ico" rel="shortcut icon"/>
 
         <!-- title -->
         <title>My Bookings - Flight Finder</title>
@@ -44,7 +44,7 @@
                 </li>
             </ul>
         </header>
-        <main role="main" class="px-lg-3">
+        <main role="main" class="px-lg-3 text-dark">
             <section class="d-flex align-items-center my-4">
                 <div class="container">
                     <div class="row justify-content-center">
@@ -62,7 +62,7 @@
                                                 <form id="upcomingBookingInfo-{{ loop.index }}" class="card shadow-none" method="POST" action="{{ url_for("manage_booking") }}">
                                                     <input type="hidden" name="bookingID" value="{{ booking.id }}">
                                                     <input type="hidden" name="lastName" value="{{ booking.last_name }}">
-                                                    <a id="bookingIndex-{{ loop.index }}" aria-controls="upcomingBooking-{{ booking.id }}" aria-expanded="false" class="accordion-toggler text-body collapsed" data-toggle="collapse" href="#upcomingBooking-{{ booking.id }}">
+                                                    <a id="bookingIndex-{{ loop.index }}" aria-controls="upcomingBooking-{{ booking.id }}" aria-expanded="false" class="accordion-toggler text-dark collapsed" data-toggle="collapse" href="#upcomingBooking-{{ booking.id }}">
                                                         <div class="form-row">
                                                             <div class="col-sm-2 mb-2 mb-sm-0">
                                                                 <strong>ID</strong>
@@ -83,7 +83,12 @@
                                                             </div>
                                                             <div class="col-sm-2">
                                                                 <strong>Status</strong>
-                                                                <div class="text-success">{{ booking.status }}</div>
+                                                                {% if booking.status == "Active" %}
+                                                                    {% set status_color = "success" %}
+                                                                {% else %}
+                                                                    {% set status_color = "dark" %}
+                                                                {% endif %}
+                                                                <div class="text-{{ status_color }}">{{ booking.status }}</div>
                                                             </div>
                                                         </div>
                                                     </a>
@@ -130,7 +135,7 @@
                                                 <form id="passedBookingInfo-{{ loop.index }}" class="card shadow-none" method="POST" action="{{ url_for("manage_booking") }}">
                                                     <input type="hidden" name="bookingID" value="{{ booking.id }}">
                                                     <input type="hidden" name="lastName" value="{{ booking.last_name }}">
-                                                    <a id="passedBookingIndex-{{ loop.index }}" aria-controls="passedBooking-{{ booking.id }}" aria-expanded="false" class="accordion-toggler text-body collapsed" data-toggle="collapse" href="#passedBooking-{{ booking.id }}">
+                                                    <a id="passedBookingIndex-{{ loop.index }}" aria-controls="passedBooking-{{ booking.id }}" aria-expanded="false" class="accordion-toggler text-dark collapsed" data-toggle="collapse" href="#passedBooking-{{ booking.id }}">
                                                         <div class="form-row">
                                                             <div class="col-sm-2 mb-2 mb-sm-0">
                                                                 <strong>ID</strong>
@@ -151,7 +156,12 @@
                                                             </div>
                                                             <div class="col-sm-2">
                                                                 <strong>Status</strong>
-                                                                <div class="text-danger">{{ booking.status }}</div>
+                                                                {% if booking.status == "Canceled" %}
+                                                                    {% set status_color = "danger" %}
+                                                                {% else %}
+                                                                    {% set status_color = "dark" %}
+                                                                {% endif %}
+                                                                <div class="text-{{ status_color }}">{{ booking.status }}</div>
                                                             </div>
                                                         </div>
                                                     </a>
@@ -228,15 +238,15 @@
         </main>
 
 		<!-- jQuery first, then Popper.js, then Bootstrap JS -->
-		<script src="../static/js/jquery.min.js"></script>
-        <script src="../static/js/popper.min.js"></script>
-        <script src="../static/js/bootstrap.min.js"></script>
-        <script src="../static/js/pace.min.js"></script>
+		<script src="../../static/js/jquery.min.js"></script>
+        <script src="../../static/js/popper.min.js"></script>
+        <script src="../../static/js/bootstrap.min.js"></script>
+        <script src="../../static/js/pace.min.js"></script>
 
 		<!-- Then Material JavaScript on top of Bootstrap JavaScript -->
-		<script src="../static/js/material.js"></script>
-		<script src="../static/js/snackbar.js"></script>
-		<script src="../static/js/project.js"></script>
+		<script src="../../static/js/material.js"></script>
+		<script src="../../static/js/snackbar.js"></script>
+		<script src="../../static/js/project.js"></script>
 
 		{% with messages = get_flashed_messages() %}
 			{% if messages %}
