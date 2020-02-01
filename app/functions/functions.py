@@ -1,6 +1,6 @@
 from flask import session, request, redirect, g, url_for, abort, flash
+from itsdangerous import URLSafeTimedSerializer, URLSafeSerializer
 from pymysql.cursors import DictCursor
-from itsdangerous import URLSafeTimedSerializer
 from datetime import datetime
 from functools import wraps
 from faker import Faker
@@ -53,7 +53,7 @@ def redirect_guest(func):
     return wrapper
 
 
-def check_unconfirmed(by=""):
+def check_unconfirmed(by="", TIMED=True):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -63,7 +63,7 @@ def check_unconfirmed(by=""):
             if arg is None:
                 return abort(404)
             else:
-                email = arg if by == "email" else confirm_token(token=arg)
+                email = arg if by == "email" else confirm_token(token=arg, TIMED=TIMED)
                 if not email:
                     flash("The requested link is invalid or has expired.", "error")
                     return redirect(url_for("index"))
@@ -591,18 +591,27 @@ def send_email_mailgun(data={}):
     )
 
 
-def generate_token(email=""):
-    serializer = URLSafeTimedSerializer(os.getenv("SECRET_KEY"))
-    return serializer.dumps(email, salt=os.getenv("SECURITY_PASSWORD_SALT"))
+def generate_token(email="", TIMED=True):
+    if TIMED:
+        serializer = URLSafeTimedSerializer(os.getenv("SECRET_KEY"))
+        salt = os.getenv("SECURITY_PASSWORD_SALT")
+    else:
+        serializer = URLSafeSerializer(os.getenv("SECRET_KEY"))
+        salt = os.getenv("SECURITY_EMAIL_SALT")
+
+    return serializer.dumps(email, salt=salt)
 
 
-def confirm_token(token="", expiration=600):
-    serializer = URLSafeTimedSerializer(os.getenv("SECRET_KEY"))
-
+def confirm_token(token="", expiration=600, TIMED=True):
     try:
-        email = serializer.loads(
-            token, salt=os.getenv("SECURITY_PASSWORD_SALT"), max_age=expiration
-        )
+        if TIMED:
+            serializer = URLSafeTimedSerializer(os.getenv("SECRET_KEY"))
+            salt = os.getenv("SECURITY_PASSWORD_SALT")
+            email = serializer.loads(token, salt=salt, max_age=expiration)
+        else:
+            serializer = URLSafeSerializer(os.getenv("SECRET_KEY"))
+            salt = os.getenv("SECURITY_EMAIL_SALT")
+            email = serializer.loads(token, salt=salt)
     except:
         return False
 
