@@ -96,13 +96,13 @@ def remove_inactive_flights():
     )
 
 
-scheduler = BackgroundScheduler()
-scheduler.add_job(func=change_booking_status, trigger="interval", minutes=10)
-scheduler.add_job(func=change_flight_status, trigger="interval", minutes=10)
-scheduler.add_job(func=remove_inactive_flights, trigger="interval", days=15)
-scheduler.start()
+# scheduler = BackgroundScheduler()
+# scheduler.add_job(func=change_booking_status, trigger="interval", minutes=10)
+# scheduler.add_job(func=change_flight_status, trigger="interval", minutes=15)
+# scheduler.add_job(func=remove_inactive_flights, trigger="interval", days=15)
+# scheduler.start()
 
-atexit.register(lambda: scheduler.shutdown())
+# atexit.register(lambda: scheduler.shutdown())
 
 
 @app.before_request
