@@ -13,6 +13,7 @@
 
         <!-- Add Material CSS, replace Bootstrap CSS -->
         <link href="../static/css/material.css" rel="stylesheet">
+        <link href="../static/css/select2-material.css" rel="stylesheet">
         <link href="../static/css/project.css" rel="stylesheet">
         <link href="../static/css/pace-top.css" rel="stylesheet">
         <link href="../static/css/pace-center.css" rel="stylesheet">
@@ -142,7 +143,7 @@
                                         <div class="form-group col-sm-6 col-md-4 mb-3 mb-md-2">
                                             <div class="floating-label">
                                                 <label for="numPassengers"><i class="fas fa-users fa-fw mr-2"></i>Passengers</label>
-                                                <select class="form-control custom-select" id="numPassengers" name="numPassengers" required data-ripple-line>
+                                                <select class="form-control custom-select" id="numPassengers" name="numPassengers" required data-minimum-results-for-search="Infinity" data-ripple-line>
                                                     <option></option>
                                                     <option value="1">1</option>
                                                     <option value="2">2</option>
@@ -162,7 +163,7 @@
                                         <div class="form-group col-sm-6 col-md-4 mb-3 mb-md-2">
                                             <div class="floating-label">
                                                 <label for="flightClass"><i class="fas fa-hand-holding-usd fa-fw mr-2"></i>Flight class</label>
-                                                <select class="form-control custom-select" id="flightClass" name="flightClass" required data-ripple-line>
+                                                <select class="form-control custom-select" id="flightClass" name="flightClass" required data-minimum-results-for-search="Infinity" data-ripple-line>
                                                     <option></option>
                                                     <option value="Economy">Economy</option>
                                                     <option value="Business">Business</option>
@@ -269,11 +270,21 @@
 
     <!-- Then Material JavaScript on top of Bootstrap JavaScript -->
     <script src="../static/js/material.js"></script>
+    <script src="../static/js/select2.min.js"></script>
+    <script src="../static/js/select2-material.js"></script>
     <script src="../static/js/snackbar.js"></script>
     <script src="../static/js/project.js"></script>
 
     <script>
         fixPacePosition();
+    </script>
+    <script>
+        $(function() {
+            $('select').sm_select({
+                placeholder: "",
+                theme: "material"
+            });
+        });
     </script>
 
     {% with messages = get_flashed_messages() %}

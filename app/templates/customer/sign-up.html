@@ -13,6 +13,7 @@
 
         <!-- Add Material CSS, replace Bootstrap CSS -->
         <link href="../../static/css/material.css" rel="stylesheet">
+        <link href="../../static/css/select2-material.css" rel="stylesheet">
         <link href="../../static/css/project.css" rel="stylesheet">
         <link href="../../static/css/pace-top.css" rel="stylesheet">
         <link href="../../static/css/pace-center.css" rel="stylesheet">
@@ -82,7 +83,7 @@
                                                 <div class="form-group col-sm-6">
                                                     <div class="floating-label">
                                                         <label for="gender"><i class="fas fa-venus-mars fa-fw mr-2"></i>Gender</label>
-                                                        <select id="gender" class="form-control custom-select" name="gender" required data-ripple-line>
+                                                        <select id="gender" class="form-control custom-select" name="gender" required data-minimum-results-for-search="Infinity" data-ripple-line>
                                                             <option></option>
                                                             <option value="male">Male</option>
                                                             <option value="female">Female</option>
@@ -140,8 +141,19 @@
 
     <!-- Then Material JavaScript on top of Bootstrap JavaScript -->
     <script src="../../static/js/material.js"></script>
+    <script src="../../static/js/select2.min.js"></script>
+    <script src="../../static/js/select2-material.js"></script>
     <script src="../../static/js/snackbar.js"></script>
     <script src="../../static/js/project.js"></script>
+
+    <script>
+        $(function() {
+            $('select').sm_select({
+                placeholder: "",
+                theme: "material"
+            });
+        });
+    </script>
 
     {% with messages = get_flashed_messages() %}
         {% if messages %}
