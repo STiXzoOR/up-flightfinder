@@ -349,6 +349,32 @@ a.text-alt-secondary:hover {
   box-shadow: 0 0 0 0.375rem var(--alt-primary);
 }
 
+.form-control,
+.custom-select,
+.form-control-file {
+  transition-duration: 0.3s;
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (min-width: 576px) {
+
+  .form-control,
+  .custom-select,
+  .form-control-file {
+    transition-duration: 0.39s;
+  }
+}
+
+@media (min-width: 992px) {
+
+  .form-control,
+  .custom-select,
+  .form-control-file {
+    transition-duration: 0.2s;
+  }
+}
+
 .form-control:focus,
 .custom-select:focus,
 .form-control-file:focus {
