@@ -284,23 +284,24 @@
                     <h2 class="text-dark font-weight-bold mb-1">Popular Destinations</h2>
                     <p class="text-muted mb-0">The best tourist destinations worldwide</p>
                 </div>
-                {% for destination in destinations %}
-                    {% if loop.index in [1, 4, 7] %}
-                        <div class="card-deck text-dark">
-                    {% endif %}
-                        <div class="card shadow-1 mx-2 mb-3">
-                            <img class="card-img-top img-fluid" src="../static/images/destinations/{{ destination.name.lower() }}.jpg" alt="{{ destination.name }}" data-border>
-                            <div class="card-body py-2">
-                                <div class="clearfix">
-                                    <h5 class="mb-0 font-weight-bold float-left">{{ destination.name }}</h5>
-                                    <h5 class="mb-0 float-right">From: <span class="font-weight-bold text-alt-primary">€{{ destination.price }}</span></h5>
+                <div class="row">
+                    {% for destination in destinations %}
+                        <div class="col-12 col-lg-4">
+                            <div class="item-destination shadow-1">
+                                <div class="bg-img-mask"></div>
+                                <div class="bg-img" style='background-image: url("../static/images/destinations/{{ destination.name.lower() }}.jpg");'></div>
+                                <div class="content text-white">
+                                    <div class="item-text">
+                                        <h4 class="font-weight-bold mb-0">{{ destination.name }}</h4>
+                                    </div>
+                                    <div class="badge badge-light item-price">
+                                        <span>from: <span class="font-weight-bold text-alt-primary">€{{ destination.price }}</span></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    {% if loop.index in [3, 6, 9] %}
-                        </div>
-                    {% endif %}
-                {% endfor %}
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </main>

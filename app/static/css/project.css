@@ -711,6 +711,91 @@ hr.hr-icon::before {
   background: #eeeeee !important;
 }
 
+.item-destination {
+  border-radius: 2px;
+  position: relative;
+  height: 300px;
+  margin: 1rem 0;
+  -webkit-transition: .1s;
+  transition: .1s;
+  overflow: hidden;
+}
+
+@media (max-width: 991.98px) {
+  .item-destination {
+    height: 200px;
+  }
+}
+
+@media (max-width: 1199.98px) {
+  .item-destination {
+    height: 250px;
+  }
+}
+
+.item-destination .bg-img-mask {
+  opacity: 0.5;
+  display: block;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  position: absolute;
+  -webkit-box-shadow: inset 0 -106px 92px -35px #000;
+  box-shadow: inset 0 -106px 92px -35px #000;
+  -webkit-transition: 0.5s;
+  transition: 0.5s;
+}
+
+.item-destination:hover .bg-img-mask {
+  opacity: 0.8;
+}
+
+.item-destination .bg-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  left: 0;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  background-size: cover;
+  background-position: center center;
+  transition: 0.2s;
+}
+
+.item-destination:hover .bg-img {
+  transform: scale(1.1);
+}
+
+.item-destination .content {
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  padding: 1rem 1rem;
+}
+
+.item-destination .content .item-price {
+  right: -2px;
+  bottom: 10px;
+  position: absolute;
+  font-weight: 400;
+  font-size: 105%;
+  padding: 0.15rem 0.5rem;
+  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, .1);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, .1);
+}
+
+.item-destination .content .item-text {
+  bottom: 10px;
+  position: absolute;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, .75);
+}
+
 .jumbotron-bg {
   background-color: #fff;
   background-image: url(../images/svg/aircraft_flipped.svg);

@@ -134,18 +134,11 @@ def search_flights():
                                             <div class="price-body card-body d-flex flex-column justify-content-center align-items-center">""".format(
             id=counter, price=price
         )
-        if is_roundtrip:
-            flights += """                      <div class="font-weight-bold font-size-lg mb-2">€{price}</div>
+
+        flights += """                      <div class="font-weight-bold font-size-lg mb-2">€{price}</div>
                                                 <button class="btn btn-primary process-form" type="submit">Select</button>""".format(
-                id=counter, price=price
-            )
-        else:
-            flights += """                       <button class="btn btn-primary btn-block process-form" type="submit" style="white-space: normal;">
-                                                    Select (€{price})                                    
-                                                </button>
-                                                """.format(
-                id=counter, price=price
-            )
+            id=counter, price=price
+        )
 
         flights += """                       </div>
                                         </div>
