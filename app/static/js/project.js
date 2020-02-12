@@ -1,7 +1,7 @@
 var searchParams = new URLSearchParams(window.location.search);
 var flightsElement = $("#flightSearchResult");
 var spinner = $(".loader");
-var returnDateVal;
+var returnDateVal = {};
 var timeoutVar;
 
 $("body").addClass("pace-top");
@@ -143,9 +143,8 @@ $(function() {
       cancel: "Clear",
       closeOnCancel: false,
       closeOnSelect: true,
-      container: "body",
-      containerHidden: "body",
       firstDay: 1,
+      hiddenName: true,
       format: "dd mmm yyyy",
       formatSubmit: "yyyy-mm-dd",
       hiddenPrefix: "prefix_",
@@ -163,7 +162,8 @@ $(function() {
 
     var returnDatePickerOptions = $.extend({}, datePickerOptions);
     returnDatePickerOptions.onSet = function() {
-      returnDateVal = $("#returnDatePicker").val();
+      returnDateVal.visible = $("#returnDatePicker").val();
+      returnDateVal.hidden = $('input[name="returnDate"]').val();
     };
 
     $("#departDatePicker")
@@ -472,15 +472,25 @@ $(function() {
   });
 
   $("#nav-roundtrip-tab").on("click", function() {
-    var $target = $("#returnDatePicker");
-    $target.prop({ disabled: false, required: true });
-    $target.val(returnDateVal).trigger("change");
+    $("#returnDatePicker")
+      .prop({ disabled: false, required: true })
+      .val(returnDateVal.visible)
+      .trigger("change");
+
+    $('input[name="returnDate"]')
+      .val(returnDateVal.hidden)
+      .trigger("change");
   });
 
   $("#nav-oneway-tab").on("click", function() {
-    var $target = $("#returnDatePicker");
-    $target.prop({ disabled: true, required: false });
-    $target.val("One Way").trigger("change");
+    $("#returnDatePicker")
+      .prop({ disabled: true, required: false })
+      .val("One Way")
+      .trigger("change");
+
+    $('input[name="returnDate"]')
+      .val("One Way")
+      .trigger("change");
   });
 
   $("#btnResend").on("click", function() {

@@ -29,9 +29,7 @@ def search_flights():
     to_airport_code = request.args.get("toAirport")
     passenger_num = int(request.args.get("numPassengers"))
     flight_class = request.args.get("flightClass")
-
-    temp_depart_date = request.args.get("departDate")
-    depart_date = datetime.strptime(temp_depart_date, "%d %b %Y").date()
+    depart_date = request.args.get("departDate")
     return_date = request.args.get("returnDate")
 
     params = (
@@ -53,11 +51,10 @@ def search_flights():
 
         dep_time = (
             'f2.dep_time>=ADDTIME(f1.arr_time, "05:00:00")'
-            if return_date == temp_depart_date
+            if return_date == depart_date
             else 1
         )
-        arr_date = "f1.arr_date=f1.dep_date" if return_date == temp_depart_date else 1
-        return_date = datetime.strptime(return_date, "%d %b %Y").date()
+        arr_date = "f1.arr_date=f1.dep_date" if return_date == depart_date else 1
 
         params = (
             from_airport_code,
