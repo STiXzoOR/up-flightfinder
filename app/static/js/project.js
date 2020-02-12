@@ -330,6 +330,7 @@ $(function() {
     var $form = $(this);
     if (!validateForm($form)) return false;
     event.preventDefault();
+    var found;
 
     $.ajax({
       type: "GET",
@@ -351,20 +352,30 @@ $(function() {
       },
       success: function(data) {
         if (data.message === "no_result") {
+          found = false;
           $.snackbar({
             content: "There aren't any available flights for this route yet.",
             style: "snackbar-left mb-2"
           });
+        } else {
+          found = true;
+          flightsElement.html(
+            '<div class="text-center my-3"><h2 class="text-dark font-weight-bold mb-1">Flights</h2><p class="text-muted mb-0">Total: ' +
+              data.total +
+              "</p></div>"
+          );
+          flightsElement.append(data.content);
         }
-        flightsElement.html(data.content);
       },
       complete: function() {
-        flightsElement.removeClass("d-none");
-        if (flightsElement.isPartial()) {
-          var $scrollDistance = $("#flightSearchResult div")
-            .first()
-            .offset().top;
-          scrollDown($scrollDistance - 65);
+        if (found) {
+          flightsElement.removeClass("d-none");
+          if (flightsElement.isPartial()) {
+            var $scrollDistance = $("#flightSearchResult div")
+              .first()
+              .offset().top;
+            scrollDown($scrollDistance - 65);
+          }
         }
         return false;
       },

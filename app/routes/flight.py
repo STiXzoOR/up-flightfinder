@@ -74,7 +74,7 @@ def search_flights():
             arr_date,
         )
 
-    data = get_flights(
+    total_flights, data = get_flights(
         is_roundtrip=is_roundtrip,
         params=params,
         WHERE=WHERE,
@@ -164,7 +164,7 @@ def search_flights():
             start=start_limit + 5
         )
 
-    return jsonify(message="result", content=flights)
+    return jsonify(message="result", content=flights, total=total_flights)
 
 
 @app.route(
@@ -225,7 +225,7 @@ def picked_flight(
             flight_class,
         )
 
-    flight = get_flights(
+    _, flight = get_flights(
         is_roundtrip=is_roundtrip, params=params, WHERE=WHERE, FETCH_ALL=False
     )
 

@@ -287,6 +287,116 @@ a.text-alt-secondary:hover {
   border-bottom-right-radius: 6px;
 }
 
+.carousel-wrapper {
+  position: relative;
+  min-height: 500px;
+}
+
+@media (min-width: 576px) {
+  .carousel-wrapper {
+    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.14), 0 3px 4px 0 rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
+  }
+}
+
+.fade-carousel .carousel-item .hero .fade-in-up {
+  opacity: 0;
+  -webkit-transform: translate3d(0, 100%, 0);
+  transform: translate3d(0, 100%, 0);
+}
+
+.fade-carousel .carousel-item.active .hero .fade-in-up {
+  opacity: 1;
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+}
+
+.fade-carousel .hero .fade-in-up.duration4 {
+  -webkit-transition: 0.4s all ease-in-out 0.2s;
+  transition: 0.4s all ease-in-out 0.2s;
+  text-transform: capitalize;
+}
+
+.fade-carousel .hero .fade-in-up.duration6 {
+  -webkit-transition: 0.6s all ease-in-out 0.4s;
+  transition: 0.6s all ease-in-out 0.4s;
+}
+
+@media (min-width: 576px) {
+  .fade-carousel .hero {
+    top: 14%;
+    font-size: 1.25rem;
+  }
+
+  .fade-carousel .hero h2 {
+    font-size: 2.25rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .fade-carousel .hero {
+    top: 25%;
+    font-size: 1.5rem;
+  }
+
+  .fade-carousel .hero h2 {
+    font-size: 2.5rem;
+  }
+}
+
+.fade-carousel .carousel-item[class*="slide-"] {
+  height: 500px;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+@media (max-width: 575.98px) {
+  .fade-carousel .carousel-item[class*="slide-"] {
+    height: 300px;
+  }
+}
+
+.fade-carousel .carousel-item.slide-1 {
+  /*
+  Photo by Luca Bravo
+  https://unsplash.com/@lucabravo
+  */
+  background-image: url("../images/carousel/lake.jpg");
+}
+
+.fade-carousel .carousel-item.slide-2 {
+  /*
+  Photo by Manuel Cosentino
+  https://unsplash.com/@manucosen
+  */
+  background-image: url("../images/carousel/fuji.jpg");
+}
+
+.fade-carousel .carousel-item.slide-3 {
+  /*
+  Photo by Timur Kozmenko
+  https://unsplash.com/@timrael
+  */
+  background-image: url("../images/carousel/balloons.jpg");
+}
+
+.container.search-flights-card {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 5;
+}
+
+@media (max-width: 575.98px) {
+  .container.search-flights-card {
+    bottom: auto;
+    top: 0;
+    position: relative;
+    margin-top: 65px;
+  }
+}
+
 .custom-file-input:focus~.custom-file-label,
 .custom-file-input:hover~.custom-file-label {
   border-bottom-color: var(--alt-secondary);
@@ -555,6 +665,20 @@ textarea.form-control:focus:not([rows='1']),
   min-height: 100vh;
 }
 
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  padding: 0 1rem;
+  z-index: 3;
+  width: 100%;
+  color: #fff;
+  text-align: center;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, .75);
+}
+
 hr.hr-text {
   position: relative;
   border: none;
@@ -701,6 +825,18 @@ hr.hr-icon::before {
   .navdrawer-permanent-lg~.hero-section {
     margin-left: 17.5rem;
   }
+}
+
+.overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.picked-flights .d-picked-none {
+  display: None;
 }
 
 .picker-date-display {

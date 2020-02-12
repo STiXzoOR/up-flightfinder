@@ -27,8 +27,15 @@
     <script>
         var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
     </script>
-  <body class="body-content">
-    <header class="navbar navbar-light navbar-expand-md fixed-top toolbar-waterfall">
+    <style>
+        @media (max-width: 575.98px) {
+            .navbar-xs-color {
+                color: rgba(0, 0, 0, 0.87);
+            }
+        }
+    </style>
+  <body class="">
+    <nav class="navbar navbar-xs-color navbar-dark navbar-expand-md fixed-top toolbar-waterfall">
         <a class="navbar-brand mr-auto" href="{{ url_for("index") }}">
             <i class="ff ff-logo ff-xl ff-fw mr-1"></i>Flight Finder
         </a>
@@ -68,171 +75,207 @@
                 </li>
             {% endif %}
         </ul>
-    </header>
-    <div class="jumbotron jumbotron-fluid jumbotron-bg mb-3 shadow-none"></div>
-    <main role="main" class="container">
-        <div class="row justify-content-center mt-md-3">
-            <div class="col-lg-10 col-xl-9">
-                <div class="card rounded-3x shadow-sm-none shadow-1 mb-3">
-                    <div class="card-body">
-                        <nav class="nav nav-tabs nav-justified mb-3" id="nav-tab" role="tablist">
-                            <a class="nav-item nav-link active" id="nav-roundtrip-tab" data-toggle="tab" href="#nav-roundtrip-info" role="tab" aria-controls="nav-roundtrip-info" aria-selected="true">Round Trip</a>
-                            <a class="nav-item nav-link" id="nav-oneway-tab" data-toggle="tab" href="#nav-roundtrip-info" role="tab" aria-controls="nav-roundtrip-info" aria-selected="false">One Way</a>
-                            {% if g.current_customer.type == "GUEST" %}
-                                <a class="nav-item nav-link" id="nav-booking-tab" data-toggle="tab" href="#nav-manage-booking" role="tab" aria-controls="nav-manage-booking" aria-selected="false">Manage Booking</a>
-                            {% endif %}
-                        </nav>
-                        <div class="tab-content" id="nav-tabs-content">
-                            <div class="tab-pane show fade active" id="nav-roundtrip-info" role="tabpanel" aria-labelledby="roundtrip-tab">
-                                <form id="flightForm" novalidate>
-                                    <div class="form-row">
-                                        <div class="form-group col-sm-12 col-md-6">
-                                            <div class="form-row justify-content-center">
-                                                <div class="col-sm mb-4 mb-sm-0">
-                                                    <div class="floating-label">
-                                                        <label for="fromAirport"><i class="fas fa-plane-departure fa-fw mr-2"></i>From</label>
-                                                        <select class="form-control custom-select" id="fromAirport" name="fromAirport" required data-ripple-line>
-                                                            <option></option>
-                                                            {% for airport in airports %}
-                                                                <option value="{{ airport.code }}">{{ airport.city }} ({{ airport.code }})</option>
-                                                            {% endfor %}
-                                                        </select>
-                                                        <div class="invalid-feedback">
-                                                            Invalid source airport.
+    </nav>
+    <header class="carousel-wrapper">
+        <div class="container search-flights-card">
+            <div class="row justify-content-center mt-md-3">
+                <div class="col-lg-10 col-xl-9">
+                    <div class="card rounded-3x shadow-sm-none shadow-1 mb-3">
+                        <div class="card-body">
+                            <nav class="nav nav-tabs nav-justified mb-3" id="nav-tab" role="tablist">
+                                <a class="nav-item nav-link active" id="nav-roundtrip-tab" data-toggle="tab" href="#nav-roundtrip-info" role="tab" aria-controls="nav-roundtrip-info" aria-selected="true">Round Trip</a>
+                                <a class="nav-item nav-link" id="nav-oneway-tab" data-toggle="tab" href="#nav-roundtrip-info" role="tab" aria-controls="nav-roundtrip-info" aria-selected="false">One Way</a>
+                                {% if g.current_customer.type == "GUEST" %}
+                                    <a class="nav-item nav-link" id="nav-booking-tab" data-toggle="tab" href="#nav-manage-booking" role="tab" aria-controls="nav-manage-booking" aria-selected="false">Manage Booking</a>
+                                {% endif %}
+                            </nav>
+                            <div class="tab-content" id="nav-tabs-content">
+                                <div class="tab-pane show fade active" id="nav-roundtrip-info" role="tabpanel" aria-labelledby="roundtrip-tab">
+                                    <form id="flightForm" novalidate>
+                                        <div class="form-row">
+                                            <div class="form-group col-sm-12 col-md-6">
+                                                <div class="form-row justify-content-center">
+                                                    <div class="col-sm mb-4 mb-sm-0">
+                                                        <div class="floating-label">
+                                                            <label for="fromAirport"><i class="fas fa-plane-departure fa-fw mr-2"></i>From</label>
+                                                            <select class="form-control custom-select" id="fromAirport" name="fromAirport" required data-ripple-line>
+                                                                <option></option>
+                                                                {% for airport in airports %}
+                                                                    <option value="{{ airport.code }}">{{ airport.city }} ({{ airport.code }})</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                            <div class="invalid-feedback">
+                                                                Invalid source airport.
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="reverse-destinations-switch">
+                                                        <div class="reverse-destinations" role="button">
+                                                            <i class="fas fa-exchange-alt fa-fw fa-lg rotate-on-xs"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm">
+                                                        <div class="floating-label">
+                                                            <label for="toAirport"><i class="fas fa-plane-arrival fa-fw mr-2"></i>To</label>
+                                                            <select class="form-control custom-select" id="toAirport" name="toAirport" disabled required data-ripple-line>
+                                                                <option></option>
+                                                            </select>
+                                                            <div class="invalid-feedback">
+                                                                Invalid destination airport.
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="reverse-destinations-switch">
-                                                    <div class="reverse-destinations" role="button">
-                                                        <i class="fas fa-exchange-alt fa-fw fa-lg rotate-on-xs"></i>
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm">
-                                                    <div class="floating-label">
-                                                        <label for="toAirport"><i class="fas fa-plane-arrival fa-fw mr-2"></i>To</label>
-                                                        <select class="form-control custom-select" id="toAirport" name="toAirport" disabled required data-ripple-line>
-                                                            <option></option>
-                                                        </select>
-                                                        <div class="invalid-feedback">
-                                                            Invalid destination airport.
-                                                        </div>
-                                                    </div>
-                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="form-group col-sm-6 col-md-3">
-                                            <div class="floating-label">
-                                                <label for="departDatePicker"><i class="far fa-calendar fa-fw mr-2"></i>Depart date</label>
-                                                <input class="form-control" id="departDatePicker" type="text" name="departDate" required data-ripple-line>
-                                                <div class="invalid-feedback">
-                                                    Invalid depart date.
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="form-group col-sm-6 col-md-3">
-                                            <div class="floating-label">
-                                                <label for="returnDatePicker"><i class="far fa-calendar fa-fw mr-2"></i>Return date</label>
-                                                <input class="form-control" id="returnDatePicker" type="text" name="returnDate" required data-ripple-line>
-                                                <div class="invalid-feedback">
-                                                    Invalid return date.
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="form-group col-sm-6 col-md-4 mb-3 mb-md-2">
-                                            <div class="floating-label">
-                                                <label for="numPassengers"><i class="fas fa-users fa-fw mr-2"></i>Passengers</label>
-                                                <select class="form-control custom-select" id="numPassengers" name="numPassengers" required data-minimum-results-for-search="Infinity" data-ripple-line>
-                                                    <option></option>
-                                                    <option value="1">1</option>
-                                                    <option value="2">2</option>
-                                                    <option value="3">3</option>
-                                                    <option value="4">4</option>
-                                                    <option value="5">5</option>
-                                                    <option value="6">6</option>
-                                                    <option value="7">7</option>
-                                                    <option value="8">8</option>
-                                                    <option value="9">9</option>
-                                                </select>
-                                                <div class="invalid-feedback">
-                                                    Invalid number of passengers.
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="form-group col-sm-6 col-md-4 mb-3 mb-md-2">
-                                            <div class="floating-label">
-                                                <label for="flightClass"><i class="fas fa-hand-holding-usd fa-fw mr-2"></i>Flight class</label>
-                                                <select class="form-control custom-select" id="flightClass" name="flightClass" required data-minimum-results-for-search="Infinity" data-ripple-line>
-                                                    <option></option>
-                                                    <option value="Economy">Economy</option>
-                                                    <option value="Business">Business</option>
-                                                    <option value="First Class">First Class</option>
-                                                </select>
-                                                <div class="invalid-feedback">
-                                                    Invalid flight class.
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="form-group col-md-4 mb-0 mb-md-2">
-                                            <input type="hidden" name="startLimit" value="0">
-                                            <button id="flightSearch" class="btn btn-primary btn-block mt-md-2" type="submit" name="flightSearch"><i class="fas fa-search fa-fw mr-2"></i>Search flights</button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                            {% if g.current_customer.type == "GUEST" %}
-                                <div class="tab-pane fade show" id="nav-manage-booking" role="tabpanel" aria-labelledby="manage-booking-tab">
-                                    <form id="manageBookingForm" method="POST" action="{{ url_for("manage_booking") }}" novalidate>
-                                        <div class="card-header pt-0 pl-0">
-                                            <div class="card-title">Manage Booking</div>
-                                            <div class="card-subtitle text-muted">Enter your details below to view, edit or cancel the booking</div>
-                                        </div>
-                                        <div class="form-row mt-3">
-                                            <div class="form-group col-sm-6">
+                                            <div class="form-group col-sm-6 col-md-3">
                                                 <div class="floating-label">
-                                                    <label for="bookingID">Booking ID</label>
-                                                    <input id="bookingID" class="form-control uppercase-input" type="text" pattern="[A-Z0-9]{6}" maxlength="6" name="bookingID" required data-ripple-line>
+                                                    <label for="departDatePicker"><i class="far fa-calendar fa-fw mr-2"></i>Depart date</label>
+                                                    <input class="form-control" id="departDatePicker" type="text" name="departDate" required data-ripple-line>
                                                     <div class="invalid-feedback">
-                                                        Invalid booking id, must be 6 chars long.
+                                                        Invalid depart date.
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="form-group col-sm-6">
+                                            <div class="form-group col-sm-6 col-md-3">
                                                 <div class="floating-label">
-                                                    <label for="lastName">Last name</label>
-                                                    <input id="lastName" class="form-control" type="text" name="lastName" required data-ripple-line>
+                                                    <label for="returnDatePicker"><i class="far fa-calendar fa-fw mr-2"></i>Return date</label>
+                                                    <input class="form-control" id="returnDatePicker" type="text" name="returnDate" required data-ripple-line>
                                                     <div class="invalid-feedback">
-                                                        Invalid last name.
+                                                        Invalid return date.
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="form-row justify-content-center align-items-center">
-                                            {% for name in ["View", "Modify", "Cancel"]%}
-                                                {% set klasses = "col-sm-4" %}
-                                                {% if name == "Cancel" %}
-                                                    {% set btn_color = "danger" %}
-                                                {% else %}
-                                                    {% set btn_color = "primary" %}
-                                                    {% set klasses = klasses + " mb-2 mb-sm-0" %}
-                                                {% endif %}
-                                                <div class="{{ klasses }}">
-                                                    <button class="btn btn-sm btn-block btn-{{ btn_color }} process-form" type="submit" name="btnState" value="{{ name.lower() }}">{{ name }}</button>
+                                        <div class="form-row">
+                                            <div class="form-group col-sm-6 col-md-4 mb-3 mb-md-2">
+                                                <div class="floating-label">
+                                                    <label for="numPassengers"><i class="fas fa-users fa-fw mr-2"></i>Passengers</label>
+                                                    <select class="form-control custom-select" id="numPassengers" name="numPassengers" required data-minimum-results-for-search="Infinity" data-ripple-line>
+                                                        <option></option>
+                                                        <option value="1">1</option>
+                                                        <option value="2">2</option>
+                                                        <option value="3">3</option>
+                                                        <option value="4">4</option>
+                                                        <option value="5">5</option>
+                                                        <option value="6">6</option>
+                                                        <option value="7">7</option>
+                                                        <option value="8">8</option>
+                                                        <option value="9">9</option>
+                                                    </select>
+                                                    <div class="invalid-feedback">
+                                                        Invalid number of passengers.
+                                                    </div>
                                                 </div>
-                                            {% endfor %}
+                                            </div>
+                                            <div class="form-group col-sm-6 col-md-4 mb-3 mb-md-2">
+                                                <div class="floating-label">
+                                                    <label for="flightClass"><i class="fas fa-hand-holding-usd fa-fw mr-2"></i>Flight class</label>
+                                                    <select class="form-control custom-select" id="flightClass" name="flightClass" required data-minimum-results-for-search="Infinity" data-ripple-line>
+                                                        <option></option>
+                                                        <option value="Economy">Economy</option>
+                                                        <option value="Business">Business</option>
+                                                        <option value="First Class">First Class</option>
+                                                    </select>
+                                                    <div class="invalid-feedback">
+                                                        Invalid flight class.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-md-4 mb-0 mb-md-2">
+                                                <input type="hidden" name="startLimit" value="0">
+                                                <button id="flightSearch" class="btn btn-primary btn-block mt-md-2" type="submit" name="flightSearch"><i class="fas fa-search fa-fw mr-2"></i>Search flights</button>
+                                            </div>
                                         </div>
                                     </form>
                                 </div>
-                            {% endif %}
+                                {% if g.current_customer.type == "GUEST" %}
+                                    <div class="tab-pane fade show" id="nav-manage-booking" role="tabpanel" aria-labelledby="manage-booking-tab">
+                                        <form id="manageBookingForm" method="POST" action="{{ url_for("manage_booking") }}" novalidate>
+                                            <div class="card-header pt-0 pl-0">
+                                                <div class="card-title">Manage Booking</div>
+                                                <div class="card-subtitle text-muted">Enter your details below to view, edit or cancel the booking</div>
+                                            </div>
+                                            <div class="form-row mt-3">
+                                                <div class="form-group col-sm-6">
+                                                    <div class="floating-label">
+                                                        <label for="bookingID">Booking ID</label>
+                                                        <input id="bookingID" class="form-control uppercase-input" type="text" pattern="[A-Z0-9]{6}" maxlength="6" name="bookingID" required data-ripple-line>
+                                                        <div class="invalid-feedback">
+                                                            Invalid booking id, must be 6 chars long.
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-sm-6">
+                                                    <div class="floating-label">
+                                                        <label for="lastName">Last name</label>
+                                                        <input id="lastName" class="form-control" type="text" name="lastName" required data-ripple-line>
+                                                        <div class="invalid-feedback">
+                                                            Invalid last name.
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-row justify-content-center align-items-center">
+                                                {% for name in ["View", "Modify", "Cancel"]%}
+                                                    {% set klasses = "col-sm-4" %}
+                                                    {% if name == "Cancel" %}
+                                                        {% set btn_color = "danger" %}
+                                                    {% else %}
+                                                        {% set btn_color = "primary" %}
+                                                        {% set klasses = klasses + " mb-2 mb-sm-0" %}
+                                                    {% endif %}
+                                                    <div class="{{ klasses }}">
+                                                        <button class="btn btn-sm btn-block btn-{{ btn_color }} process-form" type="submit" name="btnState" value="{{ name.lower() }}">{{ name }}</button>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </form>
+                                    </div>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <div id="heroCarousel" class="carousel fade-carousel slide" data-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item slide-1 active">
+                    <div class="overlay"></div>
+                    <div class="hero">
+                        <h2 class="fade-in-up duration4 mb-0">Plan your next trip</h2>        
+                        <p class="fade-in-up duration6 mb-0">Pick your next flight from a variety of destinations.</p>
+                    </div>
+                </div>
+                <div class="carousel-item slide-2">
+                    <div class="overlay"></div>
+                    <div class="hero">
+                        <h2 class="fade-in-up duration4 mb-0">Travel around the world</h2>        
+                        <p class="fade-in-up duration6 mb-0">Discover the hidden beauty from top to bottom.</p>
+                    </div>
+                </div>
+                <div class="carousel-item slide-3">
+                    <div class="overlay"></div>
+                    <div class="hero">
+                        <h2 class="fade-in-up duration4 mb-0">Memories count</h2>        
+                        <p class="fade-in-up duration6 mb-0">Travel more, create more memories.</p>
+                    </div>
+                </div>
+            </div>
+            <a class="carousel-control-prev" style="z-index: 10;" href="#heroCarousel" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" style="z-index: 10;" href="#heroCarousel" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
+        </div>
+    </header>
+    <main role="main" class="container">
         <div class="row justify-content-center">
             <div class="col-12">
-                <div id="flightSearchResult" class="d-none mt-3 mb-4"></div>
+                <div id="flightSearchResult" class="d-none mt-4 mb-4"></div>
             </div>
         </div>
         <div class="row justify-content-center mb-4">

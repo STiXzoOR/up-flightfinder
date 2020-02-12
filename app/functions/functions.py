@@ -159,7 +159,7 @@ def get_user_fullname(email=None):
     cnx.close()
 
     return (
-        None
+        email.split("@")[0]
         if "first_name" not in result
         else "{fname} {lname}".format(
             fname=result["first_name"], lname=result["last_name"]
@@ -176,8 +176,9 @@ def build_flight_card(
     time_to="",
 ):
     return """  <div class="form-row justify-content-center align-items-center">
-                    <div class="col-2 col-lg-1 col-xl-2 px-0 px-md-2 px-lg-0 px-xl-2 text-center">
+                    <div class="col-2 px-0 px-md-2 px-lg-0 px-xl-2 text-center">
                         <img src="../../static/images/airlines/{airline_logo}.png" class="img-fluid h-75 w-75" alt="{airline_name}"/>
+                        <p class="d-picked-none font-size-90 font-weight-bold text-muted mb-0 mt-1">{airline_name}</p>
                     </div>
                     <div class="col-3 col-sm-2">
                         <div class="text-right font-weight-bold font-size-lg">{time_from}</div>
@@ -396,14 +397,25 @@ def get_flights(
     FROM flight as f, airline as al, airplane as ap, airport as aprt1, airport as aprt2
     """
 
+    count_query = """
+    SELECT COUNT(*) as totalRows
+    FROM flight as f, airline as al, airplane as ap, airport as aprt1, airport as aprt2
+    """
+
     if is_roundtrip:
         query = """
         SELECT f1.flight_id as departFlightID, f1.airline as departAirlineCode, al1.airline_name as departAirlineName, DATE_FORMAT(f1.dep_date, "%%d %%b %%Y") as departDate, f1.from_airport as departFromAirport, aprt1.city as departFromCity, TIME_FORMAT(f1.dep_time, "%%H:%%i") as departTime, f1.to_airport as departToAirport, aprt2.city as departToCity, TIME_FORMAT(f1.arr_time, "%%H:%%i") as departArrivalTime, f1.price as departPrice, f1.class as departClass, TIME_FORMAT(f1.duration, "%%H:%%i") as departDuration, ap1.airplane_name as departAirplaneName, f2.flight_id as returnFlightID, f2.airline as returnAirlineCode, al2.airline_name as returnAirlineName, DATE_FORMAT(f2.dep_date, "%%d %%b %%Y") as returnDate, f2.from_airport as returnFromAirport, aprt3.city as returnFromCity, TIME_FORMAT(f2.dep_time, "%%H:%%i") as returnTime, f2.to_airport as returnToAirport, aprt4.city as returnToCity, TIME_FORMAT(f2.arr_time, "%%H:%%i") as returnArrivalTime, f2.price as returnPrice, f2.class as returnClass, TIME_FORMAT(f2.duration, "%%H:%%i") as returnDuration, ap2.airplane_name as returnAirplaneName
         FROM flight as f1, flight as f2, airline as al1, airline as al2, airplane as ap1, airplane as ap2, airport as aprt1, airport as aprt2, airport as aprt3, airport as aprt4
         """
 
+        count_query = """
+        SELECT COUNT(*) as totalRows
+        FROM flight as f1, flight as f2, airline as al1, airline as al2, airplane as ap1, airplane as ap2, airport as aprt1, airport as aprt2, airport as aprt3, airport as aprt4
+        """
+
     if WHERE:
         query += " WHERE {where}".format(where=WHERE)
+        count_query += " WHERE {where}".format(where=WHERE)
 
     if ORDER_BY:
         query += " ORDER BY {order}".format(order=ORDER_BY)
@@ -413,12 +425,17 @@ def get_flights(
 
     cnx = create_connection()
     cursor = cnx.cursor()
+    cursor.execute(count_query, params)
+    total_rows = cursor.fetchone()["totalRows"]
+    cursor.close()
+
+    cursor = cnx.cursor()
     cursor.execute(query, params)
     data = cursor.fetchall() if FETCH_ALL else cursor.fetchone()
     cursor.close()
     cnx.close()
 
-    return data
+    return total_rows, data
 
 
 def booking_exists(booking_id, last_name):
@@ -519,7 +536,7 @@ def get_booking(booking_id="", booking_last_name=""):
             booking_info["flight_class"],
         )
 
-    flight = get_flights(
+    _, flight = get_flights(
         is_roundtrip=is_roundtrip, params=params, WHERE=WHERE, FETCH_ALL=False
     )
     depart_flight, return_flight = build_selected_flights(
