@@ -43,7 +43,7 @@ def database_exists():
     query = """
     SELECT schema_name 
     FROM information_schema.schemata 
-    WHERE schema_name={database}
+    WHERE schema_name="{database}"
     """.format(
         database=config.get("DB_NAME")
     )
@@ -80,7 +80,7 @@ def table_exists(table=""):
 
     cnx = create_connection()
     cursor = cnx.cursor(Cursor)
-    cursor.execute(query)
+    cursor.execute(query, (table))
     result = cursor.fetchone()
     cursor.close()
     cnx.close()
@@ -172,6 +172,17 @@ def generate_flights():
 
     # counter = 0
 
+    def _cleanup_flights():
+        query = """
+        DELETE FROM flight
+        WHERE dep_date < CURRENT_DATE and arr_date < CURRENT_DATE
+        """
+
+        cursor = cnx.cursor()
+        cursor.execute(query)
+        cursor.close()
+        cnx.commit()
+
     def _generate_id(prefix=""):
         query = """
         SELECT flight_id 
@@ -225,6 +236,8 @@ def generate_flights():
         )
 
         cnx = create_connection()
+        _cleanup_flights()
+
         for row in csv_reader:
             if row["airline"] != "":
                 airline = row["airline"]
